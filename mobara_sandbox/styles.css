@@ -11,6 +11,14 @@ body {
     image-rendering: pixelated;
     image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .game-container {
@@ -19,54 +27,11 @@ body {
     display: flex;
     flex-direction: column;
     background: #000;
+    max-width: 100%;
+    max-height: 100%;
 }
 
-/* 上部: キャラクターステータス */
-.status-section {
-    background: #fff;
-    border: 2px solid #000;
-    padding: 8px;
-    margin: 4px;
-}
 
-.character-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-}
-
-.character-slot {
-    text-align: center;
-    border: 1px solid #000;
-    padding: 4px;
-    background: #fff;
-}
-
-.char-name {
-    font-weight: bold;
-    font-size: 14px;
-    margin-bottom: 2px;
-}
-
-.char-stats {
-    display: flex;
-    justify-content: space-around;
-    font-size: 12px;
-    margin-bottom: 2px;
-}
-
-.hp {
-    color: #e74c3c;
-}
-
-.mp {
-    color: #9b59b6;
-}
-
-.char-status {
-    font-size: 10px;
-    color: #7f8c8d;
-}
 
 /* 中央: 戦闘フィールド */
 .battle-field {
@@ -74,8 +39,9 @@ body {
     position: relative;
     background: linear-gradient(to bottom, #87CEEB 0%, #87CEEB 40%, #90EE90 40%, #90EE90 100%);
     border: 2px solid #000;
-    margin: 4px;
+    margin: 2px;
     overflow: hidden;
+    min-height: 60vh;
 }
 
 .battle-background {
@@ -156,7 +122,7 @@ body {
 }
 
 .enemy-sprite {
-    font-size: 48px;
+    font-size: 64px;
     margin-bottom: 4px;
     filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
 }
@@ -174,46 +140,57 @@ body {
     display: flex;
     background: #fff;
     border: 2px solid #000;
-    margin: 4px;
+    margin: 2px;
+    min-height: 25vh;
 }
 
 .player-commands {
     flex: 2;
     border-right: 2px solid #000;
-    padding: 8px;
+    padding: 12px;
 }
 
 .command-title {
     font-weight: bold;
-    font-size: 14px;
-    margin-bottom: 8px;
+    font-size: 16px;
+    margin-bottom: 12px;
     text-align: center;
 }
 
 .command-grid {
     display: grid;
     grid-template-rows: repeat(3, 1fr);
-    gap: 4px;
+    gap: 8px;
 }
 
 .command-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 4px;
+    gap: 8px;
 }
 
 .command-option {
-    padding: 6px;
+    padding: 12px 8px;
     text-align: center;
-    border: 1px solid #000;
+    border: 2px solid #000;
     background: #fff;
     cursor: pointer;
-    font-size: 12px;
-    transition: background-color 0.1s;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .command-option:hover {
     background: #f0f0f0;
+    transform: scale(1.02);
+}
+
+.command-option:active {
+    transform: scale(0.98);
 }
 
 .command-option.selected {
@@ -223,39 +200,50 @@ body {
 
 .command-option.selected::before {
     content: '▶';
-    margin-right: 4px;
+    margin-right: 6px;
+    font-size: 16px;
 }
 
 .target-selection {
     flex: 1;
-    padding: 8px;
+    padding: 12px;
 }
 
 .target-title {
     font-weight: bold;
-    font-size: 14px;
-    margin-bottom: 8px;
+    font-size: 16px;
+    margin-bottom: 12px;
     text-align: center;
 }
 
 .target-list {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 8px;
 }
 
 .target-option {
-    padding: 6px;
+    padding: 12px 8px;
     text-align: center;
-    border: 1px solid #000;
+    border: 2px solid #000;
     background: #fff;
     cursor: pointer;
-    font-size: 12px;
-    transition: background-color 0.1s;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .target-option:hover {
     background: #f0f0f0;
+    transform: scale(1.02);
+}
+
+.target-option:active {
+    transform: scale(0.98);
 }
 
 .target-option.selected {
@@ -265,18 +253,20 @@ body {
 
 .target-option.selected::before {
     content: '▶';
-    margin-right: 4px;
+    margin-right: 6px;
+    font-size: 16px;
 }
 
 /* 戦闘ログ */
 .battle-log {
     background: #fff;
     border: 2px solid #000;
-    margin: 4px;
-    padding: 8px;
-    max-height: 100px;
+    margin: 2px;
+    padding: 12px;
+    max-height: 15vh;
     overflow-y: auto;
-    font-size: 12px;
+    font-size: 14px;
+    font-weight: bold;
 }
 
 .log-entry {
@@ -334,23 +324,49 @@ body {
     color: #fff;
 }
 
-/* レスポンシブ対応 */
+/* モバイル最適化 */
 @media (max-width: 768px) {
-    .character-grid {
-        grid-template-columns: repeat(2, 1fr);
+    .game-container {
+        height: 100vh;
+        width: 100vw;
+    }
+    
+    .battle-field {
+        min-height: 50vh;
     }
     
     .command-section {
-        flex-direction: column;
-    }
-    
-    .player-commands {
-        border-right: none;
-        border-bottom: 2px solid #000;
+        min-height: 30vh;
     }
     
     .enemy-sprite {
-        font-size: 32px;
+        font-size: 48px;
+    }
+    
+    .command-option,
+    .target-option {
+        min-height: 50px;
+        font-size: 16px;
+        padding: 15px 10px;
+    }
+    
+    .battle-log {
+        max-height: 12vh;
+        font-size: 12px;
+    }
+}
+
+/* タッチデバイス最適化 */
+@media (hover: none) and (pointer: coarse) {
+    .command-option:hover,
+    .target-option:hover {
+        transform: none;
+    }
+    
+    .command-option:active,
+    .target-option:active {
+        transform: scale(0.95);
+        background: #e0e0e0;
     }
 }
 

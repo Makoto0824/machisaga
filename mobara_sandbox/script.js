@@ -1,11 +1,12 @@
 // ゲーム状態管理
 class GameState {
     constructor() {
-        this.characters = {
-            arusu: { name: 'アルス', hp: 28, maxHp: 28, mp: 10, maxMp: 10, status: 'ゆ: 1' },
-            boccho: { name: 'ボッコ', hp: 10, maxHp: 10, mp: 14, maxMp: 14, status: 'と: 1' },
-            hanako: { name: 'ハナコ', hp: 10, maxHp: 10, mp: 13, maxMp: 13, status: 'そ: 1' },
-            momoko: { name: 'モモコ', hp: 10, maxHp: 10, mp: 7, maxMp: 7, status: 'あ: 1' }
+        this.player = {
+            name: '勇者',
+            hp: 50,
+            maxHp: 50,
+            mp: 20,
+            maxMp: 20
         };
         
         this.enemies = {
@@ -13,7 +14,6 @@ class GameState {
             crow: { name: 'おおがらす', hp: 20, maxHp: 20, alive: true }
         };
         
-        this.currentCharacter = 'arusu';
         this.currentCommand = 'attack';
         this.currentTarget = 'slime';
         this.battleLog = [];
@@ -40,21 +40,6 @@ function initGame() {
 
 // UI更新
 function updateUI() {
-    // キャラクターステータス更新
-    Object.keys(game.characters).forEach(charKey => {
-        const char = game.characters[charKey];
-        const charSlot = document.querySelector(`[data-character="${charKey}"]`);
-        if (charSlot) {
-            const hpElement = charSlot.querySelector('.hp');
-            const mpElement = charSlot.querySelector('.mp');
-            const statusElement = charSlot.querySelector('.char-status');
-            
-            if (hpElement) hpElement.textContent = `H ${char.hp}`;
-            if (mpElement) mpElement.textContent = `M ${char.mp}`;
-            if (statusElement) statusElement.textContent = char.status;
-        }
-    });
-    
     // 敵の表示/非表示
     Object.keys(game.enemies).forEach(enemyKey => {
         const enemy = game.enemies[enemyKey];
@@ -138,7 +123,7 @@ function calculateDamage(attacker, defender, isMagic = false) {
 function executeCommand() {
     if (game.battleEnded || !game.isPlayerTurn) return;
     
-    const character = game.characters[game.currentCharacter];
+    const character = game.player;
     const target = game.enemies[game.currentTarget];
     
     if (!target || !target.alive) {
@@ -310,7 +295,7 @@ function enemyTurn() {
     if (aliveEnemies.length === 0) return;
     
     const enemy = aliveEnemies[Math.floor(Math.random() * aliveEnemies.length)];
-    const character = game.characters[game.currentCharacter];
+    const character = game.player;
     
     const enemyElement = document.querySelector(`[id="${Object.keys(game.enemies).find(key => game.enemies[key] === enemy)}"]`);
     enemyElement.classList.add('attack-effect');
