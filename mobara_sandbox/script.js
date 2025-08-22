@@ -10,12 +10,11 @@ class GameState {
         };
         
         this.enemies = {
-            slime: { name: 'スライム', hp: 15, maxHp: 15, alive: true },
             crow: { name: 'おおがらす', hp: 20, maxHp: 20, alive: true }
         };
         
-        this.currentCommand = 'attack';
-        this.currentTarget = 'slime';
+        this.currentCommand = 'mera';
+        this.currentTarget = 'crow';
         this.battleLog = [];
         this.isPlayerTurn = true;
         this.battleEnded = false;
@@ -132,37 +131,37 @@ function executeCommand() {
     }
     
     switch (game.currentCommand) {
-        case 'attack':
-            executeAttack(character, target);
+        case 'mera':
+            executeMera(character, target);
             break;
-        case 'magic':
-            executeMagic(character, target);
+        case 'merami':
+            executeMerami(character, target);
+            break;
+        case 'merazoma':
+            executeMerazoma(character, target);
             break;
         case 'defend':
             executeDefend(character);
             break;
-        case 'item':
-            executeItem(character);
-            break;
-        case 'equip':
-            executeEquip(character);
-            break;
-        case 'run':
-            executeRun();
-            break;
     }
 }
 
-// 攻撃実行
-function executeAttack(character, target) {
+// メラ実行
+function executeMera(character, target) {
+    if (character.mp < 3) {
+        addLogEntry('MPが足りません！');
+        return;
+    }
+    
+    character.mp -= 3;
     const enemyElement = document.getElementById(game.currentTarget);
     enemyElement.classList.add('attack-effect');
     
     setTimeout(() => {
-        const result = calculateDamage(character, target);
+        const result = calculateDamage(character, target, true);
         target.hp = Math.max(0, target.hp - result.damage);
         
-        let message = `${character.name}の攻撃！`;
+        let message = `${character.name}のメラ！`;
         if (result.critical) {
             message += ' クリティカルヒット！';
         }
@@ -173,22 +172,15 @@ function executeAttack(character, target) {
         
         enemyElement.classList.remove('attack-effect');
         
-        // 敵のHPが0になった場合
         if (target.hp <= 0) {
             target.alive = false;
             addLogEntry(`${target.name}を倒した！`);
-            
-            // すべての敵を倒したかチェック
-            const aliveEnemies = Object.values(game.enemies).filter(enemy => enemy.alive);
-            if (aliveEnemies.length === 0) {
-                setTimeout(() => {
-                    endBattle(true);
-                }, 1000);
-                return;
-            }
+            setTimeout(() => {
+                endBattle(true);
+            }, 1000);
+            return;
         }
         
-        // 敵のターン
         game.isPlayerTurn = false;
         setTimeout(() => {
             enemyTurn();
@@ -196,8 +188,8 @@ function executeAttack(character, target) {
     }, 300);
 }
 
-// 魔法実行
-function executeMagic(character, target) {
+// メラミ実行
+function executeMerami(character, target) {
     if (character.mp < 5) {
         addLogEntry('MPが足りません！');
         return;
@@ -209,13 +201,14 @@ function executeMagic(character, target) {
     
     setTimeout(() => {
         const result = calculateDamage(character, target, true);
-        target.hp = Math.max(0, target.hp - result.damage);
+        const damage = Math.floor(result.damage * 1.5); // メラミは1.5倍ダメージ
+        target.hp = Math.max(0, target.hp - damage);
         
-        let message = `${character.name}の魔法！`;
+        let message = `${character.name}のメラミ！`;
         if (result.critical) {
             message += ' クリティカルヒット！';
         }
-        message += ` ${target.name}に${result.damage}のダメージ！`;
+        message += ` ${target.name}に${damage}のダメージ！`;
         
         addLogEntry(message);
         updateUI();
@@ -225,14 +218,10 @@ function executeMagic(character, target) {
         if (target.hp <= 0) {
             target.alive = false;
             addLogEntry(`${target.name}を倒した！`);
-            
-            const aliveEnemies = Object.values(game.enemies).filter(enemy => enemy.alive);
-            if (aliveEnemies.length === 0) {
-                setTimeout(() => {
-                    endBattle(true);
-                }, 1000);
-                return;
-            }
+            setTimeout(() => {
+                endBattle(true);
+            }, 1000);
+            return;
         }
         
         game.isPlayerTurn = false;
@@ -241,6 +230,51 @@ function executeMagic(character, target) {
         }, 1500);
     }, 300);
 }
+
+// メラゾーマ実行
+function executeMerazoma(character, target) {
+    if (character.mp < 8) {
+        addLogEntry('MPが足りません！');
+        return;
+    }
+    
+    character.mp -= 8;
+    const enemyElement = document.getElementById(game.currentTarget);
+    enemyElement.classList.add('attack-effect');
+    
+    setTimeout(() => {
+        const result = calculateDamage(character, target, true);
+        const damage = Math.floor(result.damage * 2.5); // メラゾーマは2.5倍ダメージ
+        target.hp = Math.max(0, target.hp - damage);
+        
+        let message = `${character.name}のメラゾーマ！`;
+        if (result.critical) {
+            message += ' クリティカルヒット！';
+        }
+        message += ` ${target.name}に${damage}のダメージ！`;
+        
+        addLogEntry(message);
+        updateUI();
+        
+        enemyElement.classList.remove('attack-effect');
+        
+        if (target.hp <= 0) {
+            target.alive = false;
+            addLogEntry(`${target.name}を倒した！`);
+            setTimeout(() => {
+                endBattle(true);
+            }, 1000);
+            return;
+        }
+        
+        game.isPlayerTurn = false;
+        setTimeout(() => {
+            enemyTurn();
+        }, 1500);
+    }, 300);
+}
+
+
 
 // 防御実行
 function executeDefend(character) {
@@ -251,41 +285,7 @@ function executeDefend(character) {
     }, 1500);
 }
 
-// アイテム実行
-function executeItem(character) {
-    addLogEntry(`${character.name}はアイテムを使った！`);
-    game.isPlayerTurn = false;
-    setTimeout(() => {
-        enemyTurn();
-    }, 1500);
-}
 
-// 装備実行
-function executeEquip(character) {
-    addLogEntry(`${character.name}は装備を変更した！`);
-    game.isPlayerTurn = false;
-    setTimeout(() => {
-        enemyTurn();
-    }, 1500);
-}
-
-// 逃走実行
-function executeRun() {
-    const successRate = 0.6;
-    
-    if (Math.random() < successRate) {
-        addLogEntry('逃げ出した！');
-        setTimeout(() => {
-            endBattle(false, 'run');
-        }, 1000);
-    } else {
-        addLogEntry('逃げ出せなかった！');
-        game.isPlayerTurn = false;
-        setTimeout(() => {
-            enemyTurn();
-        }, 1500);
-    }
-}
 
 // 敵のターン
 function enemyTurn() {
@@ -368,7 +368,7 @@ function setupEventListeners() {
         });
     });
     
-    // ターゲット選択
+    // ターゲット選択（タップで攻撃開始）
     document.querySelectorAll('.target-option').forEach(option => {
         option.addEventListener('click', () => {
             const targetKey = option.dataset.target;
@@ -376,6 +376,11 @@ function setupEventListeners() {
                 document.querySelectorAll('.target-option').forEach(opt => opt.classList.remove('selected'));
                 option.classList.add('selected');
                 game.currentTarget = targetKey;
+                
+                // ターゲットをタップしたら即座に攻撃開始
+                if (game.isPlayerTurn && !game.battleEnded) {
+                    executeCommand();
+                }
             }
         });
     });
@@ -401,7 +406,7 @@ function setupEventListeners() {
 
 // コマンドナビゲーション
 function navigateCommands(key) {
-    const commands = ['attack', 'magic', 'defend', 'item', 'equip', 'run'];
+    const commands = ['mera', 'merami', 'merazoma', 'defend'];
     const currentIndex = commands.indexOf(game.currentCommand);
     let newIndex = currentIndex;
     
@@ -410,7 +415,7 @@ function navigateCommands(key) {
             newIndex = currentIndex >= 2 ? currentIndex - 2 : currentIndex;
             break;
         case 'ArrowDown':
-            newIndex = currentIndex < 4 ? currentIndex + 2 : currentIndex;
+            newIndex = currentIndex < 2 ? currentIndex + 2 : currentIndex;
             break;
         case 'ArrowLeft':
             newIndex = currentIndex % 2 === 0 ? currentIndex + 1 : currentIndex - 1;
