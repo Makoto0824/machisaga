@@ -64,53 +64,32 @@ function executeCommand() {
 
 // メラ実行
 function executeMera() {
-    const enemyElement = document.getElementById(game.currentTarget);
-    enemyElement.classList.add('attack-effect');
+    updateUI();
     
+    // まちサーガのチェックインページに遷移
     setTimeout(() => {
-        updateUI();
-        
-        enemyElement.classList.remove('attack-effect');
-        
-        // まちサーガのチェックインページに遷移
-        setTimeout(() => {
-            window.open('https://play.ttt.games/worlds/machi-saga/events/UEAWX5-E8La6ob8MihKzFgefl0SMlJgmM1b1YoZU--s/checkin', '_blank');
-        }, 500);
-    }, 300);
+        window.open('https://play.ttt.games/worlds/machi-saga/events/UEAWX5-E8La6ob8MihKzFgefl0SMlJgmM1b1YoZU--s/checkin', '_blank');
+    }, 100);
 }
 
 // メラミ実行
 function executeMerami() {
-    const enemyElement = document.getElementById(game.currentTarget);
-    enemyElement.classList.add('attack-effect');
+    updateUI();
     
+    // まちサーガのチェックインページに遷移
     setTimeout(() => {
-        updateUI();
-        
-        enemyElement.classList.remove('attack-effect');
-        
-        // まちサーガのチェックインページに遷移
-        setTimeout(() => {
-            window.open('https://play.ttt.games/worlds/machi-saga/events/ZA0kD9WnKGGe4n3qHcFppJ-mY_yvzsG62K17pEGRPnA/checkin', '_blank');
-        }, 500);
-    }, 300);
+        window.open('https://play.ttt.games/worlds/machi-saga/events/ZA0kD9WnKGGe4n3qHcFppJ-mY_yvzsG62K17pEGRPnA/checkin', '_blank');
+    }, 100);
 }
 
 // メラゾーマ実行
 function executeMerazoma() {
-    const enemyElement = document.getElementById(game.currentTarget);
-    enemyElement.classList.add('attack-effect');
+    updateUI();
     
+    // まちサーガのチェックインページに遷移
     setTimeout(() => {
-        updateUI();
-        
-        enemyElement.classList.remove('attack-effect');
-        
-        // まちサーガのチェックインページに遷移
-        setTimeout(() => {
-            window.open('https://play.ttt.games/worlds/machi-saga/events/gNQHIfrDuA4Gi0csw7GJA_V6U6rsvhXJB_my9Xcdtnk/checkin', '_blank');
-        }, 500);
-    }, 300);
+        window.open('https://play.ttt.games/worlds/machi-saga/events/gNQHIfrDuA4Gi0csw7GJA_V6U6rsvhXJB_my9Xcdtnk/checkin', '_blank');
+    }, 100);
 }
 
 

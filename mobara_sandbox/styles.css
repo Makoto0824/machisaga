@@ -340,13 +340,4 @@ body {
     animation: pixelBounce 2s ease-in-out infinite;
 }
 
-/* 攻撃エフェクト */
-.attack-effect {
-    animation: attackFlash 0.3s ease-in-out;
-}
 
-@keyframes attackFlash {
-    0% { filter: brightness(1); }
-    50% { filter: brightness(1.5) saturate(1.5); }
-    100% { filter: brightness(1); }
-}
