@@ -156,6 +156,8 @@ body {
     display: flex;
     flex-direction: column;
     gap: 4px;
+    height: 140px;
+    overflow: hidden;
 }
 
 .command-option {
@@ -199,8 +201,10 @@ body {
     flex: 1;
     padding: 8px;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
+    height: 50px;
+    overflow: hidden;
 }
 
 .enemy-display {
@@ -209,6 +213,7 @@ body {
     color: #fff;
     text-align: center;
     font-family: 'DotGothic16', monospace;
+    margin-top: 4px;
 }
 
 
@@ -295,7 +300,10 @@ body {
         padding: 8px 10px;
     }
     
-
+    .command-option.selected {
+        background: transparent;
+        color: #fff;
+    }
     
     .command-menu,
     .enemy-info {
@@ -342,6 +350,46 @@ body {
 
 .enemy-sprite {
     animation: pixelBounce 2s ease-in-out infinite;
+}
+
+/* エンカウントアニメーション */
+.encounter-animation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    font-family: 'DotGothic16', monospace;
+    color: #fff;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.encounter-animation.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.encounter-enemy {
+    font-size: 24px;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.encounter-enemy.show {
+    opacity: 1;
+}
+
+.encounter-enemy.hide {
+    opacity: 0;
 }
 
 

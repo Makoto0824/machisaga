@@ -14,14 +14,38 @@ let game = new GameState();
 const gameOverModal = document.getElementById('game-over-modal');
 const gameResult = document.getElementById('game-result');
 const resultMessage = document.getElementById('result-message');
+const encounterAnimation = document.getElementById('encounter-animation');
+const encounterEnemy = document.querySelector('.encounter-enemy');
 
 // 初期化
 function initGame() {
     updateUI();
     setupEventListeners();
+    startEncounterAnimation();
 }
 
-
+// エンカウントアニメーション開始
+function startEncounterAnimation() {
+    // 1. 黒背景表示
+    encounterAnimation.classList.add('show');
+    
+    // 2. 文字表示（0.3秒後）
+    setTimeout(() => {
+        encounterEnemy.classList.add('show');
+    }, 300);
+    
+    // 3. 文字消える（1.2秒後）
+    setTimeout(() => {
+        encounterEnemy.classList.remove('show');
+        encounterEnemy.classList.add('hide');
+    }, 1200);
+    
+    // 4. 黒背景消える（1.5秒後）
+    setTimeout(() => {
+        encounterAnimation.classList.remove('show');
+        encounterEnemy.classList.remove('hide');
+    }, 1500);
+}
 
 // UI更新
 function updateUI() {
