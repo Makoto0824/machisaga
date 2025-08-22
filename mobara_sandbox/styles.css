@@ -145,6 +145,7 @@ body {
     background: #000;
     border: 2px solid #fff;
     margin: 1px;
+    margin-bottom: 10px;
     min-height: 0;
     flex-shrink: 0;
 }
@@ -239,13 +240,13 @@ body {
 .encounter-enemy {
     font-size: 24px;
     font-weight: bold;
-    animation: encounterFlash 0.8s ease-in-out;
+    animation: encounterFade 0.8s ease-in-out;
 }
 
-@keyframes encounterFlash {
+@keyframes encounterFade {
     0% { opacity: 0; }
-    20% { opacity: 1; }
-    80% { opacity: 1; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
     100% { opacity: 0; }
 }
 
