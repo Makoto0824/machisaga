@@ -19,16 +19,19 @@ body {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile */
+    width: 100vw;
+    width: 100dvw; /* Dynamic viewport width for mobile */
 }
 
 .game-container {
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     background: #000;
-    max-width: 100%;
-    max-height: 100%;
+    box-sizing: border-box;
 }
 
 
@@ -39,9 +42,9 @@ body {
     position: relative;
     background: linear-gradient(to bottom, #87CEEB 0%, #87CEEB 40%, #90EE90 40%, #90EE90 100%);
     border: 2px solid #000;
-    margin: 2px;
+    margin: 1px;
     overflow: hidden;
-    min-height: 60vh;
+    min-height: 0;
 }
 
 .battle-background {
@@ -140,8 +143,9 @@ body {
     display: flex;
     background: #fff;
     border: 2px solid #000;
-    margin: 2px;
-    min-height: 25vh;
+    margin: 1px;
+    min-height: 0;
+    flex-shrink: 0;
 }
 
 .player-commands {
@@ -261,12 +265,13 @@ body {
 .battle-log {
     background: #fff;
     border: 2px solid #000;
-    margin: 2px;
-    padding: 12px;
-    max-height: 15vh;
+    margin: 1px;
+    padding: 8px;
+    max-height: 80px;
     overflow-y: auto;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: bold;
+    flex-shrink: 0;
 }
 
 .log-entry {
@@ -326,17 +331,26 @@ body {
 
 /* モバイル最適化 */
 @media (max-width: 768px) {
-    .game-container {
+    body {
         height: 100vh;
+        height: 100dvh;
         width: 100vw;
+        width: 100dvw;
+    }
+    
+    .game-container {
+        height: 100%;
+        width: 100%;
     }
     
     .battle-field {
-        min-height: 50vh;
+        flex: 1;
+        min-height: 0;
     }
     
     .command-section {
-        min-height: 30vh;
+        flex-shrink: 0;
+        min-height: 0;
     }
     
     .enemy-sprite {
@@ -345,14 +359,26 @@ body {
     
     .command-option,
     .target-option {
-        min-height: 50px;
-        font-size: 16px;
-        padding: 15px 10px;
+        min-height: 44px;
+        font-size: 14px;
+        padding: 10px 8px;
     }
     
     .battle-log {
-        max-height: 12vh;
-        font-size: 12px;
+        max-height: 60px;
+        font-size: 11px;
+        padding: 6px;
+    }
+    
+    .player-commands,
+    .target-selection {
+        padding: 8px;
+    }
+    
+    .command-title,
+    .target-title {
+        font-size: 14px;
+        margin-bottom: 8px;
     }
 }
 
@@ -367,6 +393,17 @@ body {
     .target-option:active {
         transform: scale(0.95);
         background: #e0e0e0;
+    }
+}
+
+/* iOS Safari 対応 */
+@supports (-webkit-touch-callout: none) {
+    body {
+        height: -webkit-fill-available;
+    }
+    
+    .game-container {
+        height: -webkit-fill-available;
     }
 }
 
