@@ -255,7 +255,9 @@ body {
     }
     
     .enemy-sprite {
-        font-size: 48px;
+        width: 200px;
+        height: 200px;
+        object-fit: contain;
     }
     
     .command-option {
