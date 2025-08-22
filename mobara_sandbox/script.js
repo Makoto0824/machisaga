@@ -2,7 +2,7 @@
 class GameState {
     constructor() {
         this.player = {
-            name: '勇者',
+            name: '魔法使い',
             hp: 50,
             maxHp: 50,
             mp: 20,
@@ -140,9 +140,6 @@ function executeCommand() {
         case 'merazoma':
             executeMerazoma(character, target);
             break;
-        case 'defend':
-            executeDefend(character);
-            break;
     }
 }
 
@@ -200,14 +197,10 @@ function executeMerami(character, target) {
     enemyElement.classList.add('attack-effect');
     
     setTimeout(() => {
-        const result = calculateDamage(character, target, true);
-        const damage = Math.floor(result.damage * 1.5); // メラミは1.5倍ダメージ
+        const damage = 30; // 固定ダメージ30
         target.hp = Math.max(0, target.hp - damage);
         
         let message = `${character.name}のメラミ！`;
-        if (result.critical) {
-            message += ' クリティカルヒット！';
-        }
         message += ` ${target.name}に${damage}のダメージ！`;
         
         addLogEntry(message);
@@ -243,14 +236,10 @@ function executeMerazoma(character, target) {
     enemyElement.classList.add('attack-effect');
     
     setTimeout(() => {
-        const result = calculateDamage(character, target, true);
-        const damage = Math.floor(result.damage * 2.5); // メラゾーマは2.5倍ダメージ
+        const damage = 50; // 固定ダメージ50
         target.hp = Math.max(0, target.hp - damage);
         
         let message = `${character.name}のメラゾーマ！`;
-        if (result.critical) {
-            message += ' クリティカルヒット！';
-        }
         message += ` ${target.name}に${damage}のダメージ！`;
         
         addLogEntry(message);
@@ -276,14 +265,7 @@ function executeMerazoma(character, target) {
 
 
 
-// 防御実行
-function executeDefend(character) {
-    addLogEntry(`${character.name}は身構えた！`);
-    game.isPlayerTurn = false;
-    setTimeout(() => {
-        enemyTurn();
-    }, 1500);
-}
+
 
 
 
@@ -406,7 +388,7 @@ function setupEventListeners() {
 
 // コマンドナビゲーション
 function navigateCommands(key) {
-    const commands = ['mera', 'merami', 'merazoma', 'defend'];
+    const commands = ['mera', 'merami', 'merazoma'];
     const currentIndex = commands.indexOf(game.currentCommand);
     let newIndex = currentIndex;
     
@@ -415,7 +397,7 @@ function navigateCommands(key) {
             newIndex = currentIndex >= 2 ? currentIndex - 2 : currentIndex;
             break;
         case 'ArrowDown':
-            newIndex = currentIndex < 2 ? currentIndex + 2 : currentIndex;
+            newIndex = currentIndex < 1 ? currentIndex + 2 : currentIndex;
             break;
         case 'ArrowLeft':
             newIndex = currentIndex % 2 === 0 ? currentIndex + 1 : currentIndex - 1;
