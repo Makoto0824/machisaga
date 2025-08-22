@@ -144,8 +144,7 @@ body {
     display: flex;
     background: #000;
     border: 2px solid #fff;
-    margin: 1px;
-    margin-bottom: 10px;
+    margin: 10px;
     min-height: 0;
     flex-shrink: 0;
 }
@@ -245,8 +244,8 @@ body {
 
 @keyframes encounterFade {
     0% { opacity: 0; }
-    10% { opacity: 1; }
-    90% { opacity: 1; }
+    15% { opacity: 1; }
+    85% { opacity: 1; }
     100% { opacity: 0; }
 }
 
