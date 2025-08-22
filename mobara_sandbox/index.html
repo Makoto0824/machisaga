@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ドラクエ風戦闘シミュレーター</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="game-container">
+        <header class="game-header">
+            <h1>ドラクエ風戦闘シミュレーター</h1>
+            <div class="status-bar">
+                <div class="player-status">
+                    <span class="status-label">勇者</span>
+                    <div class="hp-bar">
+                        <div class="hp-fill" id="player-hp-fill"></div>
+                    </div>
+                    <span class="hp-text" id="player-hp-text">HP: 100/100</span>
+                </div>
+                <div class="enemy-status">
+                    <span class="status-label">スライム</span>
+                    <div class="hp-bar">
+                        <div class="hp-fill" id="enemy-hp-fill"></div>
+                    </div>
+                    <span class="hp-text" id="enemy-hp-text">HP: 50/50</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="battle-scene">
+            <div class="battle-field">
+                <div class="player-character">
+                    <div class="character-sprite player-sprite">🧙‍♂️</div>
+                    <div class="character-name">勇者</div>
+                </div>
+                <div class="enemy-character">
+                    <div class="character-sprite enemy-sprite">🟢</div>
+                    <div class="character-name">スライム</div>
+                </div>
+            </div>
+
+            <div class="battle-log" id="battle-log">
+                <div class="log-entry">戦闘開始！</div>
+            </div>
+
+            <div class="action-menu">
+                <h3>コマンド選択</h3>
+                <div class="menu-buttons">
+                    <button class="action-btn attack-btn" onclick="playerAttack()">たたかう</button>
+                    <button class="action-btn magic-btn" onclick="playerMagic()">まほう</button>
+                    <button class="action-btn heal-btn" onclick="playerHeal()">かいふく</button>
+                    <button class="action-btn run-btn" onclick="playerRun()">にげる</button>
+                </div>
+            </div>
+        </main>
+
+        <div class="game-controls">
+            <button class="control-btn" onclick="resetBattle()">戦闘リセット</button>
+            <button class="control-btn" onclick="toggleSound()">音效: ON</button>
+        </div>
+    </div>
+
+    <div class="modal" id="game-over-modal">
+        <div class="modal-content">
+            <h2 id="game-result">戦闘結果</h2>
+            <p id="result-message">メッセージ</p>
+            <button class="modal-btn" onclick="closeModal()">OK</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
