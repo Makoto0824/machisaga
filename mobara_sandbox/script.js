@@ -18,6 +18,7 @@ const encounterAnimation = document.getElementById('encounter-animation');
 const encounterEnemy = document.querySelector('.encounter-enemy');
 const encounterBattle = document.getElementById('encounter-battle');
 const bgm = document.getElementById('bgm');
+const se = document.getElementById('se');
 
 // 初期化
 function initGame() {
@@ -56,18 +57,30 @@ function startBGM() {
     bgm.play().catch(e => console.log('BGM再生エラー:', e));
 }
 
+// 効果音再生
+function playSE() {
+    se.currentTime = 0;  // 再生位置をリセット
+    se.volume = 0.5;     // 音量50%
+    se.play().catch(e => console.log('効果音再生エラー:', e));
+}
+
 // 戦闘開始
 function startBattle() {
+    // 効果音再生
+    playSE();
+    
     // 黒背景を消す
     encounterAnimation.classList.remove('show');
     encounterEnemy.classList.remove('hide');
     encounterBattle.classList.remove('show');
     
-    // BGM開始
-    startBGM();
-    
     // メニューを有効化
     enableMenu();
+    
+    // 少し遅れてBGM開始（効果音と重ならないように）
+    setTimeout(() => {
+        startBGM();
+    }, 500);
 }
 
 // UI更新
@@ -113,6 +126,9 @@ function executeCommand() {
 
 // メラ実行
 function executeMera() {
+    // 効果音再生
+    playSE();
+    
     updateUI();
     
     // まちサーガのチェックインページに遷移
@@ -123,6 +139,9 @@ function executeMera() {
 
 // メラミ実行
 function executeMerami() {
+    // 効果音再生
+    playSE();
+    
     updateUI();
     
     // まちサーガのチェックインページに遷移
@@ -133,6 +152,9 @@ function executeMerami() {
 
 // メラゾーマ実行
 function executeMerazoma() {
+    // 効果音再生
+    playSE();
+    
     updateUI();
     
     // まちサーガのチェックインページに遷移
@@ -154,6 +176,9 @@ function enableMenu() {
     // コマンド選択
     document.querySelectorAll('.command-option').forEach(option => {
         option.addEventListener('click', () => {
+            // 効果音再生
+            playSE();
+            
             document.querySelectorAll('.command-option').forEach(opt => opt.classList.remove('selected'));
             option.classList.add('selected');
             game.currentCommand = option.dataset.command;
@@ -162,6 +187,9 @@ function enableMenu() {
     
     // 敵表示をタップで攻撃開始
     document.querySelector('.enemy-display').addEventListener('click', () => {
+        // 効果音再生
+        playSE();
+        
         // 敵表示をタップしたら即座に攻撃開始
         executeCommand();
     });
