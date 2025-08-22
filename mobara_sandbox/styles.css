@@ -5,7 +5,7 @@
 }
 
 body {
-    font-family: 'DotGothic16', monospace;
+    font-family: 'Press Start 2P', monospace;
     background: #000;
     color: #000;
     image-rendering: pixelated;
@@ -131,12 +131,13 @@ body {
 }
 
 .enemy-name {
-    font-size: 12px;
+    font-size: 8px;
     font-weight: bold;
     background: rgba(255,255,255,0.8);
     padding: 2px 6px;
     border: 1px solid #000;
-    font-family: 'DotGothic16', monospace;
+    font-family: 'Press Start 2P', monospace;
+    line-height: 1.2;
 }
 
 /* 下部: コマンドとターゲット選択 */
@@ -157,10 +158,11 @@ body {
 
 .command-title {
     font-weight: bold;
-    font-size: 16px;
+    font-size: 12px;
     margin-bottom: 12px;
     text-align: center;
-    font-family: 'DotGothic16', monospace;
+    font-family: 'Press Start 2P', monospace;
+    line-height: 1.2;
 }
 
 .command-grid {
@@ -181,14 +183,15 @@ body {
     border: 2px solid #000;
     background: #fff;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 10px;
     font-weight: bold;
     transition: all 0.2s ease;
     min-height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'DotGothic16', monospace;
+    font-family: 'Press Start 2P', monospace;
+    line-height: 1.2;
 }
 
 .command-option:hover {
@@ -218,10 +221,11 @@ body {
 
 .target-title {
     font-weight: bold;
-    font-size: 16px;
+    font-size: 12px;
     margin-bottom: 12px;
     text-align: center;
-    font-family: 'DotGothic16', monospace;
+    font-family: 'Press Start 2P', monospace;
+    line-height: 1.2;
 }
 
 .target-list {
@@ -236,14 +240,15 @@ body {
     border: 2px solid #000;
     background: #fff;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 10px;
     font-weight: bold;
     transition: all 0.2s ease;
     min-height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'DotGothic16', monospace;
+    font-family: 'Press Start 2P', monospace;
+    line-height: 1.2;
 }
 
 .target-option:hover {
@@ -274,10 +279,11 @@ body {
     padding: 8px;
     max-height: 80px;
     overflow-y: auto;
-    font-size: 12px;
+    font-size: 8px;
     font-weight: bold;
     flex-shrink: 0;
-    font-family: 'DotGothic16', monospace;
+    font-family: 'Press Start 2P', monospace;
+    line-height: 1.4;
 }
 
 .log-entry {
@@ -366,13 +372,13 @@ body {
     .command-option,
     .target-option {
         min-height: 44px;
-        font-size: 14px;
+        font-size: 8px;
         padding: 10px 8px;
     }
     
     .battle-log {
         max-height: 60px;
-        font-size: 11px;
+        font-size: 6px;
         padding: 6px;
     }
     
@@ -383,7 +389,7 @@ body {
     
     .command-title,
     .target-title {
-        font-size: 14px;
+        font-size: 10px;
         margin-bottom: 8px;
     }
 }
