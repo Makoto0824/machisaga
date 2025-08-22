@@ -27,10 +27,10 @@ function initGame() {
 function startEncounterAnimation() {
     encounterAnimation.classList.add('show');
     
-    // 0.8秒後にアニメーションを非表示
+    // 0.6秒後にアニメーションを非表示
     setTimeout(() => {
         encounterAnimation.classList.remove('show');
-    }, 800);
+    }, 600);
 }
 
 // UI更新
