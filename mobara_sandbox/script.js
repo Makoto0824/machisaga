@@ -1,32 +1,24 @@
 // ゲーム状態管理
 class GameState {
     constructor() {
-        this.player = {
-            name: '勇者',
-            hp: 100,
-            maxHp: 100,
-            attack: 25,
-            defense: 15,
-            magic: 30,
-            mp: 50,
-            maxMp: 50
+        this.characters = {
+            arusu: { name: 'アルス', hp: 28, maxHp: 28, mp: 10, maxMp: 10, status: 'ゆ: 1' },
+            boccho: { name: 'ボッコ', hp: 10, maxHp: 10, mp: 14, maxMp: 14, status: 'と: 1' },
+            hanako: { name: 'ハナコ', hp: 10, maxHp: 10, mp: 13, maxMp: 13, status: 'そ: 1' },
+            momoko: { name: 'モモコ', hp: 10, maxHp: 10, mp: 7, maxMp: 7, status: 'あ: 1' }
         };
         
-        this.enemy = {
-            name: 'スライム',
-            hp: 50,
-            maxHp: 50,
-            attack: 15,
-            defense: 10,
-            magic: 0,
-            mp: 0,
-            maxMp: 0
+        this.enemies = {
+            slime: { name: 'スライム', hp: 15, maxHp: 15, alive: true },
+            crow: { name: 'おおがらす', hp: 20, maxHp: 20, alive: true }
         };
         
+        this.currentCharacter = 'arusu';
+        this.currentCommand = 'attack';
+        this.currentTarget = 'slime';
         this.battleLog = [];
         this.isPlayerTurn = true;
         this.battleEnded = false;
-        this.soundEnabled = true;
     }
 }
 
@@ -34,10 +26,6 @@ class GameState {
 let game = new GameState();
 
 // DOM要素の取得
-const playerHpFill = document.getElementById('player-hp-fill');
-const playerHpText = document.getElementById('player-hp-text');
-const enemyHpFill = document.getElementById('enemy-hp-fill');
-const enemyHpText = document.getElementById('enemy-hp-text');
 const battleLog = document.getElementById('battle-log');
 const gameOverModal = document.getElementById('game-over-modal');
 const gameResult = document.getElementById('game-result');
@@ -47,32 +35,63 @@ const resultMessage = document.getElementById('result-message');
 function initGame() {
     updateUI();
     addLogEntry('戦闘開始！');
+    setupEventListeners();
 }
 
 // UI更新
 function updateUI() {
-    // プレイヤーHP更新
-    const playerHpPercent = (game.player.hp / game.player.maxHp) * 100;
-    playerHpFill.style.width = `${playerHpPercent}%`;
-    playerHpText.textContent = `HP: ${game.player.hp}/${game.player.maxHp}`;
+    // キャラクターステータス更新
+    Object.keys(game.characters).forEach(charKey => {
+        const char = game.characters[charKey];
+        const charSlot = document.querySelector(`[data-character="${charKey}"]`);
+        if (charSlot) {
+            const hpElement = charSlot.querySelector('.hp');
+            const mpElement = charSlot.querySelector('.mp');
+            const statusElement = charSlot.querySelector('.char-status');
+            
+            if (hpElement) hpElement.textContent = `H ${char.hp}`;
+            if (mpElement) mpElement.textContent = `M ${char.mp}`;
+            if (statusElement) statusElement.textContent = char.status;
+        }
+    });
     
-    // 敵HP更新
-    const enemyHpPercent = (game.enemy.hp / game.enemy.maxHp) * 100;
-    enemyHpFill.style.width = `${enemyHpPercent}%`;
-    enemyHpText.textContent = `HP: ${game.enemy.hp}/${game.enemy.maxHp}`;
+    // 敵の表示/非表示
+    Object.keys(game.enemies).forEach(enemyKey => {
+        const enemy = game.enemies[enemyKey];
+        const enemyElement = document.getElementById(enemyKey);
+        if (enemyElement) {
+            enemyElement.style.display = enemy.alive ? 'block' : 'none';
+        }
+    });
     
-    // HPバーの色変更（低HP時）
-    if (playerHpPercent <= 25) {
-        playerHpFill.style.background = 'linear-gradient(90deg, #e74c3c, #c0392b)';
-    } else {
-        playerHpFill.style.background = 'linear-gradient(90deg, #27ae60, #2ecc71)';
-    }
-    
-    if (enemyHpPercent <= 25) {
-        enemyHpFill.style.background = 'linear-gradient(90deg, #f39c12, #e67e22)';
-    } else {
-        enemyHpFill.style.background = 'linear-gradient(90deg, #e74c3c, #c0392b)';
-    }
+    // ターゲット選択の更新
+    updateTargetSelection();
+}
+
+// ターゲット選択の更新
+function updateTargetSelection() {
+    const targetOptions = document.querySelectorAll('.target-option');
+    targetOptions.forEach(option => {
+        const targetKey = option.dataset.target;
+        const enemy = game.enemies[targetKey];
+        
+        if (enemy && enemy.alive) {
+            option.style.display = 'block';
+            option.classList.remove('selected');
+            if (targetKey === game.currentTarget) {
+                option.classList.add('selected');
+            }
+        } else {
+            option.style.display = 'none';
+            if (targetKey === game.currentTarget) {
+                // 生きている敵に切り替え
+                const aliveEnemies = Object.keys(game.enemies).filter(key => game.enemies[key].alive);
+                if (aliveEnemies.length > 0) {
+                    game.currentTarget = aliveEnemies[0];
+                }
+            }
+        }
+    });
 }
 
 // ログエントリ追加
@@ -96,8 +115,8 @@ function getRandomInt(min, max) {
 
 // ダメージ計算
 function calculateDamage(attacker, defender, isMagic = false) {
-    const baseAttack = isMagic ? attacker.magic : attacker.attack;
-    const baseDefense = defender.defense;
+    const baseAttack = isMagic ? 15 : 12;
+    const baseDefense = 5;
     
     // 基本ダメージ計算
     let damage = Math.max(1, baseAttack - baseDefense / 2);
@@ -115,95 +134,121 @@ function calculateDamage(attacker, defender, isMagic = false) {
     return { damage, critical: false };
 }
 
-// プレイヤーの攻撃
-function playerAttack() {
+// コマンド実行
+function executeCommand() {
     if (game.battleEnded || !game.isPlayerTurn) return;
     
-    const playerSprite = document.querySelector('.player-sprite');
-    playerSprite.classList.add('attack-animation');
+    const character = game.characters[game.currentCharacter];
+    const target = game.enemies[game.currentTarget];
+    
+    if (!target || !target.alive) {
+        addLogEntry('ターゲットが存在しません！');
+        return;
+    }
+    
+    switch (game.currentCommand) {
+        case 'attack':
+            executeAttack(character, target);
+            break;
+        case 'magic':
+            executeMagic(character, target);
+            break;
+        case 'defend':
+            executeDefend(character);
+            break;
+        case 'item':
+            executeItem(character);
+            break;
+        case 'equip':
+            executeEquip(character);
+            break;
+        case 'run':
+            executeRun();
+            break;
+    }
+}
+
+// 攻撃実行
+function executeAttack(character, target) {
+    const enemyElement = document.getElementById(game.currentTarget);
+    enemyElement.classList.add('attack-effect');
     
     setTimeout(() => {
-        const result = calculateDamage(game.player, game.enemy);
-        game.enemy.hp = Math.max(0, game.enemy.hp - result.damage);
+        const result = calculateDamage(character, target);
+        target.hp = Math.max(0, target.hp - result.damage);
         
-        let message = `${game.player.name}の攻撃！`;
+        let message = `${character.name}の攻撃！`;
         if (result.critical) {
             message += ' クリティカルヒット！';
         }
-        message += ` ${game.enemy.name}に${result.damage}のダメージ！`;
+        message += ` ${target.name}に${result.damage}のダメージ！`;
         
         addLogEntry(message);
         updateUI();
         
-        playerSprite.classList.remove('attack-animation');
+        enemyElement.classList.remove('attack-effect');
         
         // 敵のHPが0になった場合
-        if (game.enemy.hp <= 0) {
-            setTimeout(() => {
-                endBattle(true);
-            }, 1000);
-        } else {
-            // 敵のターン
-            game.isPlayerTurn = false;
-            setTimeout(() => {
-                enemyTurn();
-            }, 1500);
+        if (target.hp <= 0) {
+            target.alive = false;
+            addLogEntry(`${target.name}を倒した！`);
+            
+            // すべての敵を倒したかチェック
+            const aliveEnemies = Object.values(game.enemies).filter(enemy => enemy.alive);
+            if (aliveEnemies.length === 0) {
+                setTimeout(() => {
+                    endBattle(true);
+                }, 1000);
+                return;
+            }
         }
+        
+        // 敵のターン
+        game.isPlayerTurn = false;
+        setTimeout(() => {
+            enemyTurn();
+        }, 1500);
     }, 300);
 }
 
-// プレイヤーの魔法
-function playerMagic() {
-    if (game.battleEnded || !game.isPlayerTurn || game.player.mp < 10) return;
+// 魔法実行
+function executeMagic(character, target) {
+    if (character.mp < 5) {
+        addLogEntry('MPが足りません！');
+        return;
+    }
     
-    const playerSprite = document.querySelector('.player-sprite');
-    playerSprite.classList.add('attack-animation');
+    character.mp -= 5;
+    const enemyElement = document.getElementById(game.currentTarget);
+    enemyElement.classList.add('attack-effect');
     
     setTimeout(() => {
-        game.player.mp -= 10;
-        const result = calculateDamage(game.player, game.enemy, true);
-        game.enemy.hp = Math.max(0, game.enemy.hp - result.damage);
+        const result = calculateDamage(character, target, true);
+        target.hp = Math.max(0, target.hp - result.damage);
         
-        let message = `${game.player.name}の魔法！`;
+        let message = `${character.name}の魔法！`;
         if (result.critical) {
             message += ' クリティカルヒット！';
         }
-        message += ` ${game.enemy.name}に${result.damage}のダメージ！`;
+        message += ` ${target.name}に${result.damage}のダメージ！`;
         
         addLogEntry(message);
         updateUI();
         
-        playerSprite.classList.remove('attack-animation');
+        enemyElement.classList.remove('attack-effect');
         
-        if (game.enemy.hp <= 0) {
-            setTimeout(() => {
-                endBattle(true);
-            }, 1000);
-        } else {
-            game.isPlayerTurn = false;
-            setTimeout(() => {
-                enemyTurn();
-            }, 1500);
+        if (target.hp <= 0) {
+            target.alive = false;
+            addLogEntry(`${target.name}を倒した！`);
+            
+            const aliveEnemies = Object.values(game.enemies).filter(enemy => enemy.alive);
+            if (aliveEnemies.length === 0) {
+                setTimeout(() => {
+                    endBattle(true);
+                }, 1000);
+                return;
+            }
         }
-    }, 300);
-}
-
-// プレイヤーの回復
-function playerHeal() {
-    if (game.battleEnded || !game.isPlayerTurn || game.player.mp < 15) return;
-    
-    const playerSprite = document.querySelector('.player-sprite');
-    playerSprite.classList.add('heal-animation');
-    
-    setTimeout(() => {
-        game.player.mp -= 15;
-        const healAmount = Math.floor(game.player.maxHp * 0.4);
-        game.player.hp = Math.min(game.player.maxHp, game.player.hp + healAmount);
-        
-        addLogEntry(`${game.player.name}の回復魔法！ HPが${healAmount}回復した！`);
-        updateUI();
-        
-        playerSprite.classList.remove('heal-animation');
         
         game.isPlayerTurn = false;
         setTimeout(() => {
@@ -212,19 +257,44 @@ function playerHeal() {
     }, 300);
 }
 
-// プレイヤーの逃走
-function playerRun() {
-    if (game.battleEnded || !game.isPlayerTurn) return;
-    
-    const successRate = 0.6; // 60%の確率で逃走成功
+// 防御実行
+function executeDefend(character) {
+    addLogEntry(`${character.name}は身構えた！`);
+    game.isPlayerTurn = false;
+    setTimeout(() => {
+        enemyTurn();
+    }, 1500);
+}
+
+// アイテム実行
+function executeItem(character) {
+    addLogEntry(`${character.name}はアイテムを使った！`);
+    game.isPlayerTurn = false;
+    setTimeout(() => {
+        enemyTurn();
+    }, 1500);
+}
+
+// 装備実行
+function executeEquip(character) {
+    addLogEntry(`${character.name}は装備を変更した！`);
+    game.isPlayerTurn = false;
+    setTimeout(() => {
+        enemyTurn();
+    }, 1500);
+}
+
+// 逃走実行
+function executeRun() {
+    const successRate = 0.6;
     
     if (Math.random() < successRate) {
-        addLogEntry(`${game.player.name}は逃げ出した！`);
+        addLogEntry('逃げ出した！');
         setTimeout(() => {
             endBattle(false, 'run');
         }, 1000);
     } else {
-        addLogEntry(`${game.player.name}は逃げ出せなかった！`);
+        addLogEntry('逃げ出せなかった！');
         game.isPlayerTurn = false;
         setTimeout(() => {
             enemyTurn();
@@ -236,25 +306,32 @@ function playerRun() {
 function enemyTurn() {
     if (game.battleEnded) return;
     
-    const enemySprite = document.querySelector('.enemy-sprite');
-    enemySprite.classList.add('attack-animation');
+    const aliveEnemies = Object.values(game.enemies).filter(enemy => enemy.alive);
+    if (aliveEnemies.length === 0) return;
+    
+    const enemy = aliveEnemies[Math.floor(Math.random() * aliveEnemies.length)];
+    const character = game.characters[game.currentCharacter];
+    
+    const enemyElement = document.querySelector(`[id="${Object.keys(game.enemies).find(key => game.enemies[key] === enemy)}"]`);
+    enemyElement.classList.add('attack-effect');
     
     setTimeout(() => {
-        const result = calculateDamage(game.enemy, game.player);
-        game.player.hp = Math.max(0, game.player.hp - result.damage);
+        const result = calculateDamage(enemy, character);
+        character.hp = Math.max(0, character.hp - result.damage);
         
-        let message = `${game.enemy.name}の攻撃！`;
+        let message = `${enemy.name}の攻撃！`;
         if (result.critical) {
             message += ' クリティカルヒット！';
         }
-        message += ` ${game.player.name}に${result.damage}のダメージ！`;
+        message += ` ${character.name}に${result.damage}のダメージ！`;
         
         addLogEntry(message);
         updateUI();
         
-        enemySprite.classList.remove('attack-animation');
+        enemyElement.classList.remove('attack-effect');
         
-        if (game.player.hp <= 0) {
+        if (character.hp <= 0) {
+            addLogEntry(`${character.name}は力尽きた！`);
             setTimeout(() => {
                 endBattle(false);
             }, 1000);
@@ -273,10 +350,10 @@ function endBattle(playerWon, reason = '') {
         resultMessage.textContent = '無事に逃げ出すことができました。';
     } else if (playerWon) {
         gameResult.textContent = '勝利！';
-        resultMessage.textContent = `${game.enemy.name}を倒しました！`;
+        resultMessage.textContent = 'すべての敵を倒しました！';
     } else {
         gameResult.textContent = '敗北...';
-        resultMessage.textContent = `${game.player.name}は力尽きました...`;
+        resultMessage.textContent = 'パーティーは全滅しました...';
     }
     
     gameOverModal.style.display = 'block';
@@ -295,56 +372,77 @@ function resetBattle() {
     closeModal();
 }
 
-// 音效切り替え
-function toggleSound() {
-    game.soundEnabled = !game.soundEnabled;
-    const soundBtn = document.querySelector('.control-btn:last-child');
-    soundBtn.textContent = `音效: ${game.soundEnabled ? 'ON' : 'OFF'}`;
+// イベントリスナーの設定
+function setupEventListeners() {
+    // コマンド選択
+    document.querySelectorAll('.command-option').forEach(option => {
+        option.addEventListener('click', () => {
+            document.querySelectorAll('.command-option').forEach(opt => opt.classList.remove('selected'));
+            option.classList.add('selected');
+            game.currentCommand = option.dataset.command;
+        });
+    });
+    
+    // ターゲット選択
+    document.querySelectorAll('.target-option').forEach(option => {
+        option.addEventListener('click', () => {
+            const targetKey = option.dataset.target;
+            if (game.enemies[targetKey] && game.enemies[targetKey].alive) {
+                document.querySelectorAll('.target-option').forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                game.currentTarget = targetKey;
+            }
+        });
+    });
+    
+    // キーボードショートカット
+    document.addEventListener('keydown', (event) => {
+        if (game.battleEnded) return;
+        
+        switch(event.key) {
+            case 'Enter':
+            case ' ':
+                executeCommand();
+                break;
+            case 'ArrowUp':
+            case 'ArrowDown':
+            case 'ArrowLeft':
+            case 'ArrowRight':
+                navigateCommands(event.key);
+                break;
+        }
+    });
 }
 
-// キーボードショートカット
-document.addEventListener('keydown', (event) => {
-    if (game.battleEnded) return;
+// コマンドナビゲーション
+function navigateCommands(key) {
+    const commands = ['attack', 'magic', 'defend', 'item', 'equip', 'run'];
+    const currentIndex = commands.indexOf(game.currentCommand);
+    let newIndex = currentIndex;
     
-    switch(event.key) {
-        case '1':
-        case 'a':
-            playerAttack();
+    switch(key) {
+        case 'ArrowUp':
+            newIndex = currentIndex >= 2 ? currentIndex - 2 : currentIndex;
             break;
-        case '2':
-        case 'm':
-            playerMagic();
+        case 'ArrowDown':
+            newIndex = currentIndex < 4 ? currentIndex + 2 : currentIndex;
             break;
-        case '3':
-        case 'h':
-            playerHeal();
+        case 'ArrowLeft':
+            newIndex = currentIndex % 2 === 0 ? currentIndex + 1 : currentIndex - 1;
             break;
-        case '4':
-        case 'r':
-            playerRun();
+        case 'ArrowRight':
+            newIndex = currentIndex % 2 === 1 ? currentIndex - 1 : currentIndex + 1;
             break;
     }
-});
+    
+    if (newIndex >= 0 && newIndex < commands.length) {
+        game.currentCommand = commands[newIndex];
+        document.querySelectorAll('.command-option').forEach(opt => opt.classList.remove('selected'));
+        document.querySelector(`[data-command="${game.currentCommand}"]`).classList.add('selected');
+    }
+}
 
 // ゲーム初期化
 document.addEventListener('DOMContentLoaded', () => {
     initGame();
-    
-    // アクションボタンの無効化状態管理
-    const actionButtons = document.querySelectorAll('.action-btn');
-    
-    setInterval(() => {
-        if (game.battleEnded) {
-            actionButtons.forEach(btn => btn.disabled = true);
-        } else {
-            actionButtons.forEach(btn => btn.disabled = false);
-            
-            // MP不足時の魔法・回復ボタンを無効化
-            const magicBtn = document.querySelector('.magic-btn');
-            const healBtn = document.querySelector('.heal-btn');
-            
-            magicBtn.disabled = game.player.mp < 10;
-            healBtn.disabled = game.player.mp < 15;
-        }
-    }, 100);
 });

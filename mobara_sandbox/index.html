@@ -9,64 +9,105 @@
 </head>
 <body>
     <div class="game-container">
-        <header class="game-header">
-            <h1>ドラクエ風戦闘シミュレーター</h1>
-            <div class="status-bar">
-                <div class="player-status">
-                    <span class="status-label">勇者</span>
-                    <div class="hp-bar">
-                        <div class="hp-fill" id="player-hp-fill"></div>
+        <!-- 上部: キャラクターステータス -->
+        <div class="status-section">
+            <div class="character-grid">
+                <div class="character-slot" data-character="arusu">
+                    <div class="char-name">アルス</div>
+                    <div class="char-stats">
+                        <span class="hp">H 28</span>
+                        <span class="mp">M 10</span>
                     </div>
-                    <span class="hp-text" id="player-hp-text">HP: 100/100</span>
+                    <div class="char-status">ゆ: 1</div>
                 </div>
-                <div class="enemy-status">
-                    <span class="status-label">スライム</span>
-                    <div class="hp-bar">
-                        <div class="hp-fill" id="enemy-hp-fill"></div>
+                <div class="character-slot" data-character="boccho">
+                    <div class="char-name">ボッコ</div>
+                    <div class="char-stats">
+                        <span class="hp">H 10</span>
+                        <span class="mp">M 14</span>
                     </div>
-                    <span class="hp-text" id="enemy-hp-text">HP: 50/50</span>
+                    <div class="char-status">と: 1</div>
+                </div>
+                <div class="character-slot" data-character="hanako">
+                    <div class="char-name">ハナコ</div>
+                    <div class="char-stats">
+                        <span class="hp">H 10</span>
+                        <span class="mp">M 13</span>
+                    </div>
+                    <div class="char-status">そ: 1</div>
+                </div>
+                <div class="character-slot" data-character="momoko">
+                    <div class="char-name">モモコ</div>
+                    <div class="char-stats">
+                        <span class="hp">H 10</span>
+                        <span class="mp">M 7</span>
+                    </div>
+                    <div class="char-status">あ: 1</div>
                 </div>
             </div>
-        </header>
-
-        <main class="battle-scene">
-            <div class="battle-field">
-                <div class="player-character">
-                    <div class="character-sprite player-sprite">🧙‍♂️</div>
-                    <div class="character-name">勇者</div>
-                </div>
-                <div class="enemy-character">
-                    <div class="character-sprite enemy-sprite">🟢</div>
-                    <div class="character-name">スライム</div>
-                </div>
-            </div>
-
-            <div class="battle-log" id="battle-log">
-                <div class="log-entry">戦闘開始！</div>
-            </div>
-
-            <div class="action-menu">
-                <h3>コマンド選択</h3>
-                <div class="menu-buttons">
-                    <button class="action-btn attack-btn" onclick="playerAttack()">たたかう</button>
-                    <button class="action-btn magic-btn" onclick="playerMagic()">まほう</button>
-                    <button class="action-btn heal-btn" onclick="playerHeal()">かいふく</button>
-                    <button class="action-btn run-btn" onclick="playerRun()">にげる</button>
-                </div>
-            </div>
-        </main>
-
-        <div class="game-controls">
-            <button class="control-btn" onclick="resetBattle()">戦闘リセット</button>
-            <button class="control-btn" onclick="toggleSound()">音效: ON</button>
         </div>
-    </div>
 
-    <div class="modal" id="game-over-modal">
-        <div class="modal-content">
-            <h2 id="game-result">戦闘結果</h2>
-            <p id="result-message">メッセージ</p>
-            <button class="modal-btn" onclick="closeModal()">OK</button>
+        <!-- 中央: 戦闘フィールド -->
+        <div class="battle-field">
+            <div class="battle-background">
+                <div class="sky"></div>
+                <div class="mountains"></div>
+                <div class="grass"></div>
+                <div class="rocks"></div>
+            </div>
+            <div class="enemies">
+                <div class="enemy slime" id="slime">
+                    <div class="enemy-sprite">🟢</div>
+                    <div class="enemy-name">スライム</div>
+                </div>
+                <div class="enemy crow" id="crow">
+                    <div class="enemy-sprite">🦅</div>
+                    <div class="enemy-name">おおがらす</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 下部: コマンドとターゲット選択 -->
+        <div class="command-section">
+            <div class="player-commands">
+                <div class="command-title">アルス</div>
+                <div class="command-grid">
+                    <div class="command-row">
+                        <div class="command-option selected" data-command="attack">こうげき</div>
+                        <div class="command-option" data-command="magic">じゅもん</div>
+                    </div>
+                    <div class="command-row">
+                        <div class="command-option" data-command="defend">ぼうぎょ</div>
+                        <div class="command-option" data-command="item">どうぐ</div>
+                    </div>
+                    <div class="command-row">
+                        <div class="command-option" data-command="equip">そうび</div>
+                        <div class="command-option" data-command="run">にげる</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="target-selection">
+                <div class="target-title">ターゲット</div>
+                <div class="target-list">
+                    <div class="target-option selected" data-target="slime">スライム 1匹</div>
+                    <div class="target-option" data-target="crow">おおがらす 1匹</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 戦闘ログ -->
+        <div class="battle-log" id="battle-log">
+            <div class="log-entry">戦闘開始！</div>
+        </div>
+
+        <!-- ゲームオーバーモーダル -->
+        <div class="modal" id="game-over-modal">
+            <div class="modal-content">
+                <h2 id="game-result">戦闘結果</h2>
+                <p id="result-message">メッセージ</p>
+                <button class="modal-btn" onclick="closeModal()">OK</button>
+            </div>
         </div>
     </div>
 
