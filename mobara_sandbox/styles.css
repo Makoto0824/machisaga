@@ -139,131 +139,76 @@ body {
     font-family: 'DotGothic16', monospace;
 }
 
-/* 下部: コマンドとターゲット選択 */
-.command-section {
+/* 下部: レトロ戦闘メニュー */
+.battle-menu {
     display: flex;
-    background: #fff;
-    border: 2px solid #000;
+    background: #000;
+    border: 2px solid #fff;
     margin: 1px;
     min-height: 0;
     flex-shrink: 0;
 }
 
-.player-commands {
-    flex: 2;
-    border-right: 2px solid #000;
-    padding: 12px;
-}
-
-.command-title {
-    font-weight: bold;
-    font-size: 16px;
-    margin-bottom: 12px;
-    text-align: center;
-    font-family: 'DotGothic16', monospace;
-}
-
-.command-grid {
-    display: grid;
-    grid-template-rows: repeat(3, 1fr);
-    gap: 8px;
-}
-
-.command-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
+.command-menu {
+    flex: 1;
+    border-right: 2px solid #fff;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .command-option {
-    padding: 12px 8px;
-    text-align: center;
-    border: 2px solid #000;
-    background: #fff;
+    padding: 8px 12px;
+    text-align: left;
+    border: none;
+    background: transparent;
     cursor: pointer;
     font-size: 14px;
     font-weight: bold;
-    transition: all 0.2s ease;
-    min-height: 44px;
+    color: #fff;
+    transition: all 0.1s ease;
+    min-height: 32px;
     display: flex;
     align-items: center;
-    justify-content: center;
     font-family: 'DotGothic16', monospace;
+    position: relative;
 }
 
 .command-option:hover {
-    background: #f0f0f0;
-    transform: scale(1.02);
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .command-option:active {
-    transform: scale(0.98);
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .command-option.selected {
-    background: #000;
+    background: transparent;
     color: #fff;
 }
 
 .command-option.selected::before {
     content: '▶';
-    margin-right: 6px;
-    font-size: 16px;
-}
-
-.target-selection {
-    flex: 1;
-    padding: 12px;
-}
-
-.target-title {
-    font-weight: bold;
-    font-size: 16px;
-    margin-bottom: 12px;
-    text-align: center;
-    font-family: 'DotGothic16', monospace;
-}
-
-.target-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.target-option {
-    padding: 12px 8px;
-    text-align: center;
-    border: 2px solid #000;
-    background: #fff;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: bold;
-    transition: all 0.2s ease;
-    min-height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'DotGothic16', monospace;
-}
-
-.target-option:hover {
-    background: #f0f0f0;
-    transform: scale(1.02);
-}
-
-.target-option:active {
-    transform: scale(0.98);
-}
-
-.target-option.selected {
-    background: #000;
+    margin-right: 8px;
+    font-size: 12px;
     color: #fff;
 }
 
-.target-option.selected::before {
-    content: '▶';
-    margin-right: 6px;
-    font-size: 16px;
+.enemy-info {
+    flex: 1;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.enemy-display {
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+    font-family: 'DotGothic16', monospace;
 }
 
 /* 戦闘ログ */
@@ -354,7 +299,7 @@ body {
         min-height: 0;
     }
     
-    .command-section {
+    .battle-menu {
         flex-shrink: 0;
         min-height: 0;
     }
@@ -363,11 +308,10 @@ body {
         font-size: 48px;
     }
     
-    .command-option,
-    .target-option {
-        min-height: 44px;
-        font-size: 14px;
-        padding: 10px 8px;
+    .command-option {
+        min-height: 40px;
+        font-size: 12px;
+        padding: 8px 10px;
     }
     
     .battle-log {
@@ -376,15 +320,13 @@ body {
         padding: 6px;
     }
     
-    .player-commands,
-    .target-selection {
-        padding: 8px;
+    .command-menu,
+    .enemy-info {
+        padding: 6px;
     }
     
-    .command-title,
-    .target-title {
-        font-size: 14px;
-        margin-bottom: 8px;
+    .enemy-display {
+        font-size: 12px;
     }
 }
 

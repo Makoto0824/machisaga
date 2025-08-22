@@ -25,16 +25,16 @@ function initGame() {
 
 // UI更新
 function updateUI() {
-    // ターゲット選択の更新
-    updateTargetSelection();
+    // コマンド選択の更新
+    updateCommandSelection();
 }
 
-// ターゲット選択の更新
-function updateTargetSelection() {
-    const targetOptions = document.querySelectorAll('.target-option');
-    targetOptions.forEach(option => {
+// コマンド選択の更新
+function updateCommandSelection() {
+    const commandOptions = document.querySelectorAll('.command-option');
+    commandOptions.forEach(option => {
         option.classList.remove('selected');
-        if (option.dataset.target === game.currentTarget) {
+        if (option.dataset.command === game.currentCommand) {
             option.classList.add('selected');
         }
     });
@@ -149,16 +149,10 @@ function setupEventListeners() {
         });
     });
     
-    // ターゲット選択（タップで攻撃開始）
-    document.querySelectorAll('.target-option').forEach(option => {
-        option.addEventListener('click', () => {
-            document.querySelectorAll('.target-option').forEach(opt => opt.classList.remove('selected'));
-            option.classList.add('selected');
-            game.currentTarget = option.dataset.target;
-            
-            // ターゲットをタップしたら即座に攻撃開始
-            executeCommand();
-        });
+    // 敵表示をタップで攻撃開始
+    document.querySelector('.enemy-display').addEventListener('click', () => {
+        // 敵表示をタップしたら即座に攻撃開始
+        executeCommand();
     });
     
     // キーボードショートカット
