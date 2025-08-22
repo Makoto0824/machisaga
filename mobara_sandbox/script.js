@@ -11,7 +11,6 @@ class GameState {
 let game = new GameState();
 
 // DOM要素の取得
-const battleLog = document.getElementById('battle-log');
 const gameOverModal = document.getElementById('game-over-modal');
 const gameResult = document.getElementById('game-result');
 const resultMessage = document.getElementById('result-message');
@@ -19,7 +18,6 @@ const resultMessage = document.getElementById('result-message');
 // 初期化
 function initGame() {
     updateUI();
-    addLogEntry('戦闘開始！');
     setupEventListeners();
 }
 
@@ -40,19 +38,7 @@ function updateCommandSelection() {
     });
 }
 
-// ログエントリ追加
-function addLogEntry(message) {
-    const logEntry = document.createElement('div');
-    logEntry.className = 'log-entry';
-    logEntry.textContent = message;
-    battleLog.appendChild(logEntry);
-    battleLog.scrollTop = battleLog.scrollHeight;
-    
-    // ログエントリの自動削除（最大10個まで）
-    if (battleLog.children.length > 10) {
-        battleLog.removeChild(battleLog.firstChild);
-    }
-}
+
 
 // ランダム数値生成
 function getRandomInt(min, max) {
@@ -82,7 +68,6 @@ function executeMera() {
     enemyElement.classList.add('attack-effect');
     
     setTimeout(() => {
-        addLogEntry('メラを唱えた！');
         updateUI();
         
         enemyElement.classList.remove('attack-effect');
@@ -100,7 +85,6 @@ function executeMerami() {
     enemyElement.classList.add('attack-effect');
     
     setTimeout(() => {
-        addLogEntry('メラミを唱えた！');
         updateUI();
         
         enemyElement.classList.remove('attack-effect');
@@ -118,7 +102,6 @@ function executeMerazoma() {
     enemyElement.classList.add('attack-effect');
     
     setTimeout(() => {
-        addLogEntry('メラゾーマを唱えた！');
         updateUI();
         
         enemyElement.classList.remove('attack-effect');
