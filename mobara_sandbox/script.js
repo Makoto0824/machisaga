@@ -16,12 +16,15 @@ const gameResult = document.getElementById('game-result');
 const resultMessage = document.getElementById('result-message');
 const encounterAnimation = document.getElementById('encounter-animation');
 const encounterEnemy = document.querySelector('.encounter-enemy');
+const encounterBattle = document.getElementById('encounter-battle');
+const bgm = document.getElementById('bgm');
 
 // 初期化
 function initGame() {
     updateUI();
     setupEventListeners();
     startEncounterAnimation();
+    // BGMはエンカウント後に開始
 }
 
 // エンカウントアニメーション開始
@@ -40,11 +43,31 @@ function startEncounterAnimation() {
         encounterEnemy.classList.add('hide');
     }, 1200);
     
-    // 4. 黒背景消える（1.5秒後）
+    // 4. 「たたかう」表示（1.5秒後）
     setTimeout(() => {
-        encounterAnimation.classList.remove('show');
-        encounterEnemy.classList.remove('hide');
+        encounterBattle.classList.add('show');
     }, 1500);
+}
+
+// BGM開始
+function startBGM() {
+    bgm.volume = 0.3;  // 音量30%
+    bgm.loop = true;   // ループ再生
+    bgm.play().catch(e => console.log('BGM再生エラー:', e));
+}
+
+// 戦闘開始
+function startBattle() {
+    // 黒背景を消す
+    encounterAnimation.classList.remove('show');
+    encounterEnemy.classList.remove('hide');
+    encounterBattle.classList.remove('show');
+    
+    // BGM開始
+    startBGM();
+    
+    // メニューを有効化
+    enableMenu();
 }
 
 // UI更新
@@ -126,8 +149,8 @@ function executeMerazoma() {
 
 
 
-// イベントリスナーの設定
-function setupEventListeners() {
+// メニュー有効化
+function enableMenu() {
     // コマンド選択
     document.querySelectorAll('.command-option').forEach(option => {
         option.addEventListener('click', () => {
@@ -158,6 +181,12 @@ function setupEventListeners() {
                 break;
         }
     });
+}
+
+// イベントリスナーの設定
+function setupEventListeners() {
+    // 「たたかう」ボタンのクリック
+    encounterBattle.addEventListener('click', startBattle);
 }
 
 // コマンドナビゲーション

@@ -286,6 +286,19 @@ body {
         font-size: 12px;
     }
     
+    .encounter-enemy {
+        font-size: 18px;
+    }
+    
+    .encounter-battle {
+        font-size: 18px;
+        padding: 8px 16px;
+    }
+    
+    .encounter-battle::before {
+        font-size: 18px;
+    }
+    
 
 }
 
@@ -350,7 +363,7 @@ body {
 }
 
 .encounter-enemy {
-    font-size: 24px;
+    font-size: 20px;
     font-weight: bold;
     opacity: 0;
     transition: opacity 0.3s ease;
@@ -362,6 +375,47 @@ body {
 
 .encounter-enemy.hide {
     opacity: 0;
+}
+
+.encounter-battle {
+    font-size: 20px;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    cursor: pointer;
+    margin-top: 0;
+    border: 2px solid #fff;
+    padding: 10px 20px;
+    display: inline-block;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.8);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'DotGothic16', monospace;
+}
+
+.encounter-battle.show {
+    opacity: 1;
+}
+
+.encounter-battle:hover {
+    color: #ffd700;
+    border-color: #ffd700;
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.encounter-battle::before {
+    content: '▶';
+    margin-right: 8px;
+    font-size: 20px;
+    color: #fff;
+    animation: cursorBlink 1s infinite;
+}
+
+.encounter-battle:hover::before {
+    color: #ffd700;
 }
 
 
