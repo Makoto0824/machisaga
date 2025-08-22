@@ -14,24 +14,14 @@ let game = new GameState();
 const gameOverModal = document.getElementById('game-over-modal');
 const gameResult = document.getElementById('game-result');
 const resultMessage = document.getElementById('result-message');
-const encounterAnimation = document.getElementById('encounter-animation');
 
 // 初期化
 function initGame() {
     updateUI();
     setupEventListeners();
-    startEncounterAnimation();
 }
 
-// エンカウントアニメーション開始
-function startEncounterAnimation() {
-    encounterAnimation.classList.add('show');
-    
-    // 0.5秒後にアニメーションを非表示（文字が先に消える）
-    setTimeout(() => {
-        encounterAnimation.classList.remove('show');
-    }, 500);
-}
+
 
 // UI更新
 function updateUI() {
