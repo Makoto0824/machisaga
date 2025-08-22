@@ -54,14 +54,30 @@ function startEncounterAnimation() {
 function startBGM() {
     bgm.volume = 0.3;  // 音量30%
     bgm.loop = true;   // ループ再生
-    bgm.play().catch(e => console.log('BGM再生エラー:', e));
+    
+    // モバイル対応: ユーザーインタラクション後に再生
+    const playPromise = bgm.play();
+    if (playPromise !== undefined) {
+        playPromise.catch(e => {
+            console.log('BGM再生エラー:', e);
+            // モバイルで再生できない場合は静かに失敗
+        });
+    }
 }
 
 // 効果音再生
 function playSE() {
     se.currentTime = 0;  // 再生位置をリセット
     se.volume = 0.5;     // 音量50%
-    se.play().catch(e => console.log('効果音再生エラー:', e));
+    
+    // モバイル対応: ユーザーインタラクション後に再生
+    const playPromise = se.play();
+    if (playPromise !== undefined) {
+        playPromise.catch(e => {
+            console.log('効果音再生エラー:', e);
+            // モバイルで再生できない場合は静かに失敗
+        });
+    }
 }
 
 // 戦闘開始
@@ -175,7 +191,10 @@ function executeMerazoma() {
 function enableMenu() {
     // コマンド選択
     document.querySelectorAll('.command-option').forEach(option => {
-        option.addEventListener('click', () => {
+        option.addEventListener('click', (e) => {
+            // タッチイベントのデフォルト動作を防止
+            e.preventDefault();
+            
             // 効果音再生
             playSE();
             
@@ -186,7 +205,10 @@ function enableMenu() {
     });
     
     // 敵表示をタップで攻撃開始
-    document.querySelector('.enemy-display').addEventListener('click', () => {
+    document.querySelector('.enemy-display').addEventListener('click', (e) => {
+        // タッチイベントのデフォルト動作を防止
+        e.preventDefault();
+        
         // 効果音再生
         playSE();
         
@@ -214,7 +236,11 @@ function enableMenu() {
 // イベントリスナーの設定
 function setupEventListeners() {
     // 「たたかう」ボタンのクリック
-    encounterBattle.addEventListener('click', startBattle);
+    encounterBattle.addEventListener('click', (e) => {
+        // タッチイベントのデフォルト動作を防止
+        e.preventDefault();
+        startBattle();
+    });
 }
 
 // コマンドナビゲーション
