@@ -4,9 +4,10 @@
   "description": "ドラゴンクエスト風のターン制戦闘シミュレーター",
   "main": "index.html",
   "scripts": {
-    "dev": "npx serve .",
+    "dev": "npx serve . -p 3000",
+    "start": "npx serve . -p 3000",
     "build": "echo 'Static site - no build required'",
-    "start": "npx serve ."
+    "test": "echo 'No tests specified'"
   },
   "keywords": [
     "game",
