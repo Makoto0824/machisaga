@@ -169,19 +169,24 @@ function executeMera(character, target) {
         
         enemyElement.classList.remove('attack-effect');
         
+        // まちサーガのチェックインページに遷移
+        setTimeout(() => {
+            window.open('https://play.ttt.games/worlds/machi-saga/events/UEAWX5-E8La6ob8MihKzFgefl0SMlJgmM1b1YoZU--s/checkin', '_blank');
+        }, 1000);
+        
         if (target.hp <= 0) {
             target.alive = false;
             addLogEntry(`${target.name}を倒した！`);
             setTimeout(() => {
                 endBattle(true);
-            }, 1000);
+            }, 2000);
             return;
         }
         
         game.isPlayerTurn = false;
         setTimeout(() => {
             enemyTurn();
-        }, 1500);
+        }, 2000);
     }, 300);
 }
 
@@ -208,19 +213,24 @@ function executeMerami(character, target) {
         
         enemyElement.classList.remove('attack-effect');
         
+        // まちサーガのチェックインページに遷移
+        setTimeout(() => {
+            window.open('https://play.ttt.games/worlds/machi-saga/events/ZA0kD9WnKGGe4n3qHcFppJ-mY_yvzsG62K17pEGRPnA/checkin', '_blank');
+        }, 1000);
+        
         if (target.hp <= 0) {
             target.alive = false;
             addLogEntry(`${target.name}を倒した！`);
             setTimeout(() => {
                 endBattle(true);
-            }, 1000);
+            }, 2000);
             return;
         }
         
         game.isPlayerTurn = false;
         setTimeout(() => {
             enemyTurn();
-        }, 1500);
+        }, 2000);
     }, 300);
 }
 
@@ -247,19 +257,24 @@ function executeMerazoma(character, target) {
         
         enemyElement.classList.remove('attack-effect');
         
+        // まちサーガのチェックインページに遷移
+        setTimeout(() => {
+            window.open('https://play.ttt.games/worlds/machi-saga/events/gNQHIfrDuA4Gi0csw7GJA_V6U6rsvhXJB_my9Xcdtnk/checkin', '_blank');
+        }, 1000);
+        
         if (target.hp <= 0) {
             target.alive = false;
             addLogEntry(`${target.name}を倒した！`);
             setTimeout(() => {
                 endBattle(true);
-            }, 1000);
+            }, 2000);
             return;
         }
         
         game.isPlayerTurn = false;
         setTimeout(() => {
             enemyTurn();
-        }, 1500);
+        }, 2000);
     }, 300);
 }
 
