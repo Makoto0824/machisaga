@@ -158,6 +158,28 @@ body {
     animation: cursorBlink 1s infinite;
 }
 
+/* コマンド説明ボックス */
+.command-description {
+    background: #000;
+    border: 2px solid #fff;
+    padding: 8px;
+    margin: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    overflow: hidden;
+}
+
+.description-text {
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+    font-family: 'DotGothic16', monospace;
+    margin: 0;
+}
+
 @keyframes cursorBlink {
     0%, 50% { opacity: 1; }
     51%, 100% { opacity: 0; }

@@ -19,6 +19,7 @@ const encounterEnemy = document.querySelector('.encounter-enemy');
 const encounterBattle = document.getElementById('encounter-battle');
 const bgm = document.getElementById('bgm');
 const se = document.getElementById('se');
+const descriptionText = document.getElementById('description-text');
 
 // 初期化
 function initGame() {
@@ -26,6 +27,8 @@ function initGame() {
     setupEventListeners();
     startEncounterAnimation();
     // BGMはエンカウント後に開始
+    // 初期説明テキストを設定
+    updateDescriptionText();
 }
 
 // エンカウントアニメーション開始
@@ -115,6 +118,8 @@ function startBattle() {
 function updateUI() {
     // コマンド選択の更新
     updateCommandSelection();
+    // 説明テキストの更新
+    updateDescriptionText();
 }
 
 // コマンド選択の更新
@@ -126,6 +131,23 @@ function updateCommandSelection() {
             option.classList.add('selected');
         }
     });
+}
+
+// 説明テキストの更新
+function updateDescriptionText() {
+    switch (game.currentCommand) {
+        case 'mera':
+            descriptionText.textContent = '小さな火の玉をぶつけてダメージを与える';
+            break;
+        case 'merami':
+            descriptionText.textContent = '火の玉をぶつけてダメージを与える';
+            break;
+        case 'merazoma':
+            descriptionText.textContent = '大きな火の玉をぶつけてダメージを与える';
+            break;
+        default:
+            descriptionText.textContent = '火の玉をぶつけてダメージを与える';
+    }
 }
 
 
@@ -213,6 +235,9 @@ function enableMenu() {
             document.querySelectorAll('.command-option').forEach(opt => opt.classList.remove('selected'));
             option.classList.add('selected');
             game.currentCommand = option.dataset.command;
+            
+            // 説明テキストを更新
+            updateDescriptionText();
         });
     });
     
