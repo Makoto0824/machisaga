@@ -189,16 +189,16 @@ function updateCommandSelection() {
 function updateDescriptionText() {
     switch (game.currentCommand) {
         case 'mera':
-            descriptionText.textContent = '小さな火の玉をぶつけてダメージを与える';
+            descriptionText.textContent = 'クリームをぶつけてダメージを与える';
             break;
         case 'merami':
-            descriptionText.textContent = '火の玉をぶつけてダメージを与える';
+            descriptionText.textContent = 'プリン型のボムを爆発させてダメージを与える';
             break;
         case 'merazoma':
-            descriptionText.textContent = '大きな火の玉をぶつけてダメージを与える';
+            descriptionText.textContent = 'ケーキをスライスするがごとくの斬撃でダメージを与える';
             break;
         default:
-            descriptionText.textContent = '火の玉をぶつけてダメージを与える';
+            descriptionText.textContent = 'クリームをぶつけてダメージを与える';
     }
 }
 
