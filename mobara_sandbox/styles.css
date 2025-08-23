@@ -400,22 +400,12 @@ body {
     opacity: 1;
 }
 
-.encounter-battle:hover {
-    color: #ffd700;
-    border-color: #ffd700;
-    background: rgba(0, 0, 0, 0.9);
-}
-
 .encounter-battle::before {
     content: '▶';
     margin-right: 8px;
     font-size: 20px;
     color: #fff;
     animation: cursorBlink 1s infinite;
-}
-
-.encounter-battle:hover::before {
-    color: #ffd700;
 }
 
 

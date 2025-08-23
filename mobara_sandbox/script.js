@@ -65,6 +65,18 @@ function startBGM() {
     }
 }
 
+// ページが非表示になった時にBGMを停止
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        bgm.pause();
+    } else {
+        // ページが再表示された時にBGMを再開
+        if (bgm.volume > 0) {
+            bgm.play().catch(e => console.log('BGM再開エラー:', e));
+        }
+    }
+});
+
 // 効果音再生
 function playSE() {
     se.currentTime = 0;  // 再生位置をリセット
