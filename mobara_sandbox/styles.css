@@ -109,6 +109,7 @@ body {
     flex-direction: column;
     gap: 10px;
     flex: 1;
+    height: 140px;
 }
 
 .command-option {
@@ -175,17 +176,18 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 50px;
+    height: 80px;
     overflow: hidden;
 }
 
 .description-text {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: bold;
     color: #fff;
     text-align: center;
     font-family: 'DotGothic16', monospace;
     margin: 0;
+    line-height: 1.2;
 }
 
 @keyframes cursorBlink {
@@ -200,7 +202,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 50px;
+    height: 40px;
     overflow: hidden;
 }
 
