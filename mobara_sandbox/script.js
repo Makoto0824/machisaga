@@ -68,7 +68,7 @@ function startBGM() {
 // 効果音再生
 function playSE() {
     se.currentTime = 0;  // 再生位置をリセット
-    se.volume = 0.5;     // 音量50%
+    se.volume = 0.8;     // 音量80%
     
     // モバイル対応: ユーザーインタラクション後に再生
     const playPromise = se.play();
