@@ -29,6 +29,9 @@ function initGame() {
     // BGMはエンカウント後に開始
     // 初期説明テキストを設定
     updateDescriptionText();
+    
+    // 音声ファイルのプリロード
+    preloadAudio();
 }
 
 // エンカウントアニメーション開始
@@ -80,19 +83,68 @@ document.addEventListener('visibilitychange', () => {
     }
 });
 
-// 効果音再生
+// 効果音再生（複数インスタンス対応）
+let seIndex = 0;
+const seElements = [];
+
 function playSE() {
-    se.currentTime = 0;  // 再生位置をリセット
-    se.volume = 0.8;     // 音量80%
+    // SEインスタンスが初期化されていない場合は初期化
+    if (seElements.length === 0) {
+        preloadAudio();
+    }
     
-    // モバイル対応: ユーザーインタラクション後に再生
-    const playPromise = se.play();
+    const currentSE = seElements[seIndex];
+    seIndex = (seIndex + 1) % seElements.length;
+    
+    // 再生位置をリセット
+    currentSE.currentTime = 0;
+    currentSE.volume = 0.8;
+    
+    // 再生を試行
+    const playPromise = currentSE.play();
     if (playPromise !== undefined) {
         playPromise.catch(e => {
             console.log('効果音再生エラー:', e);
-            // モバイルで再生できない場合は静かに失敗
+            // 他のインスタンスで再試行
+            tryAlternativeSE();
         });
     }
+}
+
+// 代替SE再生
+function tryAlternativeSE() {
+    for (let i = 0; i < seElements.length; i++) {
+        const altSE = seElements[i];
+        if (altSE.readyState >= 2) { // HAVE_CURRENT_DATA以上
+            altSE.currentTime = 0;
+            altSE.volume = 0.8;
+            altSE.play().catch(e => console.log('代替SE再生エラー:', e));
+            break;
+        }
+    }
+}
+
+// 音声ファイルのプリロード
+function preloadAudio() {
+    // SEインスタンスを初期化
+    seElements.push(document.getElementById('se'));
+    seElements.push(document.getElementById('se2'));
+    seElements.push(document.getElementById('se3'));
+    
+    // 各SEインスタンスの読み込みを確実にする
+    seElements.forEach((seElement, index) => {
+        seElement.load();
+        seElement.volume = 0.8;
+        
+        // 読み込み完了を監視
+        seElement.addEventListener('canplaythrough', () => {
+            console.log(`SE${index + 1} 読み込み完了`);
+        });
+        
+        seElement.addEventListener('error', (e) => {
+            console.log(`SE${index + 1} 読み込みエラー:`, e);
+        });
+    });
 }
 
 // 戦闘開始
