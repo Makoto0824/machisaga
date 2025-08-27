@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>まちサーガ / 黒船菓子店</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <!-- BGM -->
+    <audio id="bgm" preload="auto" loop>
+        <source src="audio/bgm/bgm.mp3" type="audio/mpeg">
+    </audio>
+    
+    <!-- 効果音 -->
+    <audio id="se" preload="auto" preload="metadata">
+        <source src="audio/se/se1.aac" type="audio/aac">
+    </audio>
+    <audio id="se2" preload="auto" preload="metadata">
+        <source src="audio/se/se1.aac" type="audio/aac">
+    </audio>
+    <audio id="se3" preload="auto" preload="metadata">
+        <source src="audio/se/se1.aac" type="audio/aac">
+    </audio>
+</head>
+<body>
+    <div class="game-container">
+
+
+        <!-- 中央: 戦闘フィールド -->
+        <div class="battle-field">
+            <div class="enemies">
+                <div class="enemy crow" id="crow">
+                    <img src="images/monsters/1.png" alt="おおがらす" class="enemy-sprite">
+                </div>
+            </div>
+        </div>
+        
+        <!-- エンカウントアニメーション -->
+        <div class="encounter-animation" id="encounter-animation">
+            <div class="encounter-enemy">魔導士チャウダーが　あらわれた！</div>
+            <div class="encounter-battle" id="encounter-battle">たたかう</div>
+        </div>
+
+        <!-- 下部: レトロ戦闘メニュー -->
+        <div class="battle-menu">
+            <div class="command-menu">
+                <div class="command-option" data-command="mera">ネコ背でネコパンチ</div>
+                <div class="command-option" data-command="merami">タイ風キック</div>
+                <div class="command-option" data-command="merazoma">青春のけつバット</div>
+                <div class="command-option" data-command="seiken">黒帯せいけん突き</div>
+                <div class="command-option" data-command="kancho">こんしんのカンチョー</div>
+                <div class="command-option" data-command="99punch">99れつ拳</div>
+                <div class="command-option" data-command="kiru">お前はもう斬られてる</div>
+                <div class="command-option" data-command="foot">極フットプレッシャー</div>
+                <div class="command-option" data-command="golden">G・B・クラッシャー</div>
+                <button class="next-page-btn">→</button>
+                <div class="page-indicator">1/3</div>
+            </div>
+            
+            <div class="right-side-container">
+                <div class="enemy-info">
+                    <div class="enemy-display">魔導士チャウダー</div>
+                </div>
+                
+                <!-- コマンド説明ボックス -->
+                <div class="command-description">
+                    <div class="description-text" id="description-text">火の玉をぶつけてダメージを与える</div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- ゲームオーバーモーダル -->
+        <div class="modal" id="game-over-modal">
+            <div class="modal-content">
+                <h2 id="game-result">戦闘結果</h2>
+                <p id="result-message">メッセージ</p>
+                <button class="modal-btn" onclick="closeModal()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
