@@ -1,9 +1,10 @@
 // ゲーム状態管理
 class GameState {
     constructor() {
-        this.currentCommand = 'mera';
+        this.currentCommand = 'merami';
         this.currentTarget = 'crow';
         this.battleLog = [];
+        this.currentPage = 2; // デフォルトで2ページ目（タイ風キック）
     }
 }
 
@@ -172,6 +173,8 @@ function updateUI() {
     updateCommandSelection();
     // 説明テキストの更新
     updateDescriptionText();
+    // ページ表示の更新
+    updatePageDisplay();
 }
 
 // コマンド選択の更新
@@ -181,6 +184,30 @@ function updateCommandSelection() {
         option.classList.remove('selected');
         if (option.dataset.command === game.currentCommand) {
             option.classList.add('selected');
+        }
+    });
+}
+
+// ページ表示の更新
+function updatePageDisplay() {
+    const commandOptions = document.querySelectorAll('.command-option');
+    const pageButtons = document.querySelectorAll('.page-btn');
+    
+    // ページボタンのアクティブ状態を更新
+    pageButtons.forEach(btn => {
+        btn.classList.remove('active');
+        if (parseInt(btn.dataset.page) === game.currentPage) {
+            btn.classList.add('active');
+        }
+    });
+    
+    // コマンドオプションの表示/非表示を更新
+    commandOptions.forEach((option, index) => {
+        const page = Math.floor(index / 3) + 1;
+        if (page === game.currentPage) {
+            option.style.display = 'flex';
+        } else {
+            option.style.display = 'none';
         }
     });
 }
@@ -407,6 +434,30 @@ function enableMenu() {
         });
     });
     
+    // ページ切り替え
+    document.querySelectorAll('.page-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            // タッチイベントのデフォルト動作を防止
+            e.preventDefault();
+            
+            // 効果音再生
+            playSE();
+            
+            const newPage = parseInt(btn.dataset.page);
+            game.currentPage = newPage;
+            
+            // 現在のページの最初の技を選択
+            const commandOptions = document.querySelectorAll('.command-option');
+            const firstCommandInPage = commandOptions[(newPage - 1) * 3];
+            if (firstCommandInPage) {
+                game.currentCommand = firstCommandInPage.dataset.command;
+            }
+            
+            // UI更新
+            updateUI();
+        });
+    });
+    
     // 敵表示をタップで攻撃開始
     document.querySelector('.enemy-display').addEventListener('click', (e) => {
         // タッチイベントのデフォルト動作を防止
@@ -469,9 +520,16 @@ function navigateCommands(key) {
     
     if (newIndex >= 0 && newIndex < commands.length) {
         game.currentCommand = commands[newIndex];
+        
+        // 新しい技が属するページを計算
+        const newPage = Math.floor(newIndex / 3) + 1;
+        if (newPage !== game.currentPage) {
+            game.currentPage = newPage;
+        }
+        
         document.querySelectorAll('.command-option').forEach(opt => opt.classList.remove('selected'));
         document.querySelector(`[data-command="${game.currentCommand}"]`).classList.add('selected');
-        updateDescriptionText();
+        updateUI();
     }
 }
 
