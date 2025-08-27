@@ -189,16 +189,34 @@ function updateCommandSelection() {
 function updateDescriptionText() {
     switch (game.currentCommand) {
         case 'mera':
-            descriptionText.textContent = 'クリームをぶつけてダメージを与える';
+            descriptionText.textContent = 'ネコ背で　ネコパンチを　くりだし　ダメージを　あたえる';
             break;
         case 'merami':
-            descriptionText.textContent = 'プリン型のボムを爆発させてダメージを与える';
+            descriptionText.textContent = 'タイっぽいキックで　ダメージを　あたえる';
             break;
         case 'merazoma':
-            descriptionText.textContent = 'ケーキをスライスするがごとくの斬撃でダメージを与える';
+            descriptionText.textContent = '忘れもしないあの夏の　けつバットで　ダメージを　あたえる';
+            break;
+        case 'seiken':
+            descriptionText.textContent = '黒帯を　まいて　せいけん突きを　うち　ダメージを　あたえる';
+            break;
+        case 'kancho':
+            descriptionText.textContent = 'たましいを　こめた　カンチョーで　ダメージを　あたえる';
+            break;
+        case '99punch':
+            descriptionText.textContent = '1びょう間に　99発の　パンチを出して　ダメージを　あたえる';
+            break;
+        case 'kiru':
+            descriptionText.textContent = '斬られたことに　気づかないほどの　スピードで　斬りつけ　ダメージを　あたえる';
+            break;
+        case 'foot':
+            descriptionText.textContent = '究極にイタイと　いわれている　足ツボをおし　ダメージを　あたえる';
+            break;
+        case 'golden':
+            descriptionText.textContent = 'ゴールデンボールを…。　ダメージを　あたえる';
             break;
         default:
-            descriptionText.textContent = 'クリームをぶつけてダメージを与える';
+            descriptionText.textContent = 'ネコ背で　ネコパンチを　くりだし　ダメージを　あたえる';
     }
 }
 
@@ -223,10 +241,28 @@ function executeCommand() {
         case 'merazoma':
             executeMerazoma();
             break;
+        case 'seiken':
+            executeSeiken();
+            break;
+        case 'kancho':
+            executeKancho();
+            break;
+        case '99punch':
+            execute99Punch();
+            break;
+        case 'kiru':
+            executeKiru();
+            break;
+        case 'foot':
+            executeFoot();
+            break;
+        case 'golden':
+            executeGolden();
+            break;
     }
 }
 
-// メラ実行
+// ネコ背でネコパンチ実行
 function executeMera() {
     // 効果音再生
     playSE();
@@ -235,11 +271,11 @@ function executeMera() {
     
     // まちサーガのチェックインページに遷移
     setTimeout(() => {
-        window.open('https://play.ttt.games/worlds/machi-saga/events/UEAWX5-E8La6ob8MihKzFgefl0SMlJgmM1b1YoZU--s/checkin', '_blank');
+        window.open('https://play.ttt.games/worlds/machi-saga/events/BpgSVAXz1qE4StdxrEYhvcUO04zTN1Xrko6xgmLm8fY/checkin', '_blank');
     }, 100);
 }
 
-// メラミ実行
+// タイ風キック実行
 function executeMerami() {
     // 効果音再生
     playSE();
@@ -248,11 +284,11 @@ function executeMerami() {
     
     // まちサーガのチェックインページに遷移
     setTimeout(() => {
-        window.open('https://play.ttt.games/worlds/machi-saga/events/ZA0kD9WnKGGe4n3qHcFppJ-mY_yvzsG62K17pEGRPnA/checkin', '_blank');
+        window.open('https://play.ttt.games/worlds/machi-saga/events/Cg2clK4Cf-dK7td_8plPaz5ZwgqI3QveiKXZbC8c2wg/checkin', '_blank');
     }, 100);
 }
 
-// メラゾーマ実行
+// 青春のけつバット実行
 function executeMerazoma() {
     // 効果音再生
     playSE();
@@ -261,7 +297,85 @@ function executeMerazoma() {
     
     // まちサーガのチェックインページに遷移
     setTimeout(() => {
-        window.open('https://play.ttt.games/worlds/machi-saga/events/gNQHIfrDuA4Gi0csw7GJA_V6U6rsvhXJB_my9Xcdtnk/checkin', '_blank');
+        window.open('https://play.ttt.games/worlds/machi-saga/events/LGaJJoZSk-sswUUPgVnG0sww__GGpeB4w0eexnmBHqg/checkin', '_blank');
+    }, 100);
+}
+
+// 黒帯せいけん突き実行
+function executeSeiken() {
+    // 効果音再生
+    playSE();
+    
+    updateUI();
+    
+    // まちサーガのチェックインページに遷移
+    setTimeout(() => {
+        window.open('https://play.ttt.games/worlds/machi-saga/events/yiopBbp4QJ9JrR1acEGD8TA-hjmcLgAyw2D9fDjxans/checkin', '_blank');
+    }, 100);
+}
+
+// こんしんのカンチョー実行
+function executeKancho() {
+    // 効果音再生
+    playSE();
+    
+    updateUI();
+    
+    // まちサーガのチェックインページに遷移
+    setTimeout(() => {
+        window.open('https://play.ttt.games/worlds/machi-saga/events/0Jd2u0r_WQKhUMSvo4X9Fdp7chhKY4E_NNDW6bw_zh4/checkin', '_blank');
+    }, 100);
+}
+
+// 99れつ拳実行
+function execute99Punch() {
+    // 効果音再生
+    playSE();
+    
+    updateUI();
+    
+    // まちサーガのチェックインページに遷移
+    setTimeout(() => {
+        window.open('https://play.ttt.games/worlds/machi-saga/events/P6EpERFnWNQAKhXGp5n8r1VJ6R2Knn1ItLJhLDbA0c0/checkin', '_blank');
+    }, 100);
+}
+
+// 秘技！お前はすでに斬られている実行
+function executeKiru() {
+    // 効果音再生
+    playSE();
+    
+    updateUI();
+    
+    // まちサーガのチェックインページに遷移
+    setTimeout(() => {
+        window.open('https://play.ttt.games/worlds/machi-saga/events/EgR40twnDUba9zoDCSU9PTflYnaefalh9k8ZFrtawfM/checkin', '_blank');
+    }, 100);
+}
+
+// アルティメット・フット・プレッシャー実行
+function executeFoot() {
+    // 効果音再生
+    playSE();
+    
+    updateUI();
+    
+    // まちサーガのチェックインページに遷移
+    setTimeout(() => {
+        window.open('https://play.ttt.games/worlds/machi-saga/events/gjFWlm8uUR0dd9dgZOx3JHl5osCr9nTSnVAecq__FUg/checkin', '_blank');
+    }, 100);
+}
+
+// ゴールデン・ボール・クラッシャー実行
+function executeGolden() {
+    // 効果音再生
+    playSE();
+    
+    updateUI();
+    
+    // まちサーガのチェックインページに遷移
+    setTimeout(() => {
+        window.open('https://play.ttt.games/worlds/machi-saga/events/xfSxyFwoD-m9EdrBUZfsmLfxRxmLz0PzxFFrttc0aWQ/checkin', '_blank');
     }, 100);
 }
 
@@ -334,22 +448,22 @@ function setupEventListeners() {
 
 // コマンドナビゲーション
 function navigateCommands(key) {
-    const commands = ['mera', 'merami', 'merazoma'];
+    const commands = ['mera', 'merami', 'merazoma', 'seiken', 'kancho', '99punch', 'kiru', 'foot', 'golden'];
     const currentIndex = commands.indexOf(game.currentCommand);
     let newIndex = currentIndex;
     
     switch(key) {
         case 'ArrowUp':
-            newIndex = currentIndex >= 2 ? currentIndex - 2 : currentIndex;
+            newIndex = currentIndex >= 3 ? currentIndex - 3 : currentIndex;
             break;
         case 'ArrowDown':
-            newIndex = currentIndex < 1 ? currentIndex + 2 : currentIndex;
+            newIndex = currentIndex < 6 ? currentIndex + 3 : currentIndex;
             break;
         case 'ArrowLeft':
-            newIndex = currentIndex % 2 === 0 ? currentIndex + 1 : currentIndex - 1;
+            newIndex = currentIndex % 3 === 0 ? currentIndex + 2 : currentIndex - 1;
             break;
         case 'ArrowRight':
-            newIndex = currentIndex % 2 === 1 ? currentIndex - 1 : currentIndex + 1;
+            newIndex = currentIndex % 3 === 2 ? currentIndex - 2 : currentIndex + 1;
             break;
     }
     
@@ -357,6 +471,7 @@ function navigateCommands(key) {
         game.currentCommand = commands[newIndex];
         document.querySelectorAll('.command-option').forEach(opt => opt.classList.remove('selected'));
         document.querySelector(`[data-command="${game.currentCommand}"]`).classList.add('selected');
+        updateDescriptionText();
     }
 }
 
