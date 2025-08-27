@@ -1,6 +1,13 @@
 {
   "version": 2,
   "name": "machisaga-multi",
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build"
+    }
+  ],
+  "outputDirectory": "public",
   "rewrites": [
     {
       "source": "/",
