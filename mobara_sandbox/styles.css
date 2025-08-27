@@ -155,7 +155,7 @@ body {
     border: none;
     background: transparent;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 10px;
     font-weight: bold;
     color: #fff;
     transition: all 0.1s ease;
@@ -183,7 +183,7 @@ body {
 .command-option.selected::before {
     content: '▶';
     margin-right: 8px;
-    font-size: 12px;
+    font-size: 10px;
     color: #fff;
     animation: cursorBlink 1s infinite;
 }
