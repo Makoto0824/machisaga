@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "name": "machisaga-multi",
+  "builds": [
+    {
+      "src": "mobara_sandbox/**/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "masuya/**/*",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/",
+      "dest": "/mobara_sandbox"
+    },
+    {
+      "src": "/mobara",
+      "dest": "/mobara_sandbox"
+    },
+    {
+      "src": "/masuya",
+      "dest": "/masuya"
+    }
+  ]
+}
