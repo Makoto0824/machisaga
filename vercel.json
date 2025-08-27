@@ -32,5 +32,6 @@
       "src": "/masuya/(.*)",
       "dest": "/masuya/$1"
     }
-  ]
+  ],
+  "outputDirectory": "."
 }

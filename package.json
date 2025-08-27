@@ -1,0 +1,30 @@
+{
+  "name": "machisaga-multi",
+  "version": "1.0.0",
+  "description": "まちサーガ 複数店舗の戦闘シミュレーター",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx serve . -p 3000",
+    "start": "npx serve . -p 3000",
+    "build": "echo 'Static site - no build required'",
+    "test": "echo 'No tests specified'"
+  },
+  "keywords": [
+    "game",
+    "battle",
+    "rpg",
+    "dragon-quest",
+    "javascript",
+    "html5",
+    "css3",
+    "machisaga"
+  ],
+  "author": "Makoto",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
