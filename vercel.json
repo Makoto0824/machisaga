@@ -3,11 +3,7 @@
   "name": "machisaga-multi",
   "builds": [
     {
-      "src": "mobara_sandbox/**/*",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "masuya/**/*",
+      "src": "**/*",
       "use": "@vercel/static"
     }
   ],
@@ -32,6 +28,5 @@
       "src": "/masuya/(.*)",
       "dest": "/masuya/$1"
     }
-  ],
-  "outputDirectory": "."
+  ]
 }
