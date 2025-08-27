@@ -97,8 +97,8 @@ body {
     background: #000;
     border: 2px solid #fff;
     padding: 8px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
+    flex-direction: column;
     gap: 4px;
     height: 140px;
     overflow: hidden;
@@ -153,6 +153,7 @@ body {
     align-items: center;
     font-family: 'DotGothic16', monospace;
     position: relative;
+    width: 100%;
 }
 
 .command-option:hover {

@@ -497,16 +497,14 @@ function navigateCommands(key) {
     
     switch(key) {
         case 'ArrowUp':
-            newIndex = currentIndex >= 3 ? currentIndex - 3 : currentIndex;
+            newIndex = currentIndex > 0 ? currentIndex - 1 : currentIndex;
             break;
         case 'ArrowDown':
-            newIndex = currentIndex < 6 ? currentIndex + 3 : currentIndex;
+            newIndex = currentIndex < commands.length - 1 ? currentIndex + 1 : currentIndex;
             break;
         case 'ArrowLeft':
-            newIndex = currentIndex % 3 === 0 ? currentIndex + 2 : currentIndex - 1;
-            break;
         case 'ArrowRight':
-            newIndex = currentIndex % 3 === 2 ? currentIndex - 2 : currentIndex + 1;
+            // 横方向の移動は無効化（縦方向のみ）
             break;
     }
     
