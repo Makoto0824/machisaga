@@ -1,10 +1,10 @@
 // ゲーム状態管理
 class GameState {
     constructor() {
-        this.currentCommand = 'merami';
+        this.currentCommand = 'mera';
         this.currentTarget = 'crow';
         this.battleLog = [];
-        this.currentPage = 2; // デフォルトで2ページ目（タイ風キック）
+        this.currentPage = 1; // デフォルトで1ページ目（ネコ背でネコパンチ）
     }
 }
 
@@ -191,6 +191,10 @@ function updateCommandSelection() {
 // ページ表示の更新
 function updatePageDisplay() {
     const commandOptions = document.querySelectorAll('.command-option');
+    const pageIndicator = document.querySelector('.page-indicator');
+    
+    // ページ表示を更新
+    pageIndicator.textContent = `${game.currentPage}/3`;
     
     // コマンドオプションの表示/非表示を更新
     commandOptions.forEach((option, index) => {
