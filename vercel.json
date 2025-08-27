@@ -1,32 +1,26 @@
 {
   "version": 2,
   "name": "machisaga-multi",
-  "builds": [
+  "rewrites": [
     {
-      "src": "**/*",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/",
-      "dest": "/mobara_sandbox/index.html"
+      "source": "/",
+      "destination": "/mobara_sandbox/index.html"
     },
     {
-      "src": "/mobara",
-      "dest": "/mobara_sandbox/index.html"
+      "source": "/mobara",
+      "destination": "/mobara_sandbox/index.html"
     },
     {
-      "src": "/masuya",
-      "dest": "/masuya/index.html"
+      "source": "/masuya",
+      "destination": "/masuya/index.html"
     },
     {
-      "src": "/mobara_sandbox/(.*)",
-      "dest": "/mobara_sandbox/$1"
+      "source": "/mobara_sandbox/:path*",
+      "destination": "/mobara_sandbox/:path*"
     },
     {
-      "src": "/masuya/(.*)",
-      "dest": "/masuya/$1"
+      "source": "/masuya/:path*",
+      "destination": "/masuya/:path*"
     }
   ]
 }
