@@ -191,15 +191,6 @@ function updateCommandSelection() {
 // ページ表示の更新
 function updatePageDisplay() {
     const commandOptions = document.querySelectorAll('.command-option');
-    const pageButtons = document.querySelectorAll('.page-btn');
-    
-    // ページボタンのアクティブ状態を更新
-    pageButtons.forEach(btn => {
-        btn.classList.remove('active');
-        if (parseInt(btn.dataset.page) === game.currentPage) {
-            btn.classList.add('active');
-        }
-    });
     
     // コマンドオプションの表示/非表示を更新
     commandOptions.forEach((option, index) => {
@@ -434,29 +425,7 @@ function enableMenu() {
         });
     });
     
-    // ページ切り替え
-    document.querySelectorAll('.page-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            // タッチイベントのデフォルト動作を防止
-            e.preventDefault();
-            
-            // 効果音再生
-            playSE();
-            
-            const newPage = parseInt(btn.dataset.page);
-            game.currentPage = newPage;
-            
-            // 現在のページの最初の技を選択
-            const commandOptions = document.querySelectorAll('.command-option');
-            const firstCommandInPage = commandOptions[(newPage - 1) * 3];
-            if (firstCommandInPage) {
-                game.currentCommand = firstCommandInPage.dataset.command;
-            }
-            
-            // UI更新
-            updateUI();
-        });
-    });
+
     
     // 次のページボタン
     document.querySelector('.next-page-btn').addEventListener('click', (e) => {

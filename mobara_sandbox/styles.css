@@ -128,33 +128,7 @@ body {
     background: rgba(255, 255, 255, 0.2);
 }
 
-.page-navigation {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 8px;
-}
 
-.page-btn {
-    background: #000;
-    border: 2px solid #fff;
-    color: #fff;
-    padding: 4px 8px;
-    cursor: pointer;
-    font-family: 'DotGothic16', monospace;
-    font-size: 12px;
-    font-weight: bold;
-    transition: all 0.1s ease;
-}
-
-.page-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.page-btn.active {
-    background: #fff;
-    color: #000;
-}
 
 .right-side-container {
     display: flex;
