@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "dragon-quest-battle-simulator",
+  "builds": [
+    {
+      "src": "**/*",
+      "use": "@vercel/static"
+    }
+  ]
+}
