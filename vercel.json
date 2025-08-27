@@ -1,10 +1,6 @@
 {
   "rewrites": [
     {
-      "source": "/",
-      "destination": "/mobara_sandbox/index.html"
-    },
-    {
       "source": "/mobara",
       "destination": "/mobara_sandbox/index.html"
     },
