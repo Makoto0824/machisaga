@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/mobara",
-      "destination": "/mobara_sandbox/index.html"
+      "destination": "/mobara.html"
     },
     {
       "source": "/masuya",
-      "destination": "/masuya/index.html"
+      "destination": "/masuya.html"
     }
   ]
 }

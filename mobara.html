@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>まちサーガ / 黒船菓子店</title>
+    <link rel="stylesheet" href="mobara_sandbox/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="game-container">
+        <div class="encounter-animation" id="encounter-animation">
+            <div class="encounter-text">魔王スイッツンが　あらわれた！</div>
+        </div>
+        
+        <div class="battle-screen" id="battle-screen">
+            <div class="enemy-section">
+                <div class="enemy-display">
+                    <img src="mobara_sandbox/images/monsters/1.png" alt="魔王スイッツン" class="enemy-sprite">
+                    <div class="enemy-name">魔王スイッツン</div>
+                </div>
+            </div>
+            
+            <div class="command-section">
+                <div class="command-menu" id="command-menu">
+                    <div class="command-option" data-command="mera">ネコ背でネコパンチ</div>
+                    <div class="command-option" data-command="merami">タイ風キック</div>
+                    <div class="command-option" data-command="merazoma">青春のけつバット</div>
+                    <div class="command-option" data-command="seiken">黒帯せいけん突き</div>
+                    <div class="command-option" data-command="kancho">こんしんのカンチョー</div>
+                    <div class="command-option" data-command="99punch">99れつ拳</div>
+                    <div class="command-option" data-command="kiru">お前はもう斬られてる</div>
+                    <div class="command-option" data-command="foot">極フットプレッシャー</div>
+                    <div class="command-option" data-command="golden">G・B・クラッシャー</div>
+                </div>
+                <div class="next-page-btn" id="next-page-btn">→</div>
+                <div class="page-indicator" id="page-indicator">1/3</div>
+            </div>
+            
+            <div class="description-box" id="description-box">
+                ネコ背で　ネコパンチを　くりだし　ダメージを　あたえる
+            </div>
+        </div>
+        
+        <div class="start-button" id="start-button">
+            ▶︎たたかう
+        </div>
+    </div>
+    
+    <audio id="bgm" preload="auto">
+        <source src="mobara_sandbox/audio/bgm/bgm.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="se" preload="auto">
+        <source src="mobara_sandbox/audio/se/se1.aac" type="audio/aac">
+    </audio>
+    
+    <script src="mobara_sandbox/script.js"></script>
+</body>
+</html>
