@@ -102,6 +102,30 @@ body {
     gap: 4px;
     height: 140px;
     overflow: hidden;
+    position: relative;
+}
+
+.next-page-btn {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 2px;
+    transition: all 0.1s ease;
+    z-index: 10;
+}
+
+.next-page-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.next-page-btn:active {
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .page-navigation {

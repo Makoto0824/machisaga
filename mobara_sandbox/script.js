@@ -458,6 +458,29 @@ function enableMenu() {
         });
     });
     
+    // 次のページボタン
+    document.querySelector('.next-page-btn').addEventListener('click', (e) => {
+        // タッチイベントのデフォルト動作を防止
+        e.preventDefault();
+        
+        // 効果音再生
+        playSE();
+        
+        // 次のページに移動
+        const nextPage = game.currentPage < 3 ? game.currentPage + 1 : 1;
+        game.currentPage = nextPage;
+        
+        // 現在のページの最初の技を選択
+        const commandOptions = document.querySelectorAll('.command-option');
+        const firstCommandInPage = commandOptions[(nextPage - 1) * 3];
+        if (firstCommandInPage) {
+            game.currentCommand = firstCommandInPage.dataset.command;
+        }
+        
+        // UI更新
+        updateUI();
+    });
+    
     // 敵表示をタップで攻撃開始
     document.querySelector('.enemy-display').addEventListener('click', (e) => {
         // タッチイベントのデフォルト動作を防止
