@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "npx serve . -p 3000",
     "start": "npx serve . -p 3000",
-    "build": "echo 'Static site - no build required'",
+    "build": "mkdir -p public && cp -r mobara_sandbox/* public/ && cp -r masuya public/",
     "test": "echo 'No tests specified'"
   },
   "keywords": [
