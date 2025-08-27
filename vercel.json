@@ -33,6 +33,6 @@
       "dest": "/masuya/$1"
     }
   ],
-  "functions": {},
+
   "outputDirectory": "."
 }
