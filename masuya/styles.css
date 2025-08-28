@@ -73,6 +73,21 @@ body {
     filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
 }
 
+/* 動画の揺れを防ぐためのスタイル */
+.enemy-sprite video {
+    width: 100%;
+    height: 100%;
+    max-width: 600px;
+    max-height: 600px;
+    object-fit: contain;
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
+    /* 動画の揺れを防ぐ */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+    will-change: auto;
+}
+
 .enemy-name {
     font-size: 12px;
     font-weight: bold;
