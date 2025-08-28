@@ -432,14 +432,14 @@ body {
     }
 }
 
-/* ピクセルアート風のアニメーション */
-@keyframes pixelBounce {
+/* ピクセルアート風のアニメーション - 停止 */
+/* @keyframes pixelBounce {
     0%, 100% { transform: translateY(0px); }
     50% { transform: translateY(-2px); }
-}
+} */
 
 .enemy-sprite {
-    animation: pixelBounce 2s ease-in-out infinite;
+    /* animation: pixelBounce 2s ease-in-out infinite; */
 }
 
 /* エンカウントアニメーション */
