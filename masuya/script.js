@@ -54,6 +54,9 @@ function initGame() {
     
     // 音声ファイルのプリロード
     preloadAudio();
+    
+    // ダメージ動画をプリロード
+    preloadDamageVideo();
 }
 
 // エンカウントアニメーション開始
@@ -167,6 +170,21 @@ function preloadAudio() {
             console.log(`SE${index + 1} 読み込みエラー:`, e);
         });
     });
+}
+
+// ダメージ動画のプリロード
+function preloadDamageVideo() {
+    const video = document.createElement('video');
+    video.src = 'videos/damage.mp4';
+    video.preload = 'auto';
+    video.muted = true; // プリロード時は音声を無効化
+    video.style.display = 'none'; // 非表示でプリロード
+    document.body.appendChild(video);
+    
+    // プリロード完了後に要素を削除
+    video.addEventListener('loadeddata', () => {
+        document.body.removeChild(video);
+    }, { once: true });
 }
 
 // 戦闘開始
@@ -287,32 +305,45 @@ function getWeightedRandomCommand() {
 function playDamageVideo() {
     const video = document.querySelector('.enemy-sprite');
     if (video && !game.hasPlayedDamageVideo) {
-        // ダメージ動画に変更
-        video.src = 'videos/damage.mp4';
+        // フェードアウト効果
+        video.style.opacity = '0';
+        video.style.transition = 'opacity 0.2s ease-out';
         
-        // 動画を1度だけ再生、音声を有効化
-        video.loop = false;
-        video.muted = false; // 音声を有効化
-        video.volume = 0.5; // 音量を50%に設定
-        video.currentTime = 0;
-        
-        // 動画の再生開始
-        const playPromise = video.play();
-        if (playPromise !== undefined) {
-            playPromise.then(() => {
-                // 再生が開始されたらフラグを設定
-                game.hasPlayedDamageVideo = true;
+        setTimeout(() => {
+            // ダメージ動画に変更
+            video.src = 'videos/damage.mp4';
+            
+            // 動画を1度だけ再生、音声を有効化
+            video.loop = false;
+            video.muted = false; // 音声を有効化
+            video.volume = 0.5; // 音量を50%に設定
+            video.currentTime = 0;
+            
+            // 動画の読み込み完了を待ってから再生
+            video.addEventListener('loadeddata', () => {
+                // フェードイン効果
+                video.style.opacity = '1';
+                video.style.transition = 'opacity 0.2s ease-in';
                 
-                // 動画が終了したら最終フレームで停止
-                video.addEventListener('ended', () => {
-                    // 最終フレームで停止（少し手前で停止して最終フレームを表示）
-                    video.currentTime = video.duration - 0.1;
-                    video.pause();
-                }, { once: true });
-            }).catch(e => {
-                console.log('ダメージ動画再生エラー:', e);
-            });
-        }
+                // 動画の再生開始
+                const playPromise = video.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        // 再生が開始されたらフラグを設定
+                        game.hasPlayedDamageVideo = true;
+                        
+                        // 動画が終了したら最終フレームで停止
+                        video.addEventListener('ended', () => {
+                            // 最終フレームで停止（少し手前で停止して最終フレームを表示）
+                            video.currentTime = video.duration - 0.1;
+                            video.pause();
+                        }, { once: true });
+                    }).catch(e => {
+                        console.log('ダメージ動画再生エラー:', e);
+                    });
+                }
+            }, { once: true });
+        }, 200); // フェードアウト完了を待つ
         
         // 効果音再生（動画の音声と重複する場合は削除可能）
         // playSE();
