@@ -4,23 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>まちサーガ / 串かつ枡や</title>
-    <link rel="stylesheet" href="../masuya/styles.css">
+    <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Press+Start+2P&display=swap" rel="stylesheet">
     
     <!-- BGM -->
     <audio id="bgm" preload="auto" loop>
-        <source src="../masuya/audio/bgm/bgm.mp3" type="audio/mpeg">
+        <source src="audio/bgm/bgm.mp3" type="audio/mpeg">
     </audio>
     
     <!-- 効果音 -->
     <audio id="se" preload="auto" preload="metadata">
-        <source src="../masuya/audio/se/se1.aac" type="audio/aac">
+        <source src="audio/se/se1.aac" type="audio/aac">
     </audio>
     <audio id="se2" preload="auto" preload="metadata">
-        <source src="../masuya/audio/se/se1.aac" type="audio/aac">
+        <source src="audio/se/se1.aac" type="audio/aac">
     </audio>
     <audio id="se3" preload="auto" preload="metadata">
-        <source src="../masuya/audio/se/se1.aac" type="audio/aac">
+        <source src="audio/se/se1.aac" type="audio/aac">
     </audio>
 </head>
 <body>
@@ -31,8 +31,8 @@
         <div class="battle-field">
             <div class="enemies">
                 <div class="enemy crow" id="crow">
-                    <video src="../masuya/videos/1.mp4" alt="おおがらす" class="enemy-sprite" autoplay loop muted playsinline>
-                        <source src="../masuya/videos/1.mp4" type="video/mp4">
+                    <video src="videos/1.mp4" alt="おおがらす" class="enemy-sprite" autoplay loop muted playsinline>
+                        <source src="videos/1.mp4" type="video/mp4">
                     </video>
                 </div>
             </div>
@@ -47,17 +47,21 @@
         <!-- 下部: レトロ戦闘メニュー -->
         <div class="battle-menu">
             <div class="command-menu">
-                <div class="command-option" data-command="mera">ネコ背でネコパンチ</div>
-                <div class="command-option" data-command="merami">タイ風キック</div>
-                <div class="command-option" data-command="merazoma">青春のけつバット</div>
-                <div class="command-option" data-command="seiken">黒帯せいけん突き</div>
-                <div class="command-option" data-command="kancho">こんしんのカンチョー</div>
-                <div class="command-option" data-command="99punch">99れつ拳</div>
-                <div class="command-option" data-command="kiru">お前はもう斬られてる</div>
-                <div class="command-option" data-command="foot">極フットプレッシャー</div>
-                <div class="command-option" data-command="golden">G・B・クラッシャー</div>
-                <button class="next-page-btn">→</button>
-                <div class="page-indicator">1/3</div>
+                <!-- わざルーレットスタートボタン（初期表示） -->
+                <div class="kaishi-option" id="kaishi-option">
+                    <button class="kaishi-btn" id="kaishi-btn">わざルーレット　スタート</button>
+                </div>
+                
+                <!-- 技オプション（初期非表示） -->
+                <div class="command-option" data-command="mera" style="display: none;">ネコ背でネコパンチ</div>
+                <div class="command-option" data-command="merami" style="display: none;">タイ風キック</div>
+                <div class="command-option" data-command="merazoma" style="display: none;">青春のけつバット</div>
+                <div class="command-option" data-command="seiken" style="display: none;">黒帯せいけん突き</div>
+                <div class="command-option" data-command="kancho" style="display: none;">こんしんのカンチョー</div>
+                <div class="command-option" data-command="99punch" style="display: none;">99れつ拳</div>
+                <div class="command-option" data-command="kiru" style="display: none;">お前はもう斬られてる</div>
+                <div class="command-option" data-command="foot" style="display: none;">極フットプレッシャー</div>
+                <div class="command-option" data-command="golden" style="display: none;">G・B・クラッシャー</div>
             </div>
             
             <div class="right-side-container">
@@ -84,6 +88,6 @@
         </div>
     </div>
 
-    <script src="../masuya/script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
