@@ -239,6 +239,12 @@ function showCommandOptions() {
 
 // 説明テキストの更新
 function updateDescriptionText() {
+    // わざルーレットスタート前は空白
+    if (!game.hasStarted) {
+        descriptionText.textContent = '';
+        return;
+    }
+    
     switch (game.currentCommand) {
         case 'mera':
             descriptionText.textContent = 'ネコ背で　ネコパンチを　くりだし　ダメージを　あたえる';
@@ -268,7 +274,7 @@ function updateDescriptionText() {
             descriptionText.textContent = 'ゴールデンボールを…。　ダメージを　あたえる';
             break;
         default:
-            descriptionText.textContent = 'ネコ背で　ネコパンチを　くりだし　ダメージを　あたえる';
+            descriptionText.textContent = '';
     }
 }
 
@@ -284,6 +290,19 @@ const allCommands = ['mera', 'merami', 'merazoma', 'seiken', 'kancho', '99punch'
 
 // 重み付きランダム選択用の重み配列（数字が大きいほど出現率が低い）
 const commandWeights = [9, 8, 7, 6, 5, 4, 3, 2, 1];
+
+// 各技のダメージ値
+const commandDamages = {
+    'mera': 10,      // ネコ背でネコパンチ
+    'merami': 40,    // タイ風キック
+    'merazoma': 55,  // 青春のけつバット
+    'seiken': 75,    // 黒帯せいけん突き
+    'kancho': 100,   // こんしんのカンチョー
+    '99punch': 115,  // 99れつ拳
+    'kiru': 135,     // お前はもう斬られてる
+    'foot': 160,     // 極フットプレッシャー
+    'golden': 210    // G・B・クラッシャー
+};
 
 // 重み付きランダム選択関数
 function getWeightedRandomCommand() {
@@ -354,6 +373,12 @@ function playDamageVideo() {
 function startAttack() {
     if (!game.isSkillDetermined || game.hasPlayedDamageVideo) return;
     
+    // 魔導士チャウダーの▶を削除
+    const enemyDisplay = document.querySelector('.enemy-display');
+    if (enemyDisplay) {
+        enemyDisplay.classList.remove('skill-determined');
+    }
+    
     // 技Boxに「勇者の　こうげき！」を表示
     showAttackMessage();
     
@@ -409,6 +434,34 @@ function showAttackMessage() {
         newKaishiBtn.style.outline = 'none';
         newKaishiBtn.style.transition = 'none';
         newKaishiBtn.classList.remove('kaishi-btn');
+        
+        // ダメージ動画再生後にダメージ表示と「つぎへ」に変更
+        setTimeout(() => {
+            // 選択された技のダメージ値を取得
+            const damage = commandDamages[game.currentCommand] || 0;
+            
+            // ダメージ表示を追加
+            const damageText = document.createElement('div');
+            damageText.textContent = `${damage} のダメージ！`;
+            damageText.className = 'damage-text';
+            // インラインスタイルは一切使わない（CSSクラスのみに依存）
+            
+            // 既存の「つぎへ」ボタンの前にダメージ表示を挿入
+            newKaishiBtn.parentNode.insertBefore(damageText, newKaishiBtn);
+            
+            // 「つぎへ」ボタン（▶はCSSアニメーションで表示）
+            newKaishiBtn.textContent = 'つぎへ';
+            newKaishiBtn.style.pointerEvents = 'auto'; // クリックを有効化
+            newKaishiBtn.style.cursor = 'pointer'; // カーソルをポインターに
+            newKaishiBtn.classList.remove('kaishi-btn'); // CSS疑似要素のクラスを削除
+            newKaishiBtn.className = 'skill-determined-btn'; // 技確定後のスタイルクラスを追加
+            
+            // 「つぎへ」ボタンのクリックイベントを追加
+            newKaishiBtn.addEventListener('click', () => {
+                // 選択された技に対応するリンク先に遷移（技名表示なし）
+                executeCommand();
+            });
+        }, 3000); // ダメージ動画再生開始から3秒後
     }
 }
 
@@ -504,11 +557,9 @@ function executeMera() {
     // 効果音再生
     playSE();
     
-    updateUI();
-    
     // まちサーガのチェックインページに遷移
     setTimeout(() => {
-        window.open('https://play.ttt.games/worlds/machi-saga/events/BpgSVAXz1qE4StdxrEYhvcUO04zTN1Xrko6xgmLm8fY/checkin', '_blank');
+        window.open('https://play.ttt.games/worlds/machi-saga/events/b-mjFuRIEBL3xROr64xXA3qaSkZ5L926lSWCOXVtH60/checkin', '_blank');
     }, 100);
 }
 
@@ -517,11 +568,9 @@ function executeMerami() {
     // 効果音再生
     playSE();
     
-    updateUI();
-    
     // まちサーガのチェックインページに遷移
     setTimeout(() => {
-        window.open('https://play.ttt.games/worlds/machi-saga/events/Cg2clK4Cf-dK7td_8plPaz5ZwgqI3QveiKXZbC8c2wg/checkin', '_blank');
+        window.open('https://play.ttt.games/worlds/machi-saga/events/iZP-oFgwKs-rwFFVToqXkV488vnDHjyxIPF_hZ5y8MM/checkin', '_blank');
     }, 100);
 }
 
@@ -530,11 +579,9 @@ function executeMerazoma() {
     // 効果音再生
     playSE();
     
-    updateUI();
-    
     // まちサーガのチェックインページに遷移
     setTimeout(() => {
-        window.open('https://play.ttt.games/worlds/machi-saga/events/LGaJJoZSk-sswUUPgVnG0sww__GGpeB4w0eexnmBHqg/checkin', '_blank');
+        window.open('https://play.ttt.games/worlds/machi-saga/events/x2pNQFx8ChWMoYPfgrXopstCgZ9HMF8JCPpNXmyXpn0/checkin', '_blank');
     }, 100);
 }
 
@@ -543,11 +590,9 @@ function executeSeiken() {
     // 効果音再生
     playSE();
     
-    updateUI();
-    
     // まちサーガのチェックインページに遷移
     setTimeout(() => {
-        window.open('https://play.ttt.games/worlds/machi-saga/events/yiopBbp4QJ9JrR1acEGD8TA-hjmcLgAyw2D9fDjxans/checkin', '_blank');
+        window.open('https://play.ttt.games/worlds/machi-saga/events/Ti0h_WV3B8OiAXAi-vxtodyw6wAyT35MHRGcsCBuh0g/checkin', '_blank');
     }, 100);
 }
 
@@ -556,11 +601,9 @@ function executeKancho() {
     // 効果音再生
     playSE();
     
-    updateUI();
-    
     // まちサーガのチェックインページに遷移
     setTimeout(() => {
-        window.open('https://play.ttt.games/worlds/machi-saga/events/0Jd2u0r_WQKhUMSvo4X9Fdp7chhKY4E_NNDW6bw_zh4/checkin', '_blank');
+        window.open('https://play.ttt.games/worlds/machi-saga/events/17VlTOfDKjp6tqoAnuXxlgvsE4wRofg2Hz1i_rr_5Fc/checkin', '_blank');
     }, 100);
 }
 
@@ -569,50 +612,42 @@ function execute99Punch() {
     // 効果音再生
     playSE();
     
-    updateUI();
-    
     // まちサーガのチェックインページに遷移
     setTimeout(() => {
-        window.open('https://play.ttt.games/worlds/machi-saga/events/P6EpERFnWNQAKhXGp5n8r1VJ6R2Knn1ItLJhLDbA0c0/checkin', '_blank');
+        window.open('https://play.ttt.games/worlds/machi-saga/events/MyKXAlK_qOWpn9hKrZEWrQKypMoE8Ess9C1PhKBXg0A/checkin', '_blank');
     }, 100);
 }
 
-// 秘技！お前はすでに斬られている実行
+// お前はもう斬られてる実行
 function executeKiru() {
     // 効果音再生
     playSE();
     
-    updateUI();
-    
     // まちサーガのチェックインページに遷移
     setTimeout(() => {
-        window.open('https://play.ttt.games/worlds/machi-saga/events/EgR40twnDUba9zoDCSU9PTflYnaefalh9k8ZFrtawfM/checkin', '_blank');
+        window.open('https://play.ttt.games/worlds/machi-saga/events/CrXfZStcu7XMtyDI77JE5lKlk7RYsZVcF5Xdk2XyiB0/checkin', '_blank');
     }, 100);
 }
 
-// アルティメット・フット・プレッシャー実行
+// 極フットプレッシャー実行
 function executeFoot() {
     // 効果音再生
     playSE();
     
-    updateUI();
-    
     // まちサーガのチェックインページに遷移
     setTimeout(() => {
-        window.open('https://play.ttt.games/worlds/machi-saga/events/gjFWlm8uUR0dd9dgZOx3JHl5osCr9nTSnVAecq__FUg/checkin', '_blank');
+        window.open('https://play.ttt.games/worlds/machi-saga/events/in7B9olSOc9H-W7yoxpV3T9WFJQwgM9vYUVrkKyHgBU/checkin', '_blank');
     }, 100);
 }
 
-// ゴールデン・ボール・クラッシャー実行
+// G・B・クラッシャー実行
 function executeGolden() {
     // 効果音再生
     playSE();
     
-    updateUI();
-    
     // まちサーガのチェックインページに遷移
     setTimeout(() => {
-        window.open('https://play.ttt.games/worlds/machi-saga/events/xfSxyFwoD-m9EdrBUZfsmLfxRxmLz0PzxFFrttc0aWQ/checkin', '_blank');
+        window.open('https://play.ttt.games/worlds/machi-saga/events/WsDzeA-BjEOjN833J0-tTzRDHnnLLzFMytiCf5gseD4/checkin', '_blank');
     }, 100);
 }
 
@@ -666,16 +701,11 @@ function enableMenu() {
         // タッチイベントのデフォルト動作を防止
         e.preventDefault();
         
-        // 技が確定していて、まだダメージ動画を再生していない場合
+        // 技が確定していて、まだダメージ動画を再生していない場合のみ攻撃可能
         if (game.isSkillDetermined && !game.hasPlayedDamageVideo) {
             startAttack();
-        } else {
-            // 効果音再生
-            playSE();
-            
-            // 敵表示をタップしたら即座に攻撃開始
-            executeCommand();
         }
+        // 技が確定していない場合は何もしない
     });
     
     // キーボードショートカット
