@@ -1,0 +1,516 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'DotGothic16', monospace;
+    background: #000;
+    color: #000;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile */
+    width: 100vw;
+    width: 100dvw; /* Dynamic viewport width for mobile */
+}
+
+.game-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #000;
+    box-sizing: border-box;
+}
+
+
+
+/* 中央: 戦闘フィールド */
+.battle-field {
+    flex: 1;
+    position: relative;
+    background: #000;
+    border: 2px solid #000;
+    margin: 1px;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.enemies {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.enemy {
+    text-align: center;
+    padding: 8px;
+    /* 動画コンテナの揺れ防止 */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    will-change: auto;
+}
+
+.enemy-sprite {
+    width: 100%;
+    height: 100%;
+    max-width: 600px;
+    max-height: 600px;
+    object-fit: contain;
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
+}
+
+/* 動画の揺れを防ぐためのスタイル */
+.enemy-sprite video {
+    width: 100%;
+    height: 100%;
+    max-width: 600px;
+    max-height: 600px;
+    object-fit: contain;
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
+    /* 動画の揺れを防ぐ - より強力な設定 */
+    transform: translateZ(0) translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+    will-change: auto;
+    /* 追加の揺れ防止 */
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+    outline: none;
+    /* レンダリング最適化 */
+    -webkit-transform: translateZ(0) translate3d(0, 0, 0);
+    -moz-transform: translateZ(0) translate3d(0, 0, 0);
+    -ms-transform: translateZ(0) translate3d(0, 0, 0);
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    -ms-backface-visibility: hidden;
+}
+
+.enemy-name {
+    font-size: 12px;
+    font-weight: bold;
+    background: rgba(255,255,255,0.8);
+    padding: 2px 6px;
+    border: 1px solid #000;
+    font-family: 'DotGothic16', monospace;
+}
+
+/* 下部: レトロ戦闘メニュー */
+.battle-menu {
+    display: flex;
+    gap: 10px;
+    margin: 10px;
+    min-height: 0;
+    flex-shrink: 0;
+    align-items: flex-start;
+}
+
+.command-menu {
+    flex: 1;
+    background: #000;
+    border: 2px solid #fff;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    height: 140px;
+    overflow: hidden;
+    position: relative;
+}
+
+.next-page-btn {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 2px;
+    transition: all 0.1s ease;
+    z-index: 10;
+}
+
+.next-page-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.next-page-btn:active {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.page-indicator {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    color: #fff;
+    font-family: 'DotGothic16', monospace;
+    font-size: 10px;
+    font-weight: bold;
+    z-index: 10;
+}
+
+
+
+.right-side-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+    height: 140px;
+}
+
+.command-option {
+    padding: 8px 12px;
+    text-align: left;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: bold;
+    color: #fff;
+    transition: all 0.1s ease;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    font-family: 'DotGothic16', monospace;
+    position: relative;
+    width: 100%;
+}
+
+.command-option:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.command-option:active {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.command-option.selected {
+    background: transparent;
+    color: #fff;
+}
+
+.command-option.selected::before {
+    content: '▶';
+    margin-right: 8px;
+    font-size: 10px;
+    color: #fff;
+    animation: cursorBlink 1s infinite;
+}
+
+.enemy-display {
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+    font-family: 'DotGothic16', monospace;
+    margin: 0;
+}
+
+.enemy-display::before {
+    content: '▶';
+    margin-right: 8px;
+    font-size: 14px;
+    color: #fff;
+    animation: cursorBlink 1s infinite;
+}
+
+/* コマンド説明ボックス */
+.command-description {
+    background: #000;
+    border: 2px solid #fff;
+    padding: 8px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 90px;
+    overflow: hidden;
+}
+
+.description-text {
+    font-size: 12px;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+    font-family: 'DotGothic16', monospace;
+    margin: 0;
+    line-height: 1.2;
+}
+
+@keyframes cursorBlink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+.enemy-info {
+    background: #000;
+    border: 2px solid #fff;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    overflow: hidden;
+}
+
+.enemy-display {
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+    font-family: 'DotGothic16', monospace;
+    margin: 0;
+}
+
+
+
+
+
+/* モーダル */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.modal-content {
+    background: #fff;
+    margin: 20% auto;
+    padding: 20px;
+    border: 3px solid #000;
+    width: 80%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.modal-content h2 {
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.modal-content p {
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.modal-btn {
+    padding: 8px 16px;
+    border: 2px solid #000;
+    background: #fff;
+    color: #000;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.modal-btn:hover {
+    background: #000;
+    color: #fff;
+}
+
+/* モバイル最適化 */
+@media (max-width: 768px) {
+    body {
+        height: 100vh;
+        height: 100dvh;
+        width: 100vw;
+        width: 100dvw;
+    }
+    
+    .game-container {
+        height: 100%;
+        width: 100%;
+    }
+    
+    .battle-field {
+        flex: 1;
+        min-height: 0;
+    }
+    
+    .battle-menu {
+        flex-shrink: 0;
+        min-height: 0;
+    }
+    
+    .enemy-sprite {
+        width: 90vw;
+        height: 90vw;
+        max-width: 400px;
+        max-height: 400px;
+        object-fit: contain;
+    }
+    
+    .command-option {
+        min-height: 40px;
+        font-size: 12px;
+        padding: 8px 10px;
+    }
+    
+    .command-option.selected {
+        background: transparent;
+        color: #fff;
+    }
+    
+    .command-menu,
+    .enemy-info {
+        padding: 6px;
+    }
+    
+    .enemy-display {
+        font-size: 12px;
+    }
+    
+    .encounter-enemy {
+        font-size: 18px;
+    }
+    
+    .encounter-battle {
+        font-size: 18px;
+        padding: 8px 16px;
+    }
+    
+    .encounter-battle::before {
+        font-size: 18px;
+    }
+    
+
+}
+
+/* タッチデバイス最適化 */
+@media (hover: none) and (pointer: coarse) {
+    .command-option:hover,
+    .target-option:hover {
+        transform: none;
+    }
+    
+    .command-option:active,
+.target-option:active {
+    transform: scale(0.95);
+    background: transparent;
+}
+}
+
+/* iOS Safari 対応 */
+@supports (-webkit-touch-callout: none) {
+    body {
+        height: -webkit-fill-available;
+    }
+    
+    .game-container {
+        height: -webkit-fill-available;
+    }
+}
+
+/* ピクセルアート風のアニメーション - 停止 */
+/* @keyframes pixelBounce {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-2px); }
+} */
+
+.enemy-sprite {
+    /* animation: pixelBounce 2s ease-in-out infinite; */
+}
+
+/* エンカウントアニメーション */
+.encounter-animation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    font-family: 'DotGothic16', monospace;
+    color: #fff;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.encounter-animation.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.encounter-enemy {
+    font-size: 20px;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.encounter-enemy.show {
+    opacity: 1;
+}
+
+.encounter-enemy.hide {
+    opacity: 0;
+}
+
+.encounter-battle {
+    font-size: 20px;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    cursor: pointer;
+    margin-top: 0;
+    border: 2px solid #fff;
+    padding: 10px 20px;
+    display: inline-block;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.8);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'DotGothic16', monospace;
+}
+
+.encounter-battle.show {
+    opacity: 1;
+}
+
+.encounter-battle::before {
+    content: '▶';
+    margin-right: 8px;
+    font-size: 20px;
+    color: #fff;
+    animation: cursorBlink 1s infinite;
+}
+
+

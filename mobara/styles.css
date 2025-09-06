@@ -128,6 +128,115 @@ body {
     align-items: flex-start;
 }
 
+/* わざルーレットスタートオプション */
+.kaishi-option {
+    background: #000;
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: 'DotGothic16', monospace;
+    position: relative;
+    width: 100%;
+    height: 140px;
+    text-align: center;
+}
+
+/* 子要素の中央揃えを確実にする */
+.kaishi-option > * {
+    text-align: center !important;
+}
+
+/* すべての子要素の中央揃えを強制 */
+.kaishi-option div,
+.kaishi-option button,
+.kaishi-option span {
+    text-align: center !important;
+}
+
+/* ダメージ表示の専用スタイル */
+.kaishi-option .damage-text {
+    text-align: center !important;
+    display: block !important;
+    margin: 0 auto 30px auto !important;
+    width: 100% !important;
+    color: #fff !important;
+    font-family: 'DotGothic16', monospace !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8) !important;
+    line-height: 1.4 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+}
+
+.kaishi-btn {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-family: 'DotGothic16', monospace;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: none;
+    outline: none;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 技確定後のボタンスタイルを確実にする */
+.kaishi-option .skill-determined-btn {
+    display: block !important;
+    text-align: center !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    width: 100% !important;
+    font-size: 14px !important;
+    font-family: 'DotGothic16', monospace !important;
+    color: #fff !important;
+    font-weight: bold !important;
+}
+
+/* つぎへボタンの▶点滅アニメーション */
+.kaishi-option .skill-determined-btn::before {
+    content: '▶';
+    margin-right: 8px;
+    font-size: 14px;
+    color: #fff;
+    animation: cursorBlink 1s infinite;
+}
+
+.kaishi-btn::before {
+    content: '▶';
+    margin-right: 8px;
+    font-size: 16px;
+    color: #fff;
+    animation: cursorBlink 1s infinite;
+}
+
+.kaishi-option:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.kaishi-option:active {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.kaishi-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 .command-menu {
     flex: 1;
     background: #000;
@@ -186,18 +295,19 @@ body {
 }
 
 .command-option {
-    padding: 8px 12px;
-    text-align: left;
+    padding: 0;
+    text-align: center;
     border: none;
     background: transparent;
     cursor: pointer;
-    font-size: 10px;
+    font-size: 16px;
     font-weight: bold;
     color: #fff;
     transition: all 0.1s ease;
-    min-height: 32px;
+    height: 140px;
     display: flex;
     align-items: center;
+    justify-content: center;
     font-family: 'DotGothic16', monospace;
     position: relative;
     width: 100%;
@@ -217,11 +327,11 @@ body {
 }
 
 .command-option.selected::before {
-    content: '▶';
-    margin-right: 8px;
-    font-size: 10px;
+    content: '';
+    margin-right: 0;
+    font-size: 16px;
     color: #fff;
-    animation: cursorBlink 1s infinite;
+    animation: none;
 }
 
 .enemy-display {
@@ -234,6 +344,14 @@ body {
 }
 
 .enemy-display::before {
+    content: '';
+    margin-right: 0;
+    font-size: 14px;
+    color: #fff;
+    animation: none;
+}
+
+.enemy-display.skill-determined::before {
     content: '▶';
     margin-right: 8px;
     font-size: 14px;

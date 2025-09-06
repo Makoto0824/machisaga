@@ -24,6 +24,9 @@ const encounterEnemy = document.querySelector('.encounter-enemy');
 const encounterBattle = document.getElementById('encounter-battle');
 const bgm = document.getElementById('bgm');
 const se = document.getElementById('se');
+const attackSE = document.getElementById('attackSE');
+const rouletteStartSE = document.getElementById('rouletteStartSE');
+const rouletteStopSE = document.getElementById('rouletteStopSE');
 const descriptionText = document.getElementById('description-text');
 const kaishiBtn = document.getElementById('kaishi-btn');
 const kaishiOption = document.getElementById('kaishi-option');
@@ -146,6 +149,47 @@ function tryAlternativeSE() {
             altSE.play().catch(e => console.log('代替SE再生エラー:', e));
             break;
         }
+    }
+}
+
+// 攻撃時効果音再生
+function playAttackSE() {
+    // 攻撃時効果音の再生位置をリセット
+    attackSE.currentTime = 0;
+    attackSE.volume = 0.8;
+    
+    // 再生を試行
+    const playPromise = attackSE.play();
+    if (playPromise !== undefined) {
+        playPromise.catch(e => {
+            console.log('攻撃時効果音再生エラー:', e);
+        });
+    }
+}
+
+// ルーレット開始効果音再生
+function playRouletteStartSE() {
+    rouletteStartSE.currentTime = 0;
+    rouletteStartSE.volume = 0.8;
+    
+    const playPromise = rouletteStartSE.play();
+    if (playPromise !== undefined) {
+        playPromise.catch(e => {
+            console.log('ルーレット開始効果音再生エラー:', e);
+        });
+    }
+}
+
+// ルーレット停止効果音再生
+function playRouletteStopSE() {
+    rouletteStopSE.currentTime = 0;
+    rouletteStopSE.volume = 0.8;
+    
+    const playPromise = rouletteStopSE.play();
+    if (playPromise !== undefined) {
+        playPromise.catch(e => {
+            console.log('ルーレット停止効果音再生エラー:', e);
+        });
     }
 }
 
@@ -390,6 +434,9 @@ function startAttack() {
 
 // 攻撃メッセージ表示関数
 function showAttackMessage() {
+    // 攻撃時効果音を再生
+    playAttackSE();
+    
     // 技オプションを非表示
     const commandOptions = document.querySelectorAll('.command-option');
     commandOptions.forEach(option => {
@@ -475,8 +522,8 @@ function startRandomSelection() {
     // かいしオプションを非表示にして技オプションを表示
     showCommandOptions();
     
-    // 効果音再生
-    playSE();
+    // ルーレット開始効果音を再生
+    playRouletteStartSE();
     
     // 技を順番に切り替える（100ms間隔）
     game.randomSelectionInterval = setInterval(() => {
@@ -498,6 +545,10 @@ function stopRandomSelection() {
     clearInterval(game.randomSelectionInterval);
     game.isRandomSelecting = false;
     
+    // ルーレット開始音を停止
+    rouletteStartSE.pause();
+    rouletteStartSE.currentTime = 0;
+    
     // 最終的な技を決定（重み付きランダム選択）
     const finalCommand = getWeightedRandomCommand();
     game.currentCommand = finalCommand;
@@ -513,8 +564,8 @@ function stopRandomSelection() {
         enemyDisplay.classList.add('skill-determined');
     }
     
-    // 効果音再生
-    playSE();
+    // ルーレット停止効果音を再生
+    playRouletteStopSE();
 }
 
 
