@@ -395,11 +395,16 @@ function playDamageVideo() {
                         // 再生が開始されたらフラグを設定
                         game.hasPlayedDamageVideo = true;
                         
-                        // 動画が終了したら最終フレームで停止
+                        // 動画が終了したら最終フレームで停止し、BGMを再開
                         video.addEventListener('ended', () => {
                             // 最終フレームで停止（少し手前で停止して最終フレームを表示）
                             video.currentTime = video.duration - 0.1;
                             video.pause();
+                            
+                            // モバイル対応: BGMが停止していたら再開
+                            if (bgm.paused && bgm.volume > 0) {
+                                bgm.play().catch(e => console.log('BGM再開エラー:', e));
+                            }
                         }, { once: true });
                     }).catch(e => {
                         console.log('ダメージ動画再生エラー:', e);
