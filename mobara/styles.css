@@ -585,6 +585,47 @@ body {
     pointer-events: auto;
 }
 
+/* エンカウンターGIFアニメーション */
+.encounter-gif-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    width: 100vw;
+    height: 100vh;
+    width: 100dvw; /* Dynamic viewport width */
+    height: 100dvh; /* Dynamic viewport height */
+    display: flex;
+    align-items: stretch;
+    justify-content: stretch;
+    opacity: 0;
+    z-index: 1001;
+    pointer-events: none; /* クリックをブロックしない */
+    transition: opacity 0.3s ease;
+    overflow: hidden;
+}
+
+.encounter-gif-container.show {
+    opacity: 1;
+}
+
+.encounter-gif {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 画面全体をカバー、アスペクト比維持 */
+    object-position: center; /* 中央配置 */
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    display: block;
+}
+
+/* 代替オプション: アスペクト比を無視して完全フィット */
+.encounter-gif.stretch {
+    object-fit: fill; /* アスペクト比を無視して完全フィット */
+}
+
 .encounter-enemy {
     font-size: 20px;
     font-weight: bold;

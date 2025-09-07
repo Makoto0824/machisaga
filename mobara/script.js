@@ -20,6 +20,7 @@ const gameOverModal = document.getElementById('game-over-modal');
 const gameResult = document.getElementById('game-result');
 const resultMessage = document.getElementById('result-message');
 const encounterAnimation = document.getElementById('encounter-animation');
+const encounterGifContainer = document.getElementById('encounter-gif-container');
 const encounterEnemy = document.querySelector('.encounter-enemy');
 const encounterBattle = document.getElementById('encounter-battle');
 const bgm = document.getElementById('bgm');
@@ -67,21 +68,31 @@ function startEncounterAnimation() {
     // 1. 黒背景表示
     encounterAnimation.classList.add('show');
     
-    // 2. 文字表示（0.3秒後）
+    // 2. エンカウンターGIFアニメーション表示（即座に）
+    encounterGifContainer.style.display = 'flex'; // 表示状態に戻す
+    encounterGifContainer.classList.add('show');
+    
+    // 3. GIFアニメーション停止（1秒後）
+    setTimeout(() => {
+        encounterGifContainer.classList.remove('show');
+        encounterGifContainer.style.display = 'none'; // 完全に非表示
+    }, 1000);
+    
+    // 4. 文字表示（1.3秒後）
     setTimeout(() => {
         encounterEnemy.classList.add('show');
-    }, 300);
+    }, 1300);
     
-    // 3. 文字消える（1.2秒後）
+    // 5. 文字消える（2.2秒後）
     setTimeout(() => {
         encounterEnemy.classList.remove('show');
         encounterEnemy.classList.add('hide');
-    }, 1200);
+    }, 2200);
     
-    // 4. 「たたかう」表示（1.5秒後）
+    // 6. 「たたかう」表示（2.5秒後）
     setTimeout(() => {
         encounterBattle.classList.add('show');
-    }, 1500);
+    }, 2500);
 }
 
 // BGM開始
