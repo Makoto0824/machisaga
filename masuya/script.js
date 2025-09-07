@@ -91,19 +91,19 @@ function startEncounterAnimation() {
     encounterVideo.muted = false; // 音声を有効化
     encounterVideo.play().catch(e => console.log('エンカウンター動画再生エラー:', e));
     
-    // 4. 動画アニメーション停止（1秒後）
+    // 4. 動画アニメーション停止（1.06秒後）
     setTimeout(() => {
         encounterVideoContainer.classList.remove('show');
         encounterVideoContainer.style.display = 'none'; // 完全に非表示
         encounterVideo.pause(); // 動画停止
-    }, 1000);
+    }, 1060);
     
-    // 5. 文字表示（1.3秒後）
+    // 5. 文字表示（1.36秒後）
     setTimeout(() => {
         encounterEnemy.classList.add('show');
-    }, 1300);
+    }, 1360);
     
-    // 6. 文字消える（2.2秒後）とバトル開始
+    // 6. 文字消える（2.26秒後）とバトル開始
     setTimeout(() => {
         encounterEnemy.classList.remove('show');
         encounterEnemy.classList.add('hide');
@@ -112,7 +112,7 @@ function startEncounterAnimation() {
         setTimeout(() => {
             startActualBattle();
         }, 300);
-    }, 2200);
+    }, 2260);
 }
 
 // BGM開始
