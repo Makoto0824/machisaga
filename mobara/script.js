@@ -20,7 +20,8 @@ const gameOverModal = document.getElementById('game-over-modal');
 const gameResult = document.getElementById('game-result');
 const resultMessage = document.getElementById('result-message');
 const encounterAnimation = document.getElementById('encounter-animation');
-const encounterGifContainer = document.getElementById('encounter-gif-container');
+const encounterVideoContainer = document.getElementById('encounter-video-container');
+const encounterVideo = document.getElementById('encounter-video');
 const encounterEnemy = document.querySelector('.encounter-enemy');
 const encounterBattle = document.getElementById('encounter-battle');
 const bgm = document.getElementById('bgm');
@@ -51,8 +52,8 @@ function initGame() {
     game.hasPlayedDamageVideo = false;
     
     setupEventListeners();
-    startEncounterAnimation();
-    // BGMはエンカウント後に開始
+    showInitialBattleButton();
+    // エンカウンターはユーザーインタラクション後に開始
     // 初期説明テキストを設定
     updateDescriptionText();
     
@@ -63,36 +64,55 @@ function initGame() {
     preloadDamageVideo();
 }
 
+// 初期「たたかう」ボタンを表示（ユーザーインタラクション待ち）
+function showInitialBattleButton() {
+    // 黒背景とたたかうボタンのみ表示
+    encounterAnimation.classList.add('show');
+    encounterBattle.classList.add('show');
+    
+    // エンカウンター演出は非表示のまま
+    encounterEnemy.classList.remove('show');
+    encounterVideoContainer.style.display = 'none';
+}
+
 // エンカウントアニメーション開始
 function startEncounterAnimation() {
-    // 1. 黒背景表示
+    // 1. 初期「たたかう」ボタンを非表示
+    encounterBattle.classList.remove('show');
+    
+    // 2. 黒背景表示
     encounterAnimation.classList.add('show');
     
-    // 2. エンカウンターGIFアニメーション表示（即座に）
-    encounterGifContainer.style.display = 'flex'; // 表示状態に戻す
-    encounterGifContainer.classList.add('show');
+    // 3. エンカウンター動画アニメーション表示（即座に）
+    encounterVideoContainer.style.display = 'flex'; // 表示状態に戻す
+    encounterVideoContainer.classList.add('show');
+    encounterVideo.currentTime = 0; // 動画を最初から再生
+    encounterVideo.volume = 0.7; // 音量設定（70%）
+    encounterVideo.muted = false; // 音声を有効化
+    encounterVideo.play().catch(e => console.log('エンカウンター動画再生エラー:', e));
     
-    // 3. GIFアニメーション停止（1秒後）
+    // 4. 動画アニメーション停止（1秒後）
     setTimeout(() => {
-        encounterGifContainer.classList.remove('show');
-        encounterGifContainer.style.display = 'none'; // 完全に非表示
+        encounterVideoContainer.classList.remove('show');
+        encounterVideoContainer.style.display = 'none'; // 完全に非表示
+        encounterVideo.pause(); // 動画停止
     }, 1000);
     
-    // 4. 文字表示（1.3秒後）
+    // 5. 文字表示（1.3秒後）
     setTimeout(() => {
         encounterEnemy.classList.add('show');
     }, 1300);
     
-    // 5. 文字消える（2.2秒後）
+    // 6. 文字消える（2.2秒後）とバトル開始
     setTimeout(() => {
         encounterEnemy.classList.remove('show');
         encounterEnemy.classList.add('hide');
+        
+        // 直接バトル開始（0.3秒後）
+        setTimeout(() => {
+            startActualBattle();
+        }, 300);
     }, 2200);
-    
-    // 6. 「たたかう」表示（2.5秒後）
-    setTimeout(() => {
-        encounterBattle.classList.add('show');
-    }, 2500);
 }
 
 // BGM開始
@@ -242,11 +262,17 @@ function preloadDamageVideo() {
     }, { once: true });
 }
 
-// 戦闘開始
+// 戦闘開始（ユーザークリック時）
 function startBattle() {
-    // 効果音再生
-    playSE();
-    
+    // 最初のクリックでエンカウンター演出開始
+    if (!game.hasStarted) {
+        startEncounterAnimation();
+        return;
+    }
+}
+
+// 実際のバトル開始処理（エンカウンター演出後）
+function startActualBattle() {
     // 黒背景を消す
     encounterAnimation.classList.remove('show');
     encounterEnemy.classList.remove('hide');
@@ -255,10 +281,8 @@ function startBattle() {
     // メニューを有効化
     enableMenu();
     
-    // 少し遅れてBGM開始（効果音と重ならないように）
-    setTimeout(() => {
-        startBGM();
-    }, 500);
+    // BGM開始
+    startBGM();
 }
 
 // UI更新
