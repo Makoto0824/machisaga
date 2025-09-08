@@ -477,10 +477,11 @@ function showAttackMessage() {
     // 攻撃時効果音を再生
     playAttackSE();
     
-    // 技オプションを非表示
+    // 技オプションを非表示・クリック無効化
     const commandOptions = document.querySelectorAll('.command-option');
     commandOptions.forEach(option => {
         option.style.display = 'none';
+        option.style.pointerEvents = 'none'; // クリックを無効化
     });
     
     // かいしオプションを表示して「勇者の　こうげき！」を表示
@@ -489,6 +490,7 @@ function showAttackMessage() {
     
     if (kaishiOption && kaishiBtn) {
         kaishiOption.style.display = 'flex';
+        kaishiOption.style.pointerEvents = 'none'; // 親要素のクリックも無効化
         kaishiBtn.textContent = '勇者の　こうげき！';
         kaishiBtn.style.pointerEvents = 'none'; // クリックを無効化
         kaishiBtn.style.cursor = 'default'; // カーソルを通常に
@@ -561,6 +563,12 @@ function startRandomSelection() {
     
     // かいしオプションを非表示にして技オプションを表示
     showCommandOptions();
+    
+    // コマンドオプションのクリックを無効化（ルーレット開始後は選択不可）
+    const commandOptions = document.querySelectorAll('.command-option');
+    commandOptions.forEach(option => {
+        option.style.pointerEvents = 'none'; // クリックを無効化
+    });
     
     // ルーレット開始効果音を再生
     playRouletteStartSE();
