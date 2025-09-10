@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "description": "まちサーガ 複数店舗の戦闘シミュレーター",
   "main": "index.html",
+  "type": "module",
   "scripts": {
     "dev": "npx serve . -p 3000",
     "start": "npx serve . -p 3000",
-    "test": "echo 'No tests specified'"
+    "test": "echo 'No tests specified'",
+    "build": "echo 'No build step required'"
   },
   "keywords": [
     "game",
@@ -16,7 +18,9 @@
     "javascript",
     "html5",
     "css3",
-    "machisaga"
+    "machisaga",
+    "vercel",
+    "api"
   ],
   "author": "Makoto",
   "license": "MIT",
@@ -24,6 +28,6 @@
     "serve": "^14.2.0"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=18.0.0"
   }
 }
