@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>まちサーガ イベント管理画面</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: #3498db;
+        }
+
+        .header p {
+            opacity: 0.8;
+            font-size: 1.1rem;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .card h3 {
+            color: #3498db;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+
+        .button {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            border: none;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .button.danger {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+        }
+
+        .button.success {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+        }
+
+        .button:disabled {
+            background: #7f8c8d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .auth-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(231, 76, 60, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+
+        .auth-section h4 {
+            color: #e74c3c;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin: 1rem 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .form-group input[type="password"],
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .usage-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .usage-table th,
+        .usage-table td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .usage-table th {
+            background: rgba(255, 255, 255, 0.1);
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .usage-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .status-used {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .status-available {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .message.success {
+            background: rgba(39, 174, 96, 0.2);
+            border: 1px solid rgba(39, 174, 96, 0.5);
+            color: #2ecc71;
+        }
+
+        .message.error {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid rgba(231, 76, 60, 0.5);
+            color: #e74c3c;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏰 まちサーガ イベント管理画面</h1>
+            <p>使い切りURL システム管理</p>
+        </div>
+
+        <div class="auth-section">
+            <h4>🔐 管理者認証</h4>
+            <div class="form-group">
+                <label for="adminPassword">管理者パスワード:</label>
+                <input type="password" id="adminPassword" placeholder="管理者パスワードを入力">
+            </div>
+            <button class="button" onclick="authenticateAdmin()">認証</button>
+        </div>
+
+        <div id="adminContent" style="display: none;">
+            <div class="dashboard">
+                <div class="card">
+                    <h3>📊 使用状況統計</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-number" id="totalUrls">--</div>
+                            <div class="stat-label">総URL数</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="usedUrls">--</div>
+                            <div class="stat-label">使用済み</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="availableUrls">--</div>
+                            <div class="stat-label">利用可能</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="usageRate">--%</div>
+                            <div class="stat-label">利用率</div>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                    <button class="button" onclick="refreshStats()">🔄 統計更新</button>
+                </div>
+
+                <div class="card">
+                    <h3>🔧 システム管理</h3>
+                    <button class="button success" onclick="reloadFromCSV()">📥 CSVから再読み込み</button>
+                    <button class="button" onclick="exportReport()">📊 使用状況レポート出力</button>
+                    <button class="button danger" onclick="resetAllUrls()">🔄 全URLリセット</button>
+                    
+                    <div class="form-group" style="margin-top: 2rem;">
+                        <label for="resetUrlId">個別URLリセット:</label>
+                        <input type="text" id="resetUrlId" placeholder="URL ID (例: event_001)">
+                        <button class="button" onclick="resetSingleUrl()">リセット実行</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>📋 最近の使用履歴</h3>
+                <div id="recentUsageContainer">
+                    <p>データを読み込み中...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="messageContainer"></div>
+    </div>
+
+    <script>
+        let isAuthenticated = false;
+        let currentPassword = '';
+
+        // 管理者認証
+        async function authenticateAdmin() {
+            const password = document.getElementById('adminPassword').value;
+            
+            if (!password) {
+                showMessage('パスワードを入力してください', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/single-use-redirect', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        action: 'stats', 
+                        password: password 
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    isAuthenticated = true;
+                    currentPassword = password;
+                    
+                    document.querySelector('.auth-section').style.display = 'none';
+                    document.getElementById('adminContent').style.display = 'block';
+                    
+                    showMessage('✅ 認証成功！管理画面にアクセスできます', 'success');
+                    
+                    // 初回データ読み込み
+                    updateStats(data.stats, data.recentUsage);
+                } else {
+                    showMessage('❌ 認証に失敗しました。パスワードを確認してください', 'error');
+                }
+            } catch (error) {
+                console.error('Authentication error:', error);
+                showMessage('❌ 認証エラーが発生しました', 'error');
+            }
+        }
+
+        // 統計データ更新
+        function updateStats(stats, recentUsage = []) {
+            document.getElementById('totalUrls').textContent = stats.total || 0;
+            document.getElementById('usedUrls').textContent = stats.used || 0;
+            document.getElementById('availableUrls').textContent = stats.available || 0;
+            document.getElementById('usageRate').textContent = `${stats.usageRate || 0}%`;
+            
+            // プログレスバー更新
+            const progressFill = document.getElementById('progressFill');
+            progressFill.style.width = `${stats.usageRate || 0}%`;
+
+            // 最近の使用履歴更新
+            updateRecentUsage(recentUsage);
+        }
+
+        // 最近の使用履歴更新
+        function updateRecentUsage(recentUsage) {
+            const container = document.getElementById('recentUsageContainer');
+            
+            if (!recentUsage || recentUsage.length === 0) {
+                container.innerHTML = '<p>使用履歴がありません</p>';
+                return;
+            }
+
+            const tableHTML = `
+                <table class="usage-table">
+                    <thead>
+                        <tr>
+                            <th>URL ID</th>
+                            <th>MSC</th>
+                            <th>使用者</th>
+                            <th>使用日時</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${recentUsage.map(item => `
+                            <tr>
+                                <td>${item.id}</td>
+                                <td>${item.mscAmount} MSC</td>
+                                <td>${item.usedBy || 'Anonymous'}</td>
+                                <td>${new Date(item.usedAt).toLocaleString('ja-JP')}</td>
+                                <td>
+                                    <button class="button" onclick="resetSingleUrl('${item.id}')">リセット</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = tableHTML;
+        }
+
+        // 統計更新
+        async function refreshStats() {
+            if (!isAuthenticated) return;
+
+            try {
+                const response = await fetch('/api/single-use-redirect', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        action: 'stats', 
+                        password: currentPassword 
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    updateStats(data.stats, data.recentUsage);
+                    showMessage('✅ 統計データを更新しました', 'success');
+                }
+            } catch (error) {
+                console.error('Stats refresh error:', error);
+                showMessage('❌ 統計更新エラー', 'error');
+            }
+        }
+
+        // CSVから再読み込み
+        async function reloadFromCSV() {
+            if (!isAuthenticated) return;
+
+            try {
+                const response = await fetch('/api/single-use-redirect', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        action: 'reload', 
+                        password: currentPassword 
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    showMessage(data.message, 'success');
+                    updateStats(data.stats);
+                } else {
+                    showMessage(data.error || 'CSV読み込みに失敗しました', 'error');
+                }
+            } catch (error) {
+                console.error('CSV reload error:', error);
+                showMessage('❌ CSV読み込みエラー', 'error');
+            }
+        }
+
+        // レポート出力
+        async function exportReport() {
+            if (!isAuthenticated) return;
+
+            try {
+                const response = await fetch('/api/single-use-redirect', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        action: 'export', 
+                        password: currentPassword 
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    showMessage(`✅ ${data.message}`, 'success');
+                } else {
+                    showMessage(data.error || 'レポート出力に失敗しました', 'error');
+                }
+            } catch (error) {
+                console.error('Export error:', error);
+                showMessage('❌ レポート出力エラー', 'error');
+            }
+        }
+
+        // 全URLリセット
+        async function resetAllUrls() {
+            if (!isAuthenticated) return;
+            
+            if (!confirm('⚠️ 本当に全URLをリセットしますか？この操作は取り消せません。')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/single-use-redirect', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        action: 'reset', 
+                        password: currentPassword 
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    showMessage(data.message, 'success');
+                    refreshStats();
+                } else {
+                    showMessage(data.error || 'リセットに失敗しました', 'error');
+                }
+            } catch (error) {
+                console.error('Reset error:', error);
+                showMessage('❌ リセットエラー', 'error');
+            }
+        }
+
+        // 個別URLリセット
+        async function resetSingleUrl(urlId = null) {
+            if (!isAuthenticated) return;
+            
+            const targetUrlId = urlId || document.getElementById('resetUrlId').value;
+            
+            if (!targetUrlId) {
+                showMessage('URL IDを入力してください', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/single-use-redirect', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        action: 'reset', 
+                        password: currentPassword,
+                        urlId: targetUrlId
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    showMessage(data.message, 'success');
+                    document.getElementById('resetUrlId').value = '';
+                    refreshStats();
+                } else {
+                    showMessage(data.error || 'リセットに失敗しました', 'error');
+                }
+            } catch (error) {
+                console.error('Single reset error:', error);
+                showMessage('❌ リセットエラー', 'error');
+            }
+        }
+
+        // メッセージ表示
+        function showMessage(message, type = 'info') {
+            const container = document.getElementById('messageContainer');
+            const className = type === 'error' ? 'error' : 'success';
+            
+            container.innerHTML = `
+                <div class="message ${className}">
+                    ${message}
+                </div>
+            `;
+
+            // 5秒後にメッセージを削除
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        // 定期的に統計を更新（60秒ごと）
+        setInterval(() => {
+            if (isAuthenticated) {
+                refreshStats();
+            }
+        }, 60000);
+    </script>
+</body>
+</html>

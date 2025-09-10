@@ -4,6 +4,14 @@
     {
       "source": "/redirect/(.*)",
       "destination": "/redirect.html"
+    },
+    {
+      "source": "/event-entry",
+      "destination": "/event-entry.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/admin-panel.html"
     }
   ],
   "headers": [

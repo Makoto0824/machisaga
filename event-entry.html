@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>まちサーガ × T&T イベント参加</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .event-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+            border-left: 4px solid #ffd700;
+        }
+
+        .event-info h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .event-info p {
+            margin: 0.5rem 0;
+            line-height: 1.6;
+        }
+
+        .msc-highlight {
+            display: inline-block;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #333;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin: 0 0.5rem;
+        }
+
+        .entry-button {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            border: none;
+            color: white;
+            padding: 1.2rem 3rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin: 2rem 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(255, 107, 107, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .entry-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .entry-button:active {
+            transform: translateY(0);
+        }
+
+        .entry-button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 2rem 0;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid rgba(255, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .success {
+            background: rgba(0, 255, 0, 0.2);
+            border: 1px solid rgba(0, 255, 0, 0.5);
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .redirect-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 1rem 0;
+        }
+
+        .countdown {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #ffd700;
+            margin: 1rem 0;
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .instructions h4 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .instructions ol {
+            margin-left: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .back-link {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            margin-top: 2rem;
+            display: inline-block;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+
+            .logo {
+                font-size: 2rem;
+            }
+
+            .entry-button {
+                padding: 1rem 2rem;
+                font-size: 1.1rem;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🏰 まちサーガ</div>
+        <div class="subtitle">× T&T Games イベント</div>
+
+        <div class="event-info">
+            <h3>🎯 MSC獲得イベント開催中！</h3>
+            <p>T&T Gamesのまちサーガイベントに参加して、</p>
+            <p><span class="msc-highlight">🪙 MSCコイン</span>を獲得しよう！</p>
+            <p>先着限定のチャンスです。お見逃しなく！</p>
+        </div>
+
+        <div id="statsContainer" class="stats">
+            <div class="stat-item">
+                <div class="stat-number" id="availableCount">--</div>
+                <div class="stat-label">残り枠数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="totalCount">--</div>
+                <div class="stat-label">総枠数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="usageRate">--%</div>
+                <div class="stat-label">利用率</div>
+            </div>
+        </div>
+
+        <button id="entryButton" class="entry-button" onclick="startEventEntry()">
+            🚀 イベントに参加する
+        </button>
+
+        <div id="messageContainer"></div>
+
+        <div class="instructions">
+            <h4>📱 参加方法</h4>
+            <ol>
+                <li><strong>「イベントに参加する」</strong>ボタンをクリック</li>
+                <li><strong>T&Tイベントページ</strong>が自動で開きます</li>
+                <li><strong>「ログイン/登録してチェックイン」</strong>をタップ</li>
+                <li><strong>GoogleまたはApple</strong>でログイン/登録</li>
+                <li><strong>チェックイン完了</strong>でMSCコインを獲得！</li>
+            </ol>
+        </div>
+
+        <a href="/" class="back-link">← まちサーガホームに戻る</a>
+    </div>
+
+    <script>
+        let isRedirecting = false;
+
+        // ページ読み込み時に統計を取得
+        document.addEventListener('DOMContentLoaded', function() {
+            loadEventStats();
+        });
+
+        // イベント統計を読み込み
+        async function loadEventStats() {
+            try {
+                const response = await fetch('/api/single-use-redirect');
+                const data = await response.json();
+                
+                if (data.success && data.stats) {
+                    updateStats(data.stats);
+                } else {
+                    // API経由で統計取得を試行
+                    await fetchStatsViaAdmin();
+                }
+            } catch (error) {
+                console.warn('統計読み込みエラー:', error);
+                // エラー時はプレースホルダーを表示
+                updateStats({ total: 100, available: '確認中', usageRate: '--' });
+            }
+        }
+
+        // 管理者API経由で統計取得
+        async function fetchStatsViaAdmin() {
+            try {
+                const response = await fetch('/api/single-use-redirect', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        action: 'stats', 
+                        password: 'machisaga-admin-2025' 
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success && data.stats) {
+                    updateStats(data.stats);
+                }
+            } catch (error) {
+                console.warn('管理者API統計取得エラー:', error);
+            }
+        }
+
+        // 統計表示を更新
+        function updateStats(stats) {
+            document.getElementById('availableCount').textContent = stats.available || '--';
+            document.getElementById('totalCount').textContent = stats.total || '--';
+            document.getElementById('usageRate').textContent = stats.usageRate ? `${stats.usageRate}%` : '--%';
+            
+            // 残り枠が少ない場合の警告
+            if (stats.available !== undefined && stats.available <= 10) {
+                document.getElementById('availableCount').style.color = '#ff6b6b';
+                showMessage('⚠️ 残り枠が少なくなっています！お早めにご参加ください。', 'warning');
+            }
+        }
+
+        // イベント参加開始
+        async function startEventEntry() {
+            if (isRedirecting) return;
+            
+            const button = document.getElementById('entryButton');
+            const originalText = button.textContent;
+            
+            // ボタンを無効化
+            button.disabled = true;
+            button.innerHTML = '<div class="loading"></div>イベントページを準備中...';
+            isRedirecting = true;
+
+            try {
+                // 未使用URLを取得
+                const response = await fetch('/api/single-use-redirect');
+                const data = await response.json();
+
+                if (!data.success) {
+                    if (response.status === 410) {
+                        // 全て使い切り
+                        showMessage('😔 申し訳ございません。イベントの募集枠が満員となりました。次回の開催をお待ちください。', 'error');
+                        button.textContent = '満員御礼';
+                        return;
+                    } else {
+                        throw new Error(data.error || 'URLの取得に失敗しました');
+                    }
+                }
+
+                // 成功時の処理
+                showRedirectInfo(data);
+                
+                // 5秒後に自動リダイレクト
+                let countdown = 5;
+                const countdownInterval = setInterval(() => {
+                    if (countdown <= 0) {
+                        clearInterval(countdownInterval);
+                        window.open(data.url, '_blank', 'noopener,noreferrer');
+                        
+                        // リダイレクト完了後の処理
+                        setTimeout(() => {
+                            showMessage('✅ イベントページを開きました！新しいタブでT&Tイベントに参加してください。', 'success');
+                            button.textContent = '✅ 参加済み';
+                            button.style.background = '#4caf50';
+                        }, 1000);
+                        
+                        return;
+                    }
+                    
+                    updateCountdown(countdown);
+                    countdown--;
+                }, 1000);
+
+                // 統計を更新
+                if (data.stats) {
+                    updateStats(data.stats);
+                }
+
+            } catch (error) {
+                console.error('Entry error:', error);
+                showMessage(`❌ エラーが発生しました: ${error.message}`, 'error');
+                
+                // ボタンを復元
+                button.disabled = false;
+                button.textContent = originalText;
+                isRedirecting = false;
+            }
+        }
+
+        // リダイレクト情報を表示
+        function showRedirectInfo(data) {
+            const container = document.getElementById('messageContainer');
+            container.innerHTML = `
+                <div class="redirect-info">
+                    <h3>🎉 イベントページを準備しました！</h3>
+                    <p><strong>獲得予定:</strong> <span class="msc-highlight">${data.mscAmount} MSC</span></p>
+                    <p><strong>イベント:</strong> ${data.description}</p>
+                    <div class="countdown" id="countdown">5</div>
+                    <p>秒後に自動的にイベントページが開きます</p>
+                    <button onclick="window.open('${data.url}', '_blank')" style="
+                        background: #4caf50;
+                        border: none;
+                        color: white;
+                        padding: 0.8rem 1.5rem;
+                        border-radius: 25px;
+                        cursor: pointer;
+                        margin-top: 1rem;
+                        font-weight: bold;
+                    ">今すぐ開く</button>
+                </div>
+            `;
+        }
+
+        // カウントダウン更新
+        function updateCountdown(count) {
+            const countdownElement = document.getElementById('countdown');
+            if (countdownElement) {
+                countdownElement.textContent = count;
+            }
+        }
+
+        // メッセージ表示
+        function showMessage(message, type = 'info') {
+            const container = document.getElementById('messageContainer');
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : 'redirect-info';
+            
+            container.innerHTML = `
+                <div class="${className}">
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        // 定期的に統計を更新（30秒ごと）
+        setInterval(loadEventStats, 30000);
+    </script>
+</body>
+</html>
