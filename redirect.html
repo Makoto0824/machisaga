@@ -72,6 +72,72 @@
         .back-button:hover {
             background: rgba(255, 255, 255, 0.3);
         }
+        
+        .login-steps {
+            margin: 2rem 0;
+        }
+        
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin: 1.5rem 0;
+            text-align: left;
+        }
+        
+        .step-number {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .step-content h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.1rem;
+        }
+        
+        .step-content p {
+            margin: 0 0 1rem 0;
+            opacity: 0.9;
+        }
+        
+        .login-button, .proceed-button {
+            background: #4285f4;
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin: 0.5rem 0;
+        }
+        
+        .login-button:hover {
+            background: #3367d6;
+        }
+        
+        .proceed-button {
+            background: #34a853;
+        }
+        
+        .proceed-button:hover {
+            background: #2d8f47;
+        }
+        
+        .notice {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #ffd700;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -81,6 +147,38 @@
         <p>URLを検証しています。しばらくお待ちください。</p>
     </div>
     
+    <div class="container" id="loginContainer" style="display: none;">
+        <h2>🔐 T&Tログインが必要です</h2>
+        <div class="notice">
+            <p><strong>📱 まちサーガイベント</strong>にアクセスするには、T&Tプラットフォームへのログインが必要です。</p>
+        </div>
+        
+        <div class="login-steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>T&Tプラットフォームにログイン</h3>
+                    <p>GoogleまたはAppleアカウントでT&Tにログインしてください</p>
+                    <button class="login-button" onclick="openLoginPage()">
+                        🔐 T&Tにログイン（新しいタブ）
+                    </button>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>ログイン完了後にイベントへ進む</h3>
+                    <p>ログインが完了したら、下のボタンでまちサーガイベントページに進んでください</p>
+                    <button class="proceed-button" onclick="proceedToEvent()">
+                        ⚔️ まちサーガイベントへ進む
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <button class="back-button" onclick="goBack()">戻る</button>
+    </div>
+
     <div class="container" id="errorContainer" style="display: none;">
         <h2>⚠️ エラーが発生しました</h2>
         <div class="error" id="errorMessage">
@@ -180,17 +278,12 @@
                     throw new Error('トークンの有効期限が切れています');
                 }
                 
-                // iframeで表示
-                const iframe = document.getElementById('targetFrame');
-                const loadingContainer = document.getElementById('loadingContainer');
+                console.log('✅ 検証成功！T&Tログイン画面を表示します');
                 
-                console.log('✅ 検証成功！iframeで表示します:', targetUrl);
+                // まちサーガのイベントページはT&Tログインが必要なので、ログイン画面を表示
+                showLoginRequired(targetUrl);
                 
-                iframe.src = targetUrl;
-                iframe.classList.add('active');
-                loadingContainer.style.display = 'none';
-                
-                console.log('🎉 リダイレクト成功！');
+                console.log('🔐 ログイン画面表示完了！');
                 
             } catch (error) {
                 console.error('Redirect error:', error);
@@ -207,6 +300,65 @@
             loadingContainer.style.display = 'none';
             errorContainer.style.display = 'block';
             errorMessage.textContent = message;
+        }
+        
+        // グローバル変数でターゲットURLを保存
+        let currentTargetUrl = '';
+        
+        // ログインページを開く
+        function openLoginPage() {
+            console.log('🔐 T&Tログインページを開きます');
+            window.open('https://play.ttt.games/auth/signin', '_blank', 'width=600,height=700');
+        }
+        
+        // イベントページに進む
+        function proceedToEvent() {
+            if (!currentTargetUrl) {
+                showError('対象URLが設定されていません');
+                return;
+            }
+            
+            console.log('⚔️ まちサーガイベントページに進みます:', currentTargetUrl);
+            
+            // ローディング表示
+            const loginContainer = document.getElementById('loginContainer');
+            const loadingContainer = document.getElementById('loadingContainer');
+            
+            loginContainer.style.display = 'none';
+            loadingContainer.style.display = 'block';
+            
+            // ローディングメッセージを更新
+            const loadingText = loadingContainer.querySelector('p');
+            loadingText.textContent = 'まちサーガイベントページを読み込み中...';
+            
+            // 少し遅延を入れてからiframeを表示
+            setTimeout(() => {
+                const iframe = document.getElementById('targetFrame');
+                
+                iframe.src = currentTargetUrl;
+                iframe.classList.add('active');
+                loadingContainer.style.display = 'none';
+                
+                console.log('🎉 イベントページ表示完了！');
+                
+                // iframe読み込みエラーをキャッチ
+                iframe.onerror = () => {
+                    console.error('iframe読み込みエラー');
+                    showError('イベントページの読み込みに失敗しました。ログインが完了していない可能性があります。');
+                };
+            }, 1000);
+        }
+        
+        // ログイン画面を表示
+        function showLoginRequired(targetUrl) {
+            currentTargetUrl = targetUrl;
+            const loadingContainer = document.getElementById('loadingContainer');
+            const loginContainer = document.getElementById('loginContainer');
+            
+            loadingContainer.style.display = 'none';
+            loginContainer.style.display = 'block';
+            
+            console.log('🔐 ログイン必須画面を表示しました');
         }
         
         // 戻るボタン
