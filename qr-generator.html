@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>まちサーガ QRコード生成器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: white;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .section h2 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: #ffd700;
+        }
+        
+        .url-info {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        
+        .qr-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .qr-code {
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        .qr-code canvas {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #333;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .usage-info {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        
+        .usage-info h3 {
+            color: #4ade80;
+            margin-bottom: 0.5rem;
+        }
+        
+        .usage-info ul {
+            margin-left: 1rem;
+        }
+        
+        .usage-info li {
+            margin-bottom: 0.3rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+                margin: 1rem;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+        }
+    </style>
+    <!-- QRコード生成ライブラリ -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🏰 まちサーガ</div>
+            <div class="subtitle">QRコード生成器</div>
+        </div>
+        
+        <div class="section">
+            <h2>📱 自動リダイレクト用QRコード</h2>
+            <p>このQRコードをスキャンすると、自動でセキュアトークンが生成され、イベントページにリダイレクトされます。</p>
+            
+            <div class="url-info">
+                <strong>エントリーURL:</strong><br>
+                <span id="entryUrl">loading...</span>
+            </div>
+            
+            <div class="qr-container">
+                <div class="qr-code">
+                    <canvas id="qrCanvas"></canvas>
+                </div>
+                <button class="btn" onclick="downloadQR()">📁 QRコードをダウンロード</button>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🔗 直接リンク</h2>
+            <p>QRコードが使用できない場合は、下記のリンクを使用してください。</p>
+            
+            <div class="url-info">
+                <strong>直接リンク:</strong><br>
+                <a href="#" id="directLink" style="color: #ffd700;">loading...</a>
+            </div>
+        </div>
+        
+        <div class="usage-info">
+            <h3>💡 使用方法</h3>
+            <ul>
+                <li><strong>QRコード:</strong> スマートフォンのカメラでスキャン</li>
+                <li><strong>直接リンク:</strong> ブラウザで直接アクセス</li>
+                <li><strong>自動処理:</strong> トークン生成→リダイレクト（約1秒）</li>
+                <li><strong>セキュリティ:</strong> 5分間有効なワンタイムトークン</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>🔒 セキュリティ機能</h2>
+            <ul>
+                <li><strong>URL隠蔽:</strong> 元のURLは外部に露出しません</li>
+                <li><strong>署名検証:</strong> HMAC-SHA256による改ざん防止</li>
+                <li><strong>時間制限:</strong> 5分間の有効期限</li>
+                <li><strong>ワンタイム:</strong> 使い捨てトークン</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // エントリーページのURL
+        const ENTRY_URL = `${window.location.origin}/entry.html`;
+        
+        // DOM要素
+        const entryUrlEl = document.getElementById('entryUrl');
+        const directLinkEl = document.getElementById('directLink');
+        const qrCanvas = document.getElementById('qrCanvas');
+        
+        // 初期化
+        function init() {
+            // URL表示
+            entryUrlEl.textContent = ENTRY_URL;
+            directLinkEl.href = ENTRY_URL;
+            directLinkEl.textContent = ENTRY_URL;
+            
+            // QRコード生成
+            generateQR();
+        }
+        
+        // QRコード生成
+        function generateQR() {
+            const options = {
+                width: 256,
+                height: 256,
+                color: {
+                    dark: '#000000',
+                    light: '#FFFFFF'
+                },
+                errorCorrectionLevel: 'M',
+                type: 'image/png',
+                quality: 0.92,
+                margin: 1,
+            };
+            
+            QRCode.toCanvas(qrCanvas, ENTRY_URL, options, function (error) {
+                if (error) {
+                    console.error('QR Code generation error:', error);
+                    qrCanvas.parentElement.innerHTML = '<p style="color: #ef4444;">QRコード生成エラー</p>';
+                } else {
+                    console.log('QR Code generated successfully');
+                }
+            });
+        }
+        
+        // QRコードダウンロード
+        function downloadQR() {
+            const canvas = document.getElementById('qrCanvas');
+            const link = document.createElement('a');
+            link.download = 'machisaga-entry-qr.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            
+            console.log('QR Code downloaded');
+        }
+        
+        // 初期化実行
+        document.addEventListener('DOMContentLoaded', init);
+        
+        // デバッグ情報
+        console.log('QR Generator loaded:', {
+            entryUrl: ENTRY_URL,
+            origin: window.location.origin
+        });
+    </script>
+</body>
+</html>

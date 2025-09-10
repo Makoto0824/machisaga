@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>まちサーガ - イベント参加</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+        }
+        
+        .logo {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .status {
+            font-size: 1.1rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .success {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.5);
+        }
+        
+        .error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+        }
+        
+        .manual-link {
+            margin-top: 2rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .manual-link a {
+            color: #ffd700;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .manual-link a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🏰 まちサーガ</div>
+        <div class="subtitle">地域共創サポートゲーム</div>
+        
+        <div class="loading" id="loadingIndicator">
+            <div class="spinner"></div>
+            <span>安全なアクセスを準備中...</span>
+        </div>
+        
+        <div class="status" id="statusMessage">
+            トークンを生成しています...
+        </div>
+        
+        <div class="manual-link" id="manualLink" style="display: none;">
+            <p>自動リダイレクトに失敗した場合は、下記リンクをクリックしてください：</p>
+            <a href="#" id="manualRedirectLink">イベントページへ進む</a>
+        </div>
+    </div>
+
+    <script>
+        // 対象URL（隠したいURL）
+        const TARGET_URL = 'https://play.ttt.games/worlds/machi-saga/events/WsDzeA-BjEOjN833J0-tTzRDHnnLLzFMytiCf5gseD4/checkin';
+        
+        // API ベースURL
+        const API_BASE = window.location.origin;
+        
+        // デバッグ情報
+        console.log('Entry page loaded:', {
+            targetUrl: TARGET_URL,
+            apiBase: API_BASE,
+            userAgent: navigator.userAgent
+        });
+        
+        // 自動リダイレクト実行
+        async function autoRedirect() {
+            const statusEl = document.getElementById('statusMessage');
+            const loadingEl = document.getElementById('loadingIndicator');
+            const manualEl = document.getElementById('manualLink');
+            const manualLinkEl = document.getElementById('manualRedirectLink');
+            
+            try {
+                // Step 1: トークン生成
+                statusEl.textContent = 'セキュアトークンを生成中...';
+                statusEl.className = 'status';
+                
+                const apiUrl = `${API_BASE}/api/generate-token?url=${encodeURIComponent(TARGET_URL)}`;
+                console.log('API Request:', apiUrl);
+                
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('API Response:', data);
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'トークン生成に失敗しました');
+                }
+                
+                // Step 2: リダイレクト実行
+                const redirectUrl = `${API_BASE}${data.url}`;
+                
+                statusEl.textContent = '✅ トークン生成完了！リダイレクト中...';
+                statusEl.className = 'status success';
+                
+                // 手動リンクを設定（バックアップ）
+                manualLinkEl.href = redirectUrl;
+                
+                console.log('Redirecting to:', redirectUrl);
+                
+                // 短い遅延後にリダイレクト
+                setTimeout(() => {
+                    window.location.href = redirectUrl;
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Auto-redirect error:', error);
+                
+                // エラー表示
+                loadingEl.style.display = 'none';
+                statusEl.textContent = `❌ エラー: ${error.message}`;
+                statusEl.className = 'status error';
+                
+                // 手動リンクを表示
+                manualEl.style.display = 'block';
+                manualLinkEl.href = TARGET_URL; // フォールバック: 元のURL
+            }
+        }
+        
+        // タイムアウト処理（10秒後）
+        setTimeout(() => {
+            const loadingEl = document.getElementById('loadingIndicator');
+            const manualEl = document.getElementById('manualLink');
+            const manualLinkEl = document.getElementById('manualRedirectLink');
+            
+            if (loadingEl.style.display !== 'none') {
+                loadingEl.style.display = 'none';
+                manualEl.style.display = 'block';
+                manualLinkEl.href = TARGET_URL;
+                
+                document.getElementById('statusMessage').textContent = '⚠️ 自動リダイレクトがタイムアウトしました';
+                document.getElementById('statusMessage').className = 'status error';
+            }
+        }, 10000);
+        
+        // ページ読み込み完了後に実行
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, starting auto-redirect...');
+            autoRedirect();
+        });
+        
+        // バックボタン対応
+        window.addEventListener('beforeunload', () => {
+            console.log('User navigating away from entry page');
+        });
+    </script>
+</body>
+</html>
