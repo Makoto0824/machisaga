@@ -323,18 +323,42 @@
                     // iframe読み込み完了チェック
                     iframe.onload = () => {
                         console.log('🎯 イベントページ読み込み完了');
-                        // ログインが必要な場合は内容が空になるはず
+                        
+                        // T&Tログインボタンの自動操作を試行
                         setTimeout(() => {
                             try {
                                 const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-                                if (!iframeDoc || iframeDoc.body.innerHTML.trim() === '') {
-                                    console.warn('🔐 ログインが必要な可能性があります');
-                                    showLoginRequired(targetUrl);
+                                if (iframeDoc) {
+                                    // ログインボタンを探して自動クリック
+                                    const loginButton = iframeDoc.querySelector('button[class*="login"], button[id*="login"], button:contains("ログイン"), a[href*="auth"]');
+                                    if (loginButton) {
+                                        console.log('🔐 T&Tログインボタンを発見 - 自動クリック実行');
+                                        loginButton.click();
+                                    } else {
+                                        // テキストベースでログインボタンを探す
+                                        const buttons = Array.from(iframeDoc.querySelectorAll('button, a'));
+                                        const loginBtn = buttons.find(btn => 
+                                            btn.textContent.includes('ログイン') || 
+                                            btn.textContent.includes('登録') ||
+                                            btn.textContent.includes('チェックイン')
+                                        );
+                                        if (loginBtn) {
+                                            console.log('🎯 ログイン関連ボタンを発見 - 自動クリック実行');
+                                            loginBtn.click();
+                                        } else {
+                                            console.log('ℹ️ ログインボタンが見つかりません - 手動操作が必要');
+                                            showLoginInstructions();
+                                        }
+                                    }
+                                } else {
+                                    console.warn('🔐 iframe内容にアクセスできません - ログイン案内を表示');
+                                    showLoginInstructions();
                                 }
                             } catch (error) {
-                                console.log('🔒 Cross-origin制限のため内容確認不可（正常）');
+                                console.log('🔒 Cross-origin制限のため自動操作不可 - ログイン案内を表示');
+                                showLoginInstructions();
                             }
-                        }, 2000);
+                        }, 3000); // 3秒待ってからログイン操作
                     };
                 }, 1000);
                 
@@ -424,6 +448,77 @@
             loginContainer.style.display = 'block';
             
             console.log('🔐 ログイン必須画面を表示しました');
+        }
+        
+        // ログイン操作案内を表示
+        function showLoginInstructions() {
+            // オーバーレイとしてログイン案内を表示
+            const overlay = document.createElement('div');
+            overlay.id = 'loginInstructionsOverlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+                color: white;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            `;
+            
+            overlay.innerHTML = `
+                <div style="
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    padding: 2rem;
+                    border-radius: 10px;
+                    max-width: 500px;
+                    text-align: center;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                ">
+                    <h2>🎯 まちサーガイベント開始！</h2>
+                    <p style="margin: 1rem 0; line-height: 1.6;">
+                        イベントページが表示されました！<br>
+                        <strong>「ログイン/登録してチェックイン」ボタン</strong>をタップして<br>
+                        T&Tプラットフォームに登録/ログインしてください。
+                    </p>
+                    <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 5px; margin: 1rem 0;">
+                        <h3>📱 操作手順</h3>
+                        <ol style="text-align: left; margin: 0; padding-left: 1.5rem;">
+                            <li>青い「ログイン/登録してチェックイン」ボタンをタップ</li>
+                            <li>GoogleまたはAppleアカウントで登録/ログイン</li>
+                            <li>チェックイン完了でMSCコインを獲得！</li>
+                        </ol>
+                    </div>
+                    <button onclick="closeLoginInstructions()" style="
+                        background: #4285f4;
+                        border: none;
+                        color: white;
+                        padding: 0.75rem 1.5rem;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        font-size: 1rem;
+                        margin-top: 1rem;
+                    ">
+                        ✅ 理解しました
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(overlay);
+            console.log('📱 ログイン操作案内を表示しました');
+        }
+        
+        // ログイン案内を閉じる
+        function closeLoginInstructions() {
+            const overlay = document.getElementById('loginInstructionsOverlay');
+            if (overlay) {
+                overlay.remove();
+                console.log('📱 ログイン案内を閉じました');
+            }
         }
         
         // 戻るボタン
