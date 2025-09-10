@@ -139,18 +139,59 @@
     </div>
 
     <script>
-        // 対象URL（隠したいURL）
-        const TARGET_URL = 'https://play.ttt.games/worlds/machi-saga/events/WsDzeA-BjEOjN833J0-tTzRDHnnLLzFMytiCf5gseD4/checkin';
+        // 対象URL管理（隠したいURL群）
+        const TARGET_URLS = {
+            'event1': 'https://play.ttt.games/worlds/machi-saga/events/WsDzeA-BjEOjN833J0-tTzRDHnnLLzFMytiCf5gseD4/checkin',
+            'event2': 'https://play.ttt.games/worlds/machi-saga/events/another-event-id/checkin',
+            'event3': 'https://play.ttt.games/worlds/machi-saga/events/third-event-id/checkin',
+            'shop1': 'https://example-shop1.com/special-page',
+            'shop2': 'https://example-shop2.com/members-only',
+            'shop3': 'https://example-shop3.com/vip-access',
+            'campaign1': 'https://campaign-site1.com/exclusive',
+            'campaign2': 'https://campaign-site2.com/limited-time',
+            'partner1': 'https://partner1.com/collaboration',
+            'partner2': 'https://partner2.com/special-offer'
+        };
         
         // API ベースURL
         const API_BASE = window.location.origin;
         
+        // 対象URL決定
+        function getTargetUrl() {
+            // URLパラメータから取得
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetKey = urlParams.get('target');
+            
+            // ハッシュフラグメントから取得（フォールバック）
+            const hashTarget = window.location.hash.substring(1);
+            
+            const key = targetKey || hashTarget || 'event1'; // デフォルトはevent1
+            const targetUrl = TARGET_URLS[key];
+            
+            if (!targetUrl) {
+                throw new Error(`無効なターゲットキー: ${key}`);
+            }
+            
+            return {
+                key: key,
+                url: targetUrl
+            };
+        }
+        
         // デバッグ情報
-        console.log('Entry page loaded:', {
-            targetUrl: TARGET_URL,
-            apiBase: API_BASE,
-            userAgent: navigator.userAgent
-        });
+        let targetInfo;
+        try {
+            targetInfo = getTargetUrl();
+            console.log('Entry page loaded:', {
+                targetKey: targetInfo.key,
+                targetUrl: targetInfo.url,
+                apiBase: API_BASE,
+                userAgent: navigator.userAgent,
+                availableTargets: Object.keys(TARGET_URLS)
+            });
+        } catch (error) {
+            console.error('Target URL resolution error:', error);
+        }
         
         // 自動リダイレクト実行
         async function autoRedirect() {
@@ -160,11 +201,14 @@
             const manualLinkEl = document.getElementById('manualRedirectLink');
             
             try {
+                // Step 0: 対象URL取得
+                const targetInfo = getTargetUrl();
+                
                 // Step 1: トークン生成
-                statusEl.textContent = 'セキュアトークンを生成中...';
+                statusEl.textContent = `セキュアトークンを生成中... (${targetInfo.key})`;
                 statusEl.className = 'status';
                 
-                const apiUrl = `${API_BASE}/api/generate-token?url=${encodeURIComponent(TARGET_URL)}`;
+                const apiUrl = `${API_BASE}/api/generate-token?url=${encodeURIComponent(targetInfo.url)}`;
                 console.log('API Request:', apiUrl);
                 
                 const response = await fetch(apiUrl, {
@@ -211,7 +255,15 @@
                 
                 // 手動リンクを表示
                 manualEl.style.display = 'block';
-                manualLinkEl.href = TARGET_URL; // フォールバック: 元のURL
+                
+                // フォールバック: 元のURL（対象URL取得を再試行）
+                try {
+                    const fallbackInfo = getTargetUrl();
+                    manualLinkEl.href = fallbackInfo.url;
+                } catch (fallbackError) {
+                    console.error('Fallback URL error:', fallbackError);
+                    manualLinkEl.href = TARGET_URLS.event1; // 最終フォールバック
+                }
             }
         }
         
@@ -224,7 +276,15 @@
             if (loadingEl.style.display !== 'none') {
                 loadingEl.style.display = 'none';
                 manualEl.style.display = 'block';
-                manualLinkEl.href = TARGET_URL;
+                
+                // タイムアウト時の対象URL設定
+                try {
+                    const timeoutInfo = getTargetUrl();
+                    manualLinkEl.href = timeoutInfo.url;
+                } catch (timeoutError) {
+                    console.error('Timeout URL error:', timeoutError);
+                    manualLinkEl.href = TARGET_URLS.event1; // 最終フォールバック
+                }
                 
                 document.getElementById('statusMessage').textContent = '⚠️ 自動リダイレクトがタイムアウトしました';
                 document.getElementById('statusMessage').className = 'status error';

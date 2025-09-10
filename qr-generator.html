@@ -134,6 +134,25 @@
             margin-bottom: 0.3rem;
         }
         
+        .url-selector {
+            margin: 1rem 0;
+        }
+        
+        .url-selector select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .url-selector select option {
+            background: #333;
+            color: white;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 padding: 1rem;
@@ -156,13 +175,26 @@
         </div>
         
         <div class="section">
-            <h2>📱 自動リダイレクト用QRコード</h2>
-            <p>このQRコードをスキャンすると、自動でセキュアトークンが生成され、イベントページにリダイレクトされます。</p>
+            <h2>🎯 対象URL選択</h2>
+            <p>QRコードを生成したい対象URLを選択してください：</p>
             
-            <div class="url-info">
-                <strong>エントリーURL:</strong><br>
-                <span id="entryUrl">loading...</span>
+            <div class="url-selector">
+                <select id="targetSelector" onchange="generateSelectedQR()">
+                    <option value="">-- 対象URLを選択 --</option>
+                </select>
             </div>
+            
+            <div id="selectedInfo" class="url-info" style="display: none;">
+                <strong>選択された対象:</strong><br>
+                <span id="selectedTarget">-</span><br>
+                <strong>エントリーURL:</strong><br>
+                <span id="entryUrl">-</span>
+            </div>
+        </div>
+        
+        <div class="section" id="qrSection" style="display: none;">
+            <h2>📱 自動リダイレクト用QRコード</h2>
+            <p>このQRコードをスキャンすると、自動でセキュアトークンが生成され、選択されたページにリダイレクトされます。</p>
             
             <div class="qr-container">
                 <div class="qr-code">
@@ -204,27 +236,86 @@
     </div>
 
     <script>
-        // エントリーページのURL
-        const ENTRY_URL = `${window.location.origin}/entry.html`;
+        // 対象URL管理（entry.htmlと同期）
+        const TARGET_URLS = {
+            'event1': 'https://play.ttt.games/worlds/machi-saga/events/WsDzeA-BjEOjN833J0-tTzRDHnnLLzFMytiCf5gseD4/checkin',
+            'event2': 'https://play.ttt.games/worlds/machi-saga/events/another-event-id/checkin',
+            'event3': 'https://play.ttt.games/worlds/machi-saga/events/third-event-id/checkin',
+            'shop1': 'https://example-shop1.com/special-page',
+            'shop2': 'https://example-shop2.com/members-only',
+            'shop3': 'https://example-shop3.com/vip-access',
+            'campaign1': 'https://campaign-site1.com/exclusive',
+            'campaign2': 'https://campaign-site2.com/limited-time',
+            'partner1': 'https://partner1.com/collaboration',
+            'partner2': 'https://partner2.com/special-offer'
+        };
         
         // DOM要素
+        const targetSelector = document.getElementById('targetSelector');
+        const selectedInfo = document.getElementById('selectedInfo');
+        const selectedTarget = document.getElementById('selectedTarget');
         const entryUrlEl = document.getElementById('entryUrl');
         const directLinkEl = document.getElementById('directLink');
+        const qrSection = document.getElementById('qrSection');
         const qrCanvas = document.getElementById('qrCanvas');
+        
+        // 現在選択されているエントリーURL
+        let currentEntryUrl = '';
         
         // 初期化
         function init() {
-            // URL表示
-            entryUrlEl.textContent = ENTRY_URL;
-            directLinkEl.href = ENTRY_URL;
-            directLinkEl.textContent = ENTRY_URL;
+            // セレクトボックスにオプション追加
+            Object.keys(TARGET_URLS).forEach(key => {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = `${key} - ${TARGET_URLS[key].substring(0, 50)}...`;
+                targetSelector.appendChild(option);
+            });
+            
+            console.log('QR Generator initialized with targets:', Object.keys(TARGET_URLS));
+        }
+        
+        // 選択されたターゲットでQR生成
+        function generateSelectedQR() {
+            const selectedKey = targetSelector.value;
+            
+            if (!selectedKey) {
+                selectedInfo.style.display = 'none';
+                qrSection.style.display = 'none';
+                directLinkEl.href = '#';
+                directLinkEl.textContent = '対象URLを選択してください';
+                return;
+            }
+            
+            const targetUrl = TARGET_URLS[selectedKey];
+            currentEntryUrl = `${window.location.origin}/entry.html?target=${selectedKey}`;
+            
+            // 情報表示更新
+            selectedTarget.textContent = `${selectedKey} → ${targetUrl}`;
+            entryUrlEl.textContent = currentEntryUrl;
+            directLinkEl.href = currentEntryUrl;
+            directLinkEl.textContent = currentEntryUrl;
+            
+            selectedInfo.style.display = 'block';
+            qrSection.style.display = 'block';
             
             // QRコード生成
             generateQR();
+            
+            console.log('Generated QR for:', {
+                key: selectedKey,
+                targetUrl: targetUrl,
+                entryUrl: currentEntryUrl
+            });
         }
         
         // QRコード生成
         function generateQR() {
+            if (!currentEntryUrl) {
+                console.warn('No entry URL set for QR generation');
+                return;
+            }
+            
             const options = {
                 width: 256,
                 height: 256,
@@ -238,25 +329,31 @@
                 margin: 1,
             };
             
-            QRCode.toCanvas(qrCanvas, ENTRY_URL, options, function (error) {
+            QRCode.toCanvas(qrCanvas, currentEntryUrl, options, function (error) {
                 if (error) {
                     console.error('QR Code generation error:', error);
                     qrCanvas.parentElement.innerHTML = '<p style="color: #ef4444;">QRコード生成エラー</p>';
                 } else {
-                    console.log('QR Code generated successfully');
+                    console.log('QR Code generated successfully for:', currentEntryUrl);
                 }
             });
         }
         
         // QRコードダウンロード
         function downloadQR() {
+            if (!currentEntryUrl) {
+                alert('対象URLを選択してください');
+                return;
+            }
+            
             const canvas = document.getElementById('qrCanvas');
             const link = document.createElement('a');
-            link.download = 'machisaga-entry-qr.png';
+            const selectedKey = targetSelector.value;
+            link.download = `machisaga-qr-${selectedKey}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
             
-            console.log('QR Code downloaded');
+            console.log('QR Code downloaded for:', selectedKey);
         }
         
         // 初期化実行
@@ -264,7 +361,8 @@
         
         // デバッグ情報
         console.log('QR Generator loaded:', {
-            entryUrl: ENTRY_URL,
+            availableTargets: Object.keys(TARGET_URLS),
+            targetCount: Object.keys(TARGET_URLS).length,
             origin: window.location.origin
         });
     </script>

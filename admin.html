@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>まちサーガ - 管理者パネル</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: white;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .section h2 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: #ffd700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .url-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .url-table th,
+        .url-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .url-table th {
+            background: rgba(255, 255, 255, 0.1);
+            font-weight: bold;
+            color: #ffd700;
+        }
+        
+        .url-table td {
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        
+        .url-key {
+            font-weight: bold;
+            color: #4ade80;
+        }
+        
+        .url-target {
+            word-break: break-all;
+            max-width: 300px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #333;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.85rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn.secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .tools {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+                margin: 1rem;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+            
+            .url-table {
+                font-size: 0.8rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+    <script src="config.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🏰 まちサーガ</div>
+            <div class="subtitle">管理者パネル - URL管理システム</div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalUrls">-</div>
+                <div class="stat-label">管理対象URL</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="activeUrls">-</div>
+                <div class="stat-label">アクティブ</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="tokenExpiry">-</div>
+                <div class="stat-label">トークン有効期限</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🔗 URL管理</h2>
+            <p>現在管理されているプライベートURLの一覧です。</p>
+            
+            <table class="url-table">
+                <thead>
+                    <tr>
+                        <th>キー</th>
+                        <th>表示名</th>
+                        <th>対象URL</th>
+                        <th>エントリーURL</th>
+                        <th>アクション</th>
+                    </tr>
+                </thead>
+                <tbody id="urlTableBody">
+                    <!-- JavaScriptで動的生成 -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="section">
+            <h2>🛠️ 管理ツール</h2>
+            <p>システムの管理とテスト用ツールです。</p>
+            
+            <div class="tools">
+                <button class="btn" onclick="openTestPage()">🧪 テストページ</button>
+                <button class="btn" onclick="openQRGenerator()">📱 QRコード生成</button>
+                <button class="btn secondary" onclick="exportUrls()">📁 URL一覧エクスポート</button>
+                <button class="btn secondary" onclick="testAllUrls()">⚡ 全URL接続テスト</button>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>📊 システム情報</h2>
+            <div style="font-family: monospace; font-size: 0.9rem; line-height: 1.6;">
+                <p><strong>API エンドポイント:</strong> <code>/api/generate-token</code></p>
+                <p><strong>リダイレクトページ:</strong> <code>/redirect/[token]</code></p>
+                <p><strong>セキュリティ:</strong> HMAC-SHA256署名</p>
+                <p><strong>デフォルトターゲット:</strong> <code id="defaultTarget">-</code></p>
+                <p><strong>タイムアウト:</strong> <code id="timeoutDuration">-</code>秒</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 設定が読み込まれているか確認
+        if (typeof window.MACHISAGA_CONFIG === 'undefined') {
+            console.error('設定ファイル (config.js) が読み込まれていません');
+            alert('設定ファイルの読み込みに失敗しました。ページを再読み込みしてください。');
+        }
+        
+        const { TARGET_URLS, TARGET_NAMES, CONFIG } = window.MACHISAGA_CONFIG;
+        
+        // 統計情報更新
+        function updateStats() {
+            document.getElementById('totalUrls').textContent = Object.keys(TARGET_URLS).length;
+            document.getElementById('activeUrls').textContent = Object.keys(TARGET_URLS).length;
+            document.getElementById('tokenExpiry').textContent = CONFIG.tokenExpiry / 1000 / 60 + '分';
+            document.getElementById('defaultTarget').textContent = CONFIG.defaultTarget;
+            document.getElementById('timeoutDuration').textContent = CONFIG.timeoutDuration / 1000;
+        }
+        
+        // URLテーブル生成
+        function generateUrlTable() {
+            const tbody = document.getElementById('urlTableBody');
+            tbody.innerHTML = '';
+            
+            Object.keys(TARGET_URLS).forEach(key => {
+                const row = document.createElement('tr');
+                const targetUrl = TARGET_URLS[key];
+                const displayName = TARGET_NAMES[key] || key;
+                const entryUrl = `${window.location.origin}/entry.html?target=${key}`;
+                
+                row.innerHTML = `
+                    <td class="url-key">${key}</td>
+                    <td>${displayName}</td>
+                    <td class="url-target">${targetUrl}</td>
+                    <td class="url-target">${entryUrl}</td>
+                    <td class="action-buttons">
+                        <button class="btn" onclick="testEntry('${key}')">🧪 テスト</button>
+                        <button class="btn" onclick="generateQR('${key}')">📱 QR</button>
+                        <button class="btn secondary" onclick="copyUrl('${entryUrl}')">📋 コピー</button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        // 管理ツール関数
+        function openTestPage() {
+            window.open('/test', '_blank');
+        }
+        
+        function openQRGenerator() {
+            window.open('/qr-generator.html', '_blank');
+        }
+        
+        function testEntry(key) {
+            const entryUrl = `${window.location.origin}/entry.html?target=${key}`;
+            window.open(entryUrl, '_blank');
+        }
+        
+        function generateQR(key) {
+            const qrUrl = `/qr-generator.html#${key}`;
+            window.open(qrUrl, '_blank');
+        }
+        
+        function copyUrl(url) {
+            navigator.clipboard.writeText(url).then(() => {
+                alert('URLをクリップボードにコピーしました');
+            }).catch(err => {
+                console.error('クリップボードのコピーに失敗:', err);
+                prompt('下記URLをコピーしてください:', url);
+            });
+        }
+        
+        function exportUrls() {
+            const data = {
+                timestamp: new Date().toISOString(),
+                urls: TARGET_URLS,
+                names: TARGET_NAMES,
+                config: CONFIG
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.download = `machisaga-urls-${new Date().toISOString().split('T')[0]}.json`;
+            link.href = URL.createObjectURL(blob);
+            link.click();
+        }
+        
+        function testAllUrls() {
+            console.log('全URL接続テストを開始...');
+            let results = [];
+            
+            Object.keys(TARGET_URLS).forEach(async (key, index) => {
+                setTimeout(async () => {
+                    const entryUrl = `${window.location.origin}/entry.html?target=${key}`;
+                    try {
+                        const response = await fetch(`/api/generate-token?url=${encodeURIComponent(TARGET_URLS[key])}`);
+                        const result = await response.json();
+                        
+                        results.push({
+                            key: key,
+                            status: result.success ? '✅ 成功' : '❌ 失敗',
+                            url: TARGET_URLS[key]
+                        });
+                        
+                        console.log(`${key}: ${result.success ? '成功' : '失敗'}`);
+                        
+                        // 全て完了したら結果表示
+                        if (results.length === Object.keys(TARGET_URLS).length) {
+                            const summary = results.map(r => `${r.key}: ${r.status}`).join('\n');
+                            alert(`接続テスト結果:\n\n${summary}`);
+                        }
+                    } catch (error) {
+                        console.error(`${key} テストエラー:`, error);
+                        results.push({
+                            key: key,
+                            status: '❌ エラー',
+                            url: TARGET_URLS[key]
+                        });
+                    }
+                }, index * 500); // 500msずつ遅延
+            });
+        }
+        
+        // 初期化
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStats();
+            generateUrlTable();
+            
+            console.log('管理者パネル初期化完了:', {
+                totalUrls: Object.keys(TARGET_URLS).length,
+                defaultTarget: CONFIG.defaultTarget
+            });
+        });
+    </script>
+</body>
+</html>
