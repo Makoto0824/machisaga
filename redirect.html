@@ -148,32 +148,47 @@
     </div>
     
     <div class="container" id="loginContainer" style="display: none;">
-        <h2>🔐 T&Tログインが必要です</h2>
+        <h2>🔐 ログインが必要です</h2>
         <div class="notice">
-            <p><strong>📱 まちサーガイベント</strong>にアクセスするには、T&Tプラットフォームへのログインが必要です。</p>
+            <p><strong>📱 まちサーガイベント</strong>にアクセスするにはログインが必要です。</p>
+            <p><small>⚠️ T&T認証サービスに一時的な問題が発生している可能性があります。</small></p>
         </div>
         
         <div class="login-steps">
             <div class="step">
                 <div class="step-number">1</div>
                 <div class="step-content">
-                    <h3>T&Tプラットフォームにログイン</h3>
-                    <p>GoogleまたはAppleアカウントでT&Tにログインしてください</p>
+                    <h3>別のブラウザタブでログイン</h3>
+                    <p>新しいタブでT&Tプラットフォームにログインしてください</p>
                     <button class="login-button" onclick="openLoginPage()">
-                        🔐 T&Tにログイン（新しいタブ）
+                        🔐 T&Tサイトを開く（新しいタブ）
+                    </button>
+                    <br>
+                    <button class="login-button" onclick="openDirectEventPage()" style="background: #ff6b6b; margin-top: 0.5rem;">
+                        🌐 イベントページを直接開く
                     </button>
                 </div>
             </div>
             <div class="step">
                 <div class="step-number">2</div>
                 <div class="step-content">
-                    <h3>ログイン完了後にイベントへ進む</h3>
+                    <h3>ログイン完了後</h3>
                     <p>ログインが完了したら、下のボタンでまちサーガイベントページに進んでください</p>
                     <button class="proceed-button" onclick="proceedToEvent()">
                         ⚔️ まちサーガイベントへ進む
                     </button>
                 </div>
             </div>
+        </div>
+        
+        <div class="notice" style="margin-top: 2rem;">
+            <h4>🔧 代替手段</h4>
+            <p>もしログインがうまくいかない場合：</p>
+            <ul style="text-align: left; margin: 1rem 0;">
+                <li>ブラウザを再起動してみてください</li>
+                <li>他のブラウザ（Chrome、Safari等）を試してください</li>
+                <li>プライベート/シークレットモードでアクセスしてください</li>
+            </ul>
         </div>
         
         <button class="back-button" onclick="goBack()">戻る</button>
@@ -278,12 +293,52 @@
                     throw new Error('トークンの有効期限が切れています');
                 }
                 
-                console.log('✅ 検証成功！T&Tログイン画面を表示します');
+                console.log('✅ 検証成功！まちサーガイベントページに直接アクセスします');
                 
-                // まちサーガのイベントページはT&Tログインが必要なので、ログイン画面を表示
-                showLoginRequired(targetUrl);
+                // T&T認証に問題があるため、直接アクセス方式に変更
+                // showLoginRequired(targetUrl);
                 
-                console.log('🔐 ログイン画面表示完了！');
+                // 直接iframeで表示
+                const iframe = document.getElementById('targetFrame');
+                const loadingContainer = document.getElementById('loadingContainer');
+                
+                // ローディングメッセージを更新
+                const loadingText = loadingContainer.querySelector('p');
+                loadingText.textContent = 'まちサーガイベントページを読み込み中...';
+                
+                // 少し遅延を入れてからiframeを表示
+                setTimeout(() => {
+                    iframe.src = targetUrl;
+                    iframe.classList.add('active');
+                    loadingContainer.style.display = 'none';
+                    
+                    console.log('🎉 イベントページ直接表示完了！');
+                    
+                    // iframe読み込みエラーをキャッチ
+                    iframe.onerror = () => {
+                        console.error('iframe読み込みエラー - ログイン画面を表示');
+                        showLoginRequired(targetUrl);
+                    };
+                    
+                    // iframe読み込み完了チェック
+                    iframe.onload = () => {
+                        console.log('🎯 イベントページ読み込み完了');
+                        // ログインが必要な場合は内容が空になるはず
+                        setTimeout(() => {
+                            try {
+                                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                                if (!iframeDoc || iframeDoc.body.innerHTML.trim() === '') {
+                                    console.warn('🔐 ログインが必要な可能性があります');
+                                    showLoginRequired(targetUrl);
+                                }
+                            } catch (error) {
+                                console.log('🔒 Cross-origin制限のため内容確認不可（正常）');
+                            }
+                        }, 2000);
+                    };
+                }, 1000);
+                
+                console.log('🚀 直接アクセス処理完了！');
                 
             } catch (error) {
                 console.error('Redirect error:', error);
@@ -309,6 +364,16 @@
         function openLoginPage() {
             console.log('🔐 T&Tログインページを開きます');
             window.open('https://play.ttt.games/auth/signin', '_blank', 'width=600,height=700');
+        }
+        
+        // イベントページを直接開く
+        function openDirectEventPage() {
+            if (!currentTargetUrl) {
+                console.warn('⚠️ 対象URLが設定されていません');
+                return;
+            }
+            console.log('🌐 イベントページを直接開きます:', currentTargetUrl);
+            window.open(currentTargetUrl, '_blank');
         }
         
         // イベントページに進む
