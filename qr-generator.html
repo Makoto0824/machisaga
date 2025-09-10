@@ -236,18 +236,18 @@
     </div>
 
     <script>
-        // 対象URL管理（entry.htmlと同期）
+        // 対象URL管理（9個のまちサーガイベントURL）
         const TARGET_URLS = {
-            'event1': 'https://play.ttt.games/worlds/machi-saga/events/WsDzeA-BjEOjN833J0-tTzRDHnnLLzFMytiCf5gseD4/checkin',
-            'event2': 'https://play.ttt.games/worlds/machi-saga/events/another-event-id/checkin',
-            'event3': 'https://play.ttt.games/worlds/machi-saga/events/third-event-id/checkin',
-            'shop1': 'https://example-shop1.com/special-page',
-            'shop2': 'https://example-shop2.com/members-only',
-            'shop3': 'https://example-shop3.com/vip-access',
-            'campaign1': 'https://campaign-site1.com/exclusive',
-            'campaign2': 'https://campaign-site2.com/limited-time',
-            'partner1': 'https://partner1.com/collaboration',
-            'partner2': 'https://partner2.com/special-offer'
+            // まちサーガイベント（MSC報酬順）
+            'event_1msc': 'https://play.ttt.games/worlds/machi-saga/events/b-mjFuRIEBL3xROr64xXA3qaSkZ5L926lSWCOXVtH60/checkin',
+            'event_4msc': 'https://play.ttt.games/worlds/machi-saga/events/iZP-oFgwKs-rwFFVToqXkV488vnDHjyxIPF_hZ5y8MM/checkin',
+            'event_6msc': 'https://play.ttt.games/worlds/machi-saga/events/x2pNQFx8ChWMoYPfgrXopstCgZ9HMF8JCPpNXmyXpn0/checkin',
+            'event_8msc': 'https://play.ttt.games/worlds/machi-saga/events/Ti0h_WV3B8OiAXAi-vxtodyw6wAyT35MHRGcsCBuh0g/checkin',
+            'event_10msc': 'https://play.ttt.games/worlds/machi-saga/events/17VlTOfDKjp6tqoAnuXxlgvsE4wRofg2Hz1i_rr_5Fc/checkin',
+            'event_12msc': 'https://play.ttt.games/worlds/machi-saga/events/MyKXAlK_qOWpn9hKrZEWrQKypMoE8Ess9C1PhKBXg0A/checkin',
+            'event_14msc': 'https://play.ttt.games/worlds/machi-saga/events/CrXfZStcu7XMtyDI77JE5lKlk7RYsZVcF5Xdk2XyiB0/checkin',
+            'event_16msc': 'https://play.ttt.games/worlds/machi-saga/events/in7B9olSOc9H-W7yoxpV3T9WFJQwgM9vYUVrkKyHgBU/checkin',
+            'event_21msc': 'https://play.ttt.games/worlds/machi-saga/events/WsDzeA-BjEOjN833J0-tTzRDHnnLLzFMytiCf5gseD4/checkin'
         };
         
         // DOM要素
@@ -264,11 +264,18 @@
         
         // 初期化
         function init() {
-            // セレクトボックスにオプション追加
-            Object.keys(TARGET_URLS).forEach(key => {
+            // セレクトボックスにオプション追加（MSC順でソート）
+            const sortedKeys = Object.keys(TARGET_URLS).sort((a, b) => {
+                const mscA = parseInt(a.match(/(\d+)msc/)[1]);
+                const mscB = parseInt(b.match(/(\d+)msc/)[1]);
+                return mscA - mscB;
+            });
+            
+            sortedKeys.forEach(key => {
                 const option = document.createElement('option');
                 option.value = key;
-                option.textContent = `${key} - ${TARGET_URLS[key].substring(0, 50)}...`;
+                const msc = key.match(/(\d+)msc/)[1];
+                option.textContent = `${msc} MSC報酬 - まちサーガイベント`;
                 targetSelector.appendChild(option);
             });
             
@@ -291,7 +298,8 @@
             currentEntryUrl = `${window.location.origin}/entry.html?target=${selectedKey}`;
             
             // 情報表示更新
-            selectedTarget.textContent = `${selectedKey} → ${targetUrl}`;
+            const msc = selectedKey.match(/(\d+)msc/)[1];
+            selectedTarget.textContent = `${msc} MSC報酬イベント → ${targetUrl}`;
             entryUrlEl.textContent = currentEntryUrl;
             directLinkEl.href = currentEntryUrl;
             directLinkEl.textContent = currentEntryUrl;
