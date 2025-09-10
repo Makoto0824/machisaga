@@ -293,11 +293,10 @@
                     throw new Error('トークンの有効期限が切れています');
                 }
                 
-                console.log('✅ 検証成功！新しいタブでまちサーガイベントページを開きます');
+                console.log('✅ 検証成功！まずiframe表示を試行し、問題があれば新しいタブに切り替えます');
                 
-                // iframe方式ではCSPとT&T認証の問題が発生するため、
-                // 新しいタブで直接アクセスする方式に変更
-                showDirectAccessInstructions(targetUrl);
+                // ハイブリッドアプローチ: まずiframeを試行し、CSPエラー等があれば新しいタブに切り替え
+                attemptIframeFirst(targetUrl);
                 
                 console.log('🚀 直接アクセス処理完了！');
                 
@@ -541,14 +540,186 @@
             console.log('🎯 直接アクセス案内を表示しました');
         }
         
-        // イベントページを新しいタブで直接開く
+        // ハイブリッドアプローチ: iframe優先、エラー時は新しいタブ
+        function attemptIframeFirst(targetUrl) {
+            currentTargetUrl = targetUrl;
+            
+            console.log('🔒 URL秘匿化を維持するため、まずiframe表示を試行します');
+            
+            // iframe表示を試行
+            const iframe = document.getElementById('targetFrame');
+            const loadingContainer = document.getElementById('loadingContainer');
+            
+            // ローディングメッセージを更新
+            const loadingText = loadingContainer.querySelector('p');
+            loadingText.textContent = 'まちサーガイベントページを読み込み中...（URL秘匿化モード）';
+            
+            // エラー検知用のタイマー
+            let errorDetected = false;
+            let errorTimer = setTimeout(() => {
+                if (!errorDetected) {
+                    console.warn('⚠️ iframe読み込みタイムアウト - 新しいタブ方式に切り替えます');
+                    errorDetected = true;
+                    showUrlExposureWarning(targetUrl);
+                }
+            }, 10000); // 10秒タイムアウト
+            
+            // CSPエラーを検知
+            window.addEventListener('error', function(e) {
+                if (e.message.includes('Content Security Policy') || 
+                    e.message.includes('CSP') ||
+                    e.message.includes('eval')) {
+                    console.warn('🚨 CSPエラー検知 - 新しいタブ方式に切り替えます');
+                    if (!errorDetected) {
+                        errorDetected = true;
+                        clearTimeout(errorTimer);
+                        showUrlExposureWarning(targetUrl);
+                    }
+                }
+            });
+            
+            // iframe読み込み処理
+            iframe.onload = () => {
+                if (!errorDetected) {
+                    console.log('✅ iframe読み込み成功 - URL秘匿化を維持');
+                    clearTimeout(errorTimer);
+                    loadingContainer.style.display = 'none';
+                    iframe.classList.add('active');
+                    
+                    // ログインボタン自動操作を試行
+                    setTimeout(() => {
+                        try {
+                            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                            if (iframeDoc) {
+                                const buttons = Array.from(iframeDoc.querySelectorAll('button, a'));
+                                const loginBtn = buttons.find(btn => 
+                                    btn.textContent.includes('ログイン') || 
+                                    btn.textContent.includes('登録') ||
+                                    btn.textContent.includes('チェックイン')
+                                );
+                                if (loginBtn) {
+                                    console.log('🎯 ログインボタンを発見 - 自動クリック実行');
+                                    loginBtn.click();
+                                } else {
+                                    console.log('ℹ️ ログインボタンが見つかりません');
+                                    showIframeLoginInstructions();
+                                }
+                            }
+                        } catch (error) {
+                            console.log('🔒 Cross-origin制限のため自動操作不可');
+                            showIframeLoginInstructions();
+                        }
+                    }, 3000);
+                }
+            };
+            
+            iframe.onerror = () => {
+                if (!errorDetected) {
+                    console.error('❌ iframe読み込みエラー - 新しいタブ方式に切り替えます');
+                    errorDetected = true;
+                    clearTimeout(errorTimer);
+                    showUrlExposureWarning(targetUrl);
+                }
+            };
+            
+            // iframe表示を試行
+            iframe.src = targetUrl;
+        }
+        
+        // URL露出警告と新しいタブ切り替え
+        function showUrlExposureWarning(targetUrl) {
+            const loadingContainer = document.getElementById('loadingContainer');
+            loadingContainer.style.display = 'none';
+            
+            // 警告画面を作成
+            const warningContainer = document.createElement('div');
+            warningContainer.className = 'container';
+            warningContainer.style.cssText = `
+                display: block;
+                text-align: center;
+                max-width: 600px;
+                padding: 2rem;
+                color: white;
+            `;
+            
+            warningContainer.innerHTML = `
+                <h2>⚠️ セキュリティ制限による切り替え</h2>
+                <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 10px; margin: 2rem 0;">
+                    <p style="margin: 0 0 1rem 0; line-height: 1.6; font-size: 1rem;">
+                        <strong>🔒 URL秘匿化の維持を試みましたが</strong><br>
+                        T&T側のセキュリティポリシーにより、iframe表示ができませんでした。
+                    </p>
+                    
+                    <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 5px; margin: 1rem 0; border-left: 4px solid #ff9800;">
+                        <h3 style="margin: 0 0 0.5rem 0; color: #ff9800;">📋 重要な注意事項</h3>
+                        <p style="margin: 0; font-size: 0.9rem; line-height: 1.5;">
+                            新しいタブでイベントページを開くため、<strong>ブラウザのアドレスバーに実際のURLが表示</strong>されます。<br>
+                            セキュリティ上、このURLを他の人と共有しないでください。
+                        </p>
+                    </div>
+                    
+                    <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 5px; margin: 1rem 0;">
+                        <h3 style="margin: 0 0 1rem 0;">📱 操作手順</h3>
+                        <ol style="text-align: left; margin: 0; padding-left: 1.5rem; line-height: 1.8;">
+                            <li><strong>下のボタンをクリック</strong>してイベントページを開く</li>
+                            <li><strong>「ログイン/登録してチェックイン」</strong>ボタンをタップ</li>
+                            <li><strong>GoogleまたはApple</strong>アカウントで登録/ログイン</li>
+                            <li><strong>チェックイン完了</strong>でMSCコインを獲得！</li>
+                        </ol>
+                    </div>
+                    
+                    <button onclick="openEventPageDirectly()" style="
+                        background: #ff6b6b;
+                        border: none;
+                        color: white;
+                        padding: 1rem 2rem;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-size: 1.2rem;
+                        font-weight: bold;
+                        margin: 1rem 0;
+                        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+                        transition: all 0.3s ease;
+                    " onmouseover="this.style.background='#ff5252'" onmouseout="this.style.background='#ff6b6b'">
+                        ⚠️ URLを露出してイベントを開く
+                    </button>
+                    
+                    <p style="margin: 1rem 0 0 0; font-size: 0.8rem; opacity: 0.7;">
+                        ⚠️ 注意: 新しいタブが開かない場合は、ポップアップブロックを解除してください
+                    </p>
+                </div>
+                
+                <button onclick="window.history.back()" style="
+                    background: rgba(255, 255, 255, 0.2);
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    color: white;
+                    padding: 0.5rem 1rem;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    margin-top: 1rem;
+                    transition: all 0.3s ease;
+                " onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">
+                    ← 戻る
+                </button>
+            `;
+            
+            document.body.appendChild(warningContainer);
+            console.log('⚠️ URL露出警告を表示しました');
+        }
+        
+        // iframe内ログイン案内
+        function showIframeLoginInstructions() {
+            showLoginInstructions(); // 既存の案内を流用
+        }
+        
+        // イベントページを新しいタブで直接開く（URL露出）
         function openEventPageDirectly() {
             if (!currentTargetUrl) {
                 console.error('⚠️ 対象URLが設定されていません');
                 return;
             }
             
-            console.log('🚀 新しいタブでイベントページを開きます:', currentTargetUrl);
+            console.log('🚀 新しいタブでイベントページを開きます（URL露出）:', currentTargetUrl);
             
             // 新しいタブで開く
             const newTab = window.open(currentTargetUrl, '_blank', 'noopener,noreferrer');
@@ -562,22 +733,22 @@
                     position: fixed;
                     top: 20px;
                     right: 20px;
-                    background: #4caf50;
+                    background: #ff9800;
                     color: white;
                     padding: 1rem 1.5rem;
                     border-radius: 5px;
                     z-index: 10000;
                     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
                 `;
-                successMsg.textContent = '✅ イベントページを新しいタブで開きました！';
+                successMsg.innerHTML = '⚠️ イベントページを開きました<br><small>URLが露出しています</small>';
                 document.body.appendChild(successMsg);
                 
-                // 3秒後にメッセージを削除
+                // 5秒後にメッセージを削除
                 setTimeout(() => {
                     if (successMsg.parentNode) {
                         successMsg.parentNode.removeChild(successMsg);
                     }
-                }, 3000);
+                }, 5000);
             } else {
                 console.warn('⚠️ ポップアップがブロックされた可能性があります');
                 alert('ポップアップがブロックされています。ブラウザの設定でポップアップを許可してください。');
