@@ -293,74 +293,11 @@
                     throw new Error('トークンの有効期限が切れています');
                 }
                 
-                console.log('✅ 検証成功！まちサーガイベントページに直接アクセスします');
+                console.log('✅ 検証成功！新しいタブでまちサーガイベントページを開きます');
                 
-                // T&T認証に問題があるため、直接アクセス方式に変更
-                // showLoginRequired(targetUrl);
-                
-                // 直接iframeで表示
-                const iframe = document.getElementById('targetFrame');
-                const loadingContainer = document.getElementById('loadingContainer');
-                
-                // ローディングメッセージを更新
-                const loadingText = loadingContainer.querySelector('p');
-                loadingText.textContent = 'まちサーガイベントページを読み込み中...';
-                
-                // 少し遅延を入れてからiframeを表示
-                setTimeout(() => {
-                    iframe.src = targetUrl;
-                    iframe.classList.add('active');
-                    loadingContainer.style.display = 'none';
-                    
-                    console.log('🎉 イベントページ直接表示完了！');
-                    
-                    // iframe読み込みエラーをキャッチ
-                    iframe.onerror = () => {
-                        console.error('iframe読み込みエラー - ログイン画面を表示');
-                        showLoginRequired(targetUrl);
-                    };
-                    
-                    // iframe読み込み完了チェック
-                    iframe.onload = () => {
-                        console.log('🎯 イベントページ読み込み完了');
-                        
-                        // T&Tログインボタンの自動操作を試行
-                        setTimeout(() => {
-                            try {
-                                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-                                if (iframeDoc) {
-                                    // ログインボタンを探して自動クリック
-                                    const loginButton = iframeDoc.querySelector('button[class*="login"], button[id*="login"], button:contains("ログイン"), a[href*="auth"]');
-                                    if (loginButton) {
-                                        console.log('🔐 T&Tログインボタンを発見 - 自動クリック実行');
-                                        loginButton.click();
-                                    } else {
-                                        // テキストベースでログインボタンを探す
-                                        const buttons = Array.from(iframeDoc.querySelectorAll('button, a'));
-                                        const loginBtn = buttons.find(btn => 
-                                            btn.textContent.includes('ログイン') || 
-                                            btn.textContent.includes('登録') ||
-                                            btn.textContent.includes('チェックイン')
-                                        );
-                                        if (loginBtn) {
-                                            console.log('🎯 ログイン関連ボタンを発見 - 自動クリック実行');
-                                            loginBtn.click();
-                                        } else {
-                                            console.log('ℹ️ ログインボタンが見つかりません - 手動操作が必要');
-                                            showLoginInstructions();
-                                        }
-                                    }
-                                } else {
-                                    console.warn('🔐 iframe内容にアクセスできません - ログイン案内を表示');
-                                    showLoginInstructions();
-                                }
-                            } catch (error) {
-                                console.log('🔒 Cross-origin制限のため自動操作不可 - ログイン案内を表示');
-                                showLoginInstructions();
-                            }
-                        }, 3000); // 3秒待ってからログイン操作
-                    };
-                }, 1000);
+                // iframe方式ではCSPとT&T認証の問題が発生するため、
+                // 新しいタブで直接アクセスする方式に変更
+                showDirectAccessInstructions(targetUrl);
                 
                 console.log('🚀 直接アクセス処理完了！');
                 
@@ -518,6 +455,132 @@
             if (overlay) {
                 overlay.remove();
                 console.log('📱 ログイン案内を閉じました');
+            }
+        }
+        
+        // 直接アクセス案内を表示
+        function showDirectAccessInstructions(targetUrl) {
+            currentTargetUrl = targetUrl;
+            const loadingContainer = document.getElementById('loadingContainer');
+            loadingContainer.style.display = 'none';
+            
+            // 直接アクセス案内を作成
+            const container = document.createElement('div');
+            container.className = 'container';
+            container.style.cssText = `
+                display: block;
+                text-align: center;
+                max-width: 600px;
+                padding: 2rem;
+                color: white;
+            `;
+            
+            container.innerHTML = `
+                <h2>🎯 まちサーガイベントにアクセス！</h2>
+                <div style="background: rgba(255,255,255,0.1); padding: 1.5rem; border-radius: 10px; margin: 2rem 0;">
+                    <p style="margin: 0 0 1rem 0; line-height: 1.6; font-size: 1.1rem;">
+                        <strong>✅ URLの検証が完了しました！</strong><br>
+                        セキュリティ上の理由により、新しいタブでイベントページを開きます。
+                    </p>
+                    
+                    <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 5px; margin: 1rem 0;">
+                        <h3 style="margin: 0 0 1rem 0;">📱 操作手順</h3>
+                        <ol style="text-align: left; margin: 0; padding-left: 1.5rem; line-height: 1.8;">
+                            <li><strong>下のボタンをクリック</strong>してイベントページを開く</li>
+                            <li><strong>「ログイン/登録してチェックイン」</strong>ボタンをタップ</li>
+                            <li><strong>GoogleまたはApple</strong>アカウントで登録/ログイン</li>
+                            <li><strong>チェックイン完了</strong>でMSCコインを獲得！</li>
+                        </ol>
+                    </div>
+                    
+                    <button onclick="openEventPageDirectly()" style="
+                        background: #4285f4;
+                        border: none;
+                        color: white;
+                        padding: 1rem 2rem;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-size: 1.2rem;
+                        font-weight: bold;
+                        margin: 1rem 0;
+                        box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3);
+                        transition: all 0.3s ease;
+                    " onmouseover="this.style.background='#3367d6'" onmouseout="this.style.background='#4285f4'">
+                        🚀 まちサーガイベントを開く
+                    </button>
+                    
+                    <p style="margin: 1rem 0 0 0; font-size: 0.9rem; opacity: 0.8;">
+                        💡 新しいタブが開かない場合は、ポップアップブロックを解除してください
+                    </p>
+                </div>
+                
+                <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 5px; margin: 1rem 0;">
+                    <h4 style="margin: 0 0 0.5rem 0;">🔧 うまくいかない場合</h4>
+                    <p style="margin: 0; font-size: 0.9rem; line-height: 1.5;">
+                        • ブラウザのポップアップブロック設定を確認<br>
+                        • プライベート/シークレットモードを試す<br>
+                        • 他のブラウザ（Chrome、Safari等）を使用
+                    </p>
+                </div>
+                
+                <button onclick="window.history.back()" style="
+                    background: rgba(255, 255, 255, 0.2);
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    color: white;
+                    padding: 0.5rem 1rem;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    margin-top: 1rem;
+                    transition: all 0.3s ease;
+                " onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">
+                    ← 戻る
+                </button>
+            `;
+            
+            document.body.appendChild(container);
+            console.log('🎯 直接アクセス案内を表示しました');
+        }
+        
+        // イベントページを新しいタブで直接開く
+        function openEventPageDirectly() {
+            if (!currentTargetUrl) {
+                console.error('⚠️ 対象URLが設定されていません');
+                return;
+            }
+            
+            console.log('🚀 新しいタブでイベントページを開きます:', currentTargetUrl);
+            
+            // 新しいタブで開く
+            const newTab = window.open(currentTargetUrl, '_blank', 'noopener,noreferrer');
+            
+            if (newTab) {
+                console.log('✅ 新しいタブでイベントページを開きました');
+                
+                // 成功メッセージを表示
+                const successMsg = document.createElement('div');
+                successMsg.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #4caf50;
+                    color: white;
+                    padding: 1rem 1.5rem;
+                    border-radius: 5px;
+                    z-index: 10000;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                `;
+                successMsg.textContent = '✅ イベントページを新しいタブで開きました！';
+                document.body.appendChild(successMsg);
+                
+                // 3秒後にメッセージを削除
+                setTimeout(() => {
+                    if (successMsg.parentNode) {
+                        successMsg.parentNode.removeChild(successMsg);
+                    }
+                }, 3000);
+            } else {
+                console.warn('⚠️ ポップアップがブロックされた可能性があります');
+                alert('ポップアップがブロックされています。ブラウザの設定でポップアップを許可してください。');
             }
         }
         
