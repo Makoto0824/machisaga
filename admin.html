@@ -182,7 +182,6 @@
             }
         }
     </style>
-    <script src="config.js"></script>
 </head>
 <body>
     <div class="container">
@@ -251,13 +250,44 @@
     </div>
 
     <script>
-        // 設定が読み込まれているか確認
-        if (typeof window.MACHISAGA_CONFIG === 'undefined') {
-            console.error('設定ファイル (config.js) が読み込まれていません');
-            alert('設定ファイルの読み込みに失敗しました。ページを再読み込みしてください。');
-        }
+        // 設定を直接定義（config.jsと同期）
+        const TARGET_URLS = {
+            // まちサーガイベント（MSC報酬順）
+            'event_1msc': 'https://play.ttt.games/worlds/machi-saga/events/b-mjFuRIEBL3xROr64xXA3qaSkZ5L926lSWCOXVtH60/checkin',
+            'event_4msc': 'https://play.ttt.games/worlds/machi-saga/events/iZP-oFgwKs-rwFFVToqXkV488vnDHjyxIPF_hZ5y8MM/checkin',
+            'event_6msc': 'https://play.ttt.games/worlds/machi-saga/events/x2pNQFx8ChWMoYPfgrXopstCgZ9HMF8JCPpNXmyXpn0/checkin',
+            'event_8msc': 'https://play.ttt.games/worlds/machi-saga/events/Ti0h_WV3B8OiAXAi-vxtodyw6wAyT35MHRGcsCBuh0g/checkin',
+            'event_10msc': 'https://play.ttt.games/worlds/machi-saga/events/17VlTOfDKjp6tqoAnuXxlgvsE4wRofg2Hz1i_rr_5Fc/checkin',
+            'event_12msc': 'https://play.ttt.games/worlds/machi-saga/events/MyKXAlK_qOWpn9hKrZEWrQKypMoE8Ess9C1PhKBXg0A/checkin',
+            'event_14msc': 'https://play.ttt.games/worlds/machi-saga/events/CrXfZStcu7XMtyDI77JE5lKlk7RYsZVcF5Xdk2XyiB0/checkin',
+            'event_16msc': 'https://play.ttt.games/worlds/machi-saga/events/in7B9olSOc9H-W7yoxpV3T9WFJQwgM9vYUVrkKyHgBU/checkin',
+            'event_21msc': 'https://play.ttt.games/worlds/machi-saga/events/WsDzeA-BjEOjN833J0-tTzRDHnnLLzFMytiCf5gseD4/checkin'
+        };
         
-        const { TARGET_URLS, TARGET_NAMES, CONFIG } = window.MACHISAGA_CONFIG;
+        const TARGET_NAMES = {
+            'event_1msc': 'まちサーガイベント - 1 MSC報酬',
+            'event_4msc': 'まちサーガイベント - 4 MSC報酬',
+            'event_6msc': 'まちサーガイベント - 6 MSC報酬',
+            'event_8msc': 'まちサーガイベント - 8 MSC報酬',
+            'event_10msc': 'まちサーガイベント - 10 MSC報酬',
+            'event_12msc': 'まちサーガイベント - 12 MSC報酬',
+            'event_14msc': 'まちサーガイベント - 14 MSC報酬',
+            'event_16msc': 'まちサーガイベント - 16 MSC報酬',
+            'event_21msc': 'まちサーガイベント - 21 MSC報酬'
+        };
+        
+        const CONFIG = {
+            defaultTarget: 'event_21msc',
+            tokenExpiry: 5 * 60 * 1000, // 5分
+            secretKey: 'machisaga-secret-key-2025',
+            maxRedirectAttempts: 3,
+            timeoutDuration: 10000 // 10秒
+        };
+        
+        console.log('管理パネル設定読み込み完了:', {
+            targetCount: Object.keys(TARGET_URLS).length,
+            targets: Object.keys(TARGET_URLS)
+        });
         
         // 統計情報更新
         function updateStats() {
@@ -271,9 +301,21 @@
         // URLテーブル生成
         function generateUrlTable() {
             const tbody = document.getElementById('urlTableBody');
+            if (!tbody) {
+                console.error('URLテーブルのtbodyが見つかりません');
+                return;
+            }
+            
             tbody.innerHTML = '';
             
-            Object.keys(TARGET_URLS).forEach(key => {
+            // MSC順でソート
+            const sortedKeys = Object.keys(TARGET_URLS).sort((a, b) => {
+                const mscA = parseInt(a.match(/(\d+)msc/)[1]);
+                const mscB = parseInt(b.match(/(\d+)msc/)[1]);
+                return mscA - mscB;
+            });
+            
+            sortedKeys.forEach(key => {
                 const row = document.createElement('tr');
                 const targetUrl = TARGET_URLS[key];
                 const displayName = TARGET_NAMES[key] || key;
@@ -293,6 +335,8 @@
                 
                 tbody.appendChild(row);
             });
+            
+            console.log('URLテーブル生成完了:', sortedKeys.length + '件');
         }
         
         // 管理ツール関数
@@ -376,13 +420,27 @@
         
         // 初期化
         document.addEventListener('DOMContentLoaded', () => {
-            updateStats();
-            generateUrlTable();
+            console.log('DOMContentLoaded - 初期化開始');
+            console.log('TARGET_URLS:', TARGET_URLS);
+            console.log('TARGET_NAMES:', TARGET_NAMES);
+            console.log('CONFIG:', CONFIG);
             
-            console.log('管理者パネル初期化完了:', {
-                totalUrls: Object.keys(TARGET_URLS).length,
-                defaultTarget: CONFIG.defaultTarget
-            });
+            try {
+                updateStats();
+                console.log('統計情報更新完了');
+                
+                generateUrlTable();
+                console.log('URLテーブル生成完了');
+                
+                console.log('管理者パネル初期化完了:', {
+                    totalUrls: Object.keys(TARGET_URLS).length,
+                    defaultTarget: CONFIG.defaultTarget,
+                    tableBody: document.getElementById('urlTableBody')
+                });
+            } catch (error) {
+                console.error('初期化エラー:', error);
+                alert('管理者パネルの初期化に失敗しました: ' + error.message);
+            }
         });
     </script>
 </body>
