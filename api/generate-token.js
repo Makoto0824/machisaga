@@ -1,12 +1,20 @@
 // Vercel API Route: トークン付きリダイレクトURL生成
 // /api/generate-token.js
 
-const crypto = require('crypto');
+import crypto from 'crypto';
 
 // 環境変数からシークレットキーを取得（本番環境では必ず設定）
 const SECRET = process.env.SECRET || 'machisaga-secret-key-2025';
 
 export default function handler(req, res) {
+  // デバッグ情報
+  console.log('API Request:', {
+    method: req.method,
+    url: req.url,
+    query: req.query,
+    headers: req.headers
+  });
+
   // CORS設定
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -49,9 +57,11 @@ export default function handler(req, res) {
     
   } catch (error) {
     console.error('Token generation error:', error);
+    console.error('Error stack:', error.stack);
     res.status(500).json({
       success: false,
-      error: 'トークン生成に失敗しました'
+      error: 'トークン生成に失敗しました',
+      details: error.message
     });
   }
 }

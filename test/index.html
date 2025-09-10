@@ -234,6 +234,13 @@
         // API ベースURL
         const API_BASE = window.location.origin;
         
+        // デバッグ情報
+        console.log('Test page loaded:', {
+            origin: window.location.origin,
+            pathname: window.location.pathname,
+            apiBase: API_BASE
+        });
+        
         // トークン生成
         async function generateToken() {
             const targetUrl = document.getElementById('targetUrl').value;
@@ -252,8 +259,25 @@
             generateBtn.textContent = '生成中...';
             
             try {
-                const response = await fetch(`${API_BASE}/api/generate-token?url=${encodeURIComponent(targetUrl)}`);
+                const apiUrl = `${API_BASE}/api/generate-token?url=${encodeURIComponent(targetUrl)}`;
+                console.log('API Request URL:', apiUrl);
+                
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                console.log('API Response status:', response.status);
+                console.log('API Response headers:', response.headers);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
                 const data = await response.json();
+                console.log('API Response data:', data);
                 
                 if (data.success) {
                     const fullUrl = `${API_BASE}${data.url}`;
@@ -271,8 +295,16 @@
                     addTestResult(targetUrl, null, 'error', data.error);
                 }
             } catch (error) {
-                showResult(resultDiv, `❌ ネットワークエラー: ${error.message}`, 'error');
-                addTestResult(targetUrl, null, 'error', error.message);
+                console.error('Error:', error);
+                console.error('Error stack:', error.stack);
+                
+                let errorMessage = error.message;
+                if (error.message.includes('Unexpected token')) {
+                    errorMessage = 'APIレスポンスがJSON形式ではありません。サーバーエラーの可能性があります。';
+                }
+                
+                showResult(resultDiv, `❌ ネットワークエラー: ${errorMessage}`, 'error');
+                addTestResult(targetUrl, null, 'error', errorMessage);
             } finally {
                 // ボタンを有効化
                 generateBtn.disabled = false;
