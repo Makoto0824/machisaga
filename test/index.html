@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>トークン付きリダイレクトシステム - テスト</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: white;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .section h2 {
+            margin-bottom: 1rem;
+            color: #4ecdc4;
+            font-size: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        input[type="url"], input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        input[type="url"]::placeholder, input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        button {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .result {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            word-break: break-all;
+        }
+        
+        .success {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid rgba(76, 175, 80, 0.5);
+        }
+        
+        .error {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid rgba(244, 67, 54, 0.5);
+        }
+        
+        .info {
+            background: rgba(33, 150, 243, 0.2);
+            border: 1px solid rgba(33, 150, 243, 0.5);
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 0.5rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .example-urls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .example-url {
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .example-url:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+        
+        .status.active {
+            background: rgba(76, 175, 80, 0.3);
+            color: #4caf50;
+        }
+        
+        .status.inactive {
+            background: rgba(244, 67, 54, 0.3);
+            color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 トークン付きリダイレクトシステム</h1>
+        
+        <div class="section">
+            <h2>📝 トークン生成</h2>
+            <div class="form-group">
+                <label for="targetUrl">対象URL:</label>
+                <input type="url" id="targetUrl" placeholder="https://example.com" value="https://example.com">
+            </div>
+            <button onclick="generateToken()" id="generateBtn">
+                <span id="generateSpinner" class="loading" style="display: none;"></span>
+                トークン生成
+            </button>
+            <div id="generateResult"></div>
+        </div>
+        
+        <div class="section">
+            <h2>🎯 クイックテスト</h2>
+            <p>以下のURLをクリックしてテストできます：</p>
+            <div class="example-urls">
+                <div class="example-url" onclick="testUrl('https://example.com')">
+                    Example.com
+                </div>
+                <div class="example-url" onclick="testUrl('https://httpbin.org/html')">
+                    HTTPBin HTML
+                </div>
+                <div class="example-url" onclick="testUrl('https://www.google.com')">
+                    Google
+                </div>
+                <div class="example-url" onclick="testUrl('https://github.com')">
+                    GitHub
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>📊 システム情報</h2>
+            <div class="info">
+                <p><strong>API エンドポイント:</strong> <code>/api/generate-token</code></p>
+                <p><strong>リダイレクトページ:</strong> <code>/redirect/[token]</code></p>
+                <p><strong>トークン有効期限:</strong> 5分</p>
+                <p><strong>セキュリティ:</strong> HMAC-SHA256署名</p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🔍 テスト結果</h2>
+            <div id="testResults">
+                <p>まだテストが実行されていません。</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API ベースURL
+        const API_BASE = window.location.origin;
+        
+        // トークン生成
+        async function generateToken() {
+            const targetUrl = document.getElementById('targetUrl').value;
+            const generateBtn = document.getElementById('generateBtn');
+            const generateSpinner = document.getElementById('generateSpinner');
+            const resultDiv = document.getElementById('generateResult');
+            
+            if (!targetUrl) {
+                showResult(resultDiv, 'URLを入力してください', 'error');
+                return;
+            }
+            
+            // ボタンを無効化
+            generateBtn.disabled = true;
+            generateSpinner.style.display = 'inline-block';
+            generateBtn.textContent = '生成中...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/generate-token?url=${encodeURIComponent(targetUrl)}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const fullUrl = `${API_BASE}${data.url}`;
+                    showResult(resultDiv, `
+                        <strong>✅ トークン生成成功！</strong><br>
+                        <strong>リダイレクトURL:</strong><br>
+                        <a href="${fullUrl}" target="_blank" style="color: #4ecdc4;">${fullUrl}</a><br>
+                        <strong>有効期限:</strong> ${new Date(data.expiresAt).toLocaleString('ja-JP')}
+                    `, 'success');
+                    
+                    // テスト結果に追加
+                    addTestResult(targetUrl, fullUrl, 'success');
+                } else {
+                    showResult(resultDiv, `❌ エラー: ${data.error}`, 'error');
+                    addTestResult(targetUrl, null, 'error', data.error);
+                }
+            } catch (error) {
+                showResult(resultDiv, `❌ ネットワークエラー: ${error.message}`, 'error');
+                addTestResult(targetUrl, null, 'error', error.message);
+            } finally {
+                // ボタンを有効化
+                generateBtn.disabled = false;
+                generateSpinner.style.display = 'none';
+                generateBtn.innerHTML = 'トークン生成';
+            }
+        }
+        
+        // クイックテスト
+        async function testUrl(url) {
+            document.getElementById('targetUrl').value = url;
+            await generateToken();
+        }
+        
+        // 結果表示
+        function showResult(element, message, type) {
+            element.innerHTML = `<div class="result ${type}">${message}</div>`;
+        }
+        
+        // テスト結果追加
+        function addTestResult(originalUrl, redirectUrl, status, error = null) {
+            const resultsDiv = document.getElementById('testResults');
+            const timestamp = new Date().toLocaleString('ja-JP');
+            
+            let resultHtml = `
+                <div class="result ${status}">
+                    <strong>${timestamp}</strong>
+                    <span class="status ${status}">${status === 'success' ? '成功' : '失敗'}</span><br>
+                    <strong>元URL:</strong> ${originalUrl}<br>
+            `;
+            
+            if (redirectUrl) {
+                resultHtml += `<strong>リダイレクトURL:</strong> <a href="${redirectUrl}" target="_blank" style="color: #4ecdc4;">${redirectUrl}</a><br>`;
+            }
+            
+            if (error) {
+                resultHtml += `<strong>エラー:</strong> ${error}<br>`;
+            }
+            
+            resultHtml += '</div>';
+            
+            if (resultsDiv.innerHTML.includes('まだテストが実行されていません')) {
+                resultsDiv.innerHTML = resultHtml;
+            } else {
+                resultsDiv.innerHTML = resultHtml + resultsDiv.innerHTML;
+            }
+        }
+        
+        // ページ読み込み時の初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('トークン付きリダイレクトシステム - テストページ読み込み完了');
+        });
+    </script>
+</body>
+</html>

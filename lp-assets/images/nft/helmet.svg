@@ -1,0 +1,27 @@
+<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="metalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ddd;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#999;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffdd59;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ffc048;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" fill="#1a1a1a"/>
+  <!-- 兜 -->
+  <ellipse cx="100" cy="90" rx="45" ry="50" fill="url(#metalGrad)"/>
+  <!-- バイザー -->
+  <rect x="75" y="85" width="50" height="8" fill="#666"/>
+  <!-- 羽飾り -->
+  <rect x="95" y="55" width="10" height="20" fill="url(#goldGrad)"/>
+  <ellipse cx="100" cy="50" rx="8" ry="5" fill="url(#goldGrad)"/>
+  <!-- 装飾 -->
+  <circle cx="85" cy="75" r="3" fill="url(#goldGrad)"/>
+  <circle cx="115" cy="75" r="3" fill="url(#goldGrad)"/>
+  <!-- 影 -->
+  <ellipse cx="100" cy="155" rx="40" ry="8" fill="rgba(0,0,0,0.3)"/>
+  <text x="100" y="175" text-anchor="middle" fill="#fff" font-family="Arial" font-size="12">戦士の兜</text>
+  <text x="100" y="190" text-anchor="middle" fill="#ddd" font-family="Arial" font-size="10">⚔️ 防御力 +25</text>
+</svg>

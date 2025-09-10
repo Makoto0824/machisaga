@@ -1,0 +1,63 @@
+<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="dragonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fd79a8;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e84393;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="wingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#a29bfe;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6c5ce7;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" fill="#1a1a1a"/>
+  
+  <!-- 小さなドラゴンの相棒 -->
+  <!-- 翼 -->
+  <ellipse cx="80" cy="90" rx="20" ry="15" fill="url(#wingGrad)" transform="rotate(-20 80 90)"/>
+  <ellipse cx="120" cy="90" rx="20" ry="15" fill="url(#wingGrad)" transform="rotate(20 120 90)"/>
+  
+  <!-- 胴体 -->
+  <ellipse cx="100" cy="100" rx="25" ry="20" fill="url(#dragonGrad)"/>
+  
+  <!-- 頭 -->
+  <ellipse cx="100" cy="75" rx="18" ry="15" fill="url(#dragonGrad)"/>
+  
+  <!-- 目 -->
+  <circle cx="92" cy="70" r="4" fill="#fff"/>
+  <circle cx="108" cy="70" r="4" fill="#fff"/>
+  <circle cx="92" cy="70" r="2" fill="#000"/>
+  <circle cx="108" cy="70" r="2" fill="#000"/>
+  
+  <!-- 鼻先 -->
+  <ellipse cx="100" cy="82" rx="3" ry="2" fill="#ff6b6b"/>
+  
+  <!-- 尻尾 -->
+  <path d="M 125 105 Q 140 100 145 115 Q 150 125 140 130 Q 135 128 130 120" 
+        fill="url(#dragonGrad)"/>
+  
+  <!-- 手足 -->
+  <ellipse cx="85" cy="115" rx="4" ry="8" fill="url(#dragonGrad)"/>
+  <ellipse cx="115" cy="115" rx="4" ry="8" fill="url(#dragonGrad)"/>
+  <ellipse cx="90" cy="125" rx="6" ry="4" fill="url(#dragonGrad)"/>
+  <ellipse cx="110" cy="125" rx="6" ry="4" fill="url(#dragonGrad)"/>
+  
+  <!-- 角 -->
+  <polygon points="95,60 97,50 99,60" fill="#ffdd59"/>
+  <polygon points="101,60 103,50 105,60" fill="#ffdd59"/>
+  
+  <!-- 魔法のきらめき -->
+  <circle cx="70" cy="65" r="2" fill="#74b9ff" opacity="0.8"/>
+  <circle cx="130" cy="70" r="1.5" fill="#74b9ff" opacity="0.6"/>
+  <circle cx="120" cy="50" r="2" fill="#74b9ff" opacity="0.7"/>
+  <circle cx="85" cy="55" r="1" fill="#74b9ff" opacity="0.5"/>
+  
+  <!-- ハート -->
+  <path d="M 100 140 C 95 135, 85 135, 85 145 C 85 150, 95 155, 100 160 C 105 155, 115 150, 115 145 C 115 135, 105 135, 100 140" 
+        fill="#ff6b6b" opacity="0.7"/>
+  
+  <!-- 影 -->
+  <ellipse cx="100" cy="155" rx="25" ry="6" fill="rgba(0,0,0,0.3)"/>
+  
+  <text x="100" y="175" text-anchor="middle" fill="#fff" font-family="Arial" font-size="12">ドラゴンの相棒</text>
+  <text x="100" y="190" text-anchor="middle" fill="#fd79a8" font-family="Arial" font-size="10">🐉 仲間 +50</text>
+</svg>

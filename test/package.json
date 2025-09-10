@@ -1,0 +1,24 @@
+{
+  "name": "machisaga-token-redirect",
+  "version": "1.0.0",
+  "description": "トークン付きリダイレクトシステム - まちサーガ用",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "redirect",
+    "token",
+    "security",
+    "machisaga"
+  ],
+  "author": "まちサーガプロジェクト",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "crypto": "^1.0.1"
+  }
+}

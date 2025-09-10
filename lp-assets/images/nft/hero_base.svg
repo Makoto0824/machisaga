@@ -1,0 +1,17 @@
+<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="baseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4ecdc4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#44a08d;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" fill="#1a1a1a"/>
+  <!-- ベース勇者 -->
+  <circle cx="100" cy="75" r="25" fill="url(#baseGrad)"/>
+  <rect x="87.5" y="100" width="25" height="40" fill="url(#baseGrad)"/>
+  <rect x="80" y="110" width="10" height="30" fill="url(#baseGrad)"/>
+  <rect x="110" y="110" width="10" height="30" fill="url(#baseGrad)"/>
+  <rect x="85" y="140" width="30" height="10" fill="url(#baseGrad)"/>
+  <text x="100" y="165" text-anchor="middle" fill="#fff" font-family="Arial" font-size="12">ベース勇者</text>
+  <text x="100" y="180" text-anchor="middle" fill="#4ecdc4" font-family="Arial" font-size="10">Lv.1</text>
+</svg>

@@ -3,51 +3,2198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>まちサーガ</title>
-    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+    <title>まちサーガ - 街の物語を紡ぐバトルシミュレーター</title>
+    <meta name="description" content="まちサーガプロジェクト：地域共創をサポートするレトロゲーム風バトルシミュレーター。さぁ冒険へ出よう！黒船菓子店vs串かつ枡やの熱いバトルを体験しよう！">
+    <meta name="keywords" content="まちサーガ,バトルシミュレーター,レトロゲーム,街の名店,ブラウザゲーム">
+    <meta property="og:title" content="まちサーガ - 街の物語を紡ぐバトルシミュレーター">
+    <meta property="og:description" content="地域共創サポートゲーム - さぁ冒険へ出よう！">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="./lp-assets/logos/logo_white.png">
+    <link rel="icon" type="image/png" href="./lp-assets/logos/logo_white.png">
+    
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16:wght@400&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'DotGothic16', monospace;
-            background: #000;
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .container {
-            text-align: center;
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            line-height: 1.6;
+            background: #000000;
+            color: #fff;
+            overflow-x: hidden;
         }
-        .title {
-            font-size: 2em;
-            margin-bottom: 2em;
-        }
-        .links {
+
+        /* ヒーローセクション */
+        .hero {
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            gap: 1em;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            background: #000000;
         }
-        a {
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(10px, 10px); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+
+        .main-logo {
+            max-width: clamp(200px, 30vw, 400px);
+            height: auto;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+        }
+
+
+        .subtitle {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 3rem;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            text-decoration: none;
+            color: #fff;
+            border: 2px solid;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-width: 200px;
+        }
+
+        .cta-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+
+        .cta-btn:hover::before {
+            left: 0;
+        }
+
+        .btn-mobara {
+            border-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .btn-mobara::before {
+            background: #ff6b6b;
+        }
+
+        .btn-mobara:hover {
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-masuya {
+            border-color: #4ecdc4;
+            background: rgba(78, 205, 196, 0.1);
+        }
+
+        .btn-masuya::before {
+            background: #4ecdc4;
+        }
+
+        .btn-masuya:hover {
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(78, 205, 196, 0.3);
+        }
+
+        /* プロジェクト紹介セクション */
+        .section {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-family: 'DotGothic16', monospace;
+            font-size: clamp(2rem, 5vw, 3rem);
+            text-align: center;
+            margin-bottom: 3rem;
+            color: #4ecdc4;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+        }
+
+        .project-intro {
+            max-width: 800px;
+            margin: 0 auto 4rem auto;
+            text-align: center;
+        }
+
+        .project-description {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            opacity: 0.9;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .adventure-intro {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 2.5rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .adventure-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #4ecdc4;
+            font-weight: 700;
+        }
+
+        .adventure-description {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.9);
+            margin: 0;
+        }
+
+        /* 事業詳細セクション */
+        .business-details {
+            background: #000000;
+            padding: 5rem 2rem;
+        }
+
+        .business-section {
+            max-width: 1000px;
+            margin: 0 auto 4rem auto;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .business-section:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .business-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .business-content {
+            padding: 3rem;
+        }
+
+        .business-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .business-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .business-title {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: #4ecdc4;
+            font-weight: 700;
+        }
+
+        .business-subtitle {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin: 0;
+        }
+
+        .business-description {
+            text-align: left;
+        }
+
+        .business-main-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 2.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .business-features {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            flex-shrink: 0;
+            margin-top: 0.25rem;
+        }
+
+        .feature-text h4 {
+            margin: 0 0 0.5rem 0;
+            color: #ff6b6b;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .feature-text p {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem;
+            margin-top: 4rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 2rem 2.5rem 6rem 2.5rem;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            min-height: 270px;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .clickable-card {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .clickable-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-8px);
+            border-color: rgba(76, 205, 196, 0.5);
+            box-shadow: 0 10px 30px rgba(76, 205, 196, 0.2);
+        }
+
+        .clickable-card:active {
+            transform: translateY(-3px);
+        }
+
+        .click-hint {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.9rem;
+            color: #4ecdc4;
+            opacity: 0;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 0.7rem 1.4rem;
+            border-radius: 30px;
+            border: 1px solid rgba(76, 205, 196, 0.5);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+        }
+
+        .clickable-card:hover .click-hint {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-5px);
+        }
+
+        /* ハイライト効果 */
+        .highlight-section {
+            animation: highlightPulse 2s ease-in-out;
+            border: 2px solid rgba(76, 205, 196, 0.8) !important;
+            box-shadow: 0 0 30px rgba(76, 205, 196, 0.3) !important;
+        }
+
+        @keyframes highlightPulse {
+            0% {
+                box-shadow: 0 0 10px rgba(76, 205, 196, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(76, 205, 196, 0.8);
+            }
+            100% {
+                box-shadow: 0 0 30px rgba(76, 205, 196, 0.3);
+            }
+        }
+
+        /* NFTインタラクティブ要素 */
+        .nft-interactive-showcase {
+            margin: 3rem 0;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .interactive-hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .hero-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            transition: all 0.5s ease;
+            border: 2px solid rgba(76, 205, 196, 0.3);
+        }
+
+        .hero-image:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(76, 205, 196, 0.3);
+        }
+
+        .hero-overlay {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .hero-label {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #4ecdc4;
+            margin: 0.5rem 0;
+        }
+
+        .hero-hint {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin: 0;
+        }
+
+        .customization-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .option-card {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .option-card:hover {
+            background: rgba(76, 205, 196, 0.2);
+            border-color: rgba(76, 205, 196, 0.6);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(76, 205, 196, 0.3);
+        }
+
+        .option-card:hover span {
+            color: rgba(255, 255, 255, 1);
+        }
+
+        .option-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .option-icon-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 6px;
+        }
+
+        .option-card span {
+            font-size: 0.9rem;
+            color: rgba(45, 52, 54, 0.8);
+        }
+
+        /* NFTカルーセル */
+        .nft-carousel-section {
+            margin: 4rem 0;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .carousel-title {
+            text-align: center;
+            font-size: 1.3rem;
+            color: #4ecdc4;
+            margin-bottom: 2rem;
+            font-weight: 600;
+        }
+
+        .nft-carousel {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .carousel-container {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 2rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .carousel-slide.active {
+            opacity: 1;
+        }
+
+        .carousel-image {
+            width: 180px;
+            height: 180px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.5rem;
+            margin-right: 2rem;
+            flex-shrink: 0;
+        }
+        
+        /* トレーディングカード専用スタイル */
+        .trading-card-carousel .carousel-image {
+            width: 200px;
+            height: 279px; /* 744:1039のアスペクト比 */
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.8rem;
+            object-fit: cover;
+            object-position: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            margin-right: 0;
+            flex-shrink: 0;
+        }
+        
+        /* 4枚並列表示用グリッド */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            justify-items: center;
+            align-items: start;
+            padding: 1rem 0;
+        }
+        
+        .card-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .card-item .slide-info {
+            margin-top: 1rem;
+            flex: none;
+        }
+        
+        .card-item .slide-info h5 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: #4ecdc4;
+        }
+        
+        .card-item .slide-info p {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin: 0;
+        }
+
+        .slide-info {
+            flex: 1;
+        }
+
+        .slide-info h5 {
+            font-size: 1.3rem;
+            color: #4ecdc4;
+            margin: 0 0 0.5rem 0;
+            font-weight: 600;
+        }
+
+        .slide-info p {
+            color: rgba(255, 255, 255, 0.8);
+            margin: 0 0 1rem 0;
+            line-height: 1.5;
+        }
+
+        .slide-level {
+            display: inline-block;
+            background: rgba(76, 205, 196, 0.2);
+            color: #4ecdc4;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .carousel-btn:hover {
+            background: rgba(76, 205, 196, 0.3);
+            border-color: rgba(76, 205, 196, 0.5);
+        }
+
+        .carousel-btn.prev {
+            left: 10px;
+        }
+
+        .carousel-btn.next {
+            right: 10px;
+        }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+            gap: 0.5rem;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: #4ecdc4;
+        }
+
+        .dot:hover {
+            background: rgba(76, 205, 196, 0.7);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .feature-title {
+            font-family: 'DotGothic16', monospace;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: #4ecdc4;
+        }
+
+        .feature-desc {
+            font-size: 0.95rem;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        /* ゲーム紹介セクション */
+        .games-section {
+            background: #000000;
+            padding: 5rem 2rem;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 3rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 2.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+        }
+
+        .game-card:hover {
+            transform: scale(1.02);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .game-title {
+            font-family: 'DotGothic16', monospace;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .game-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.7;
+            margin-bottom: 1.5rem;
+        }
+
+        .game-description {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            opacity: 0.8;
+        }
+
+        .play-btn {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
             color: #fff;
             text-decoration: none;
-            padding: 1em 2em;
-            border: 2px solid #fff;
-            transition: all 0.3s;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
-        a:hover {
-            background: #fff;
-            color: #000;
+
+        .play-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+        }
+
+        /* フッター */
+        .footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: #000000;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-text {
+            opacity: 0.6;
+            font-size: 0.9rem;
+        }
+
+        .footer-logo {
+            max-width: 120px;
+            height: auto;
+            opacity: 0.8;
+            margin-bottom: 1rem;
+            transition: opacity 0.3s ease;
+        }
+
+        .footer-logo:hover {
+            opacity: 1;
+        }
+
+        /* スクロールアニメーション */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.6);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            40% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+            60% {
+                transform: translateX(-50%) translateY(-5px);
+            }
+        }
+
+        /* レスポンシブ */
+        
+        /* Extra Large screens */
+        @media (min-width: 1400px) {
+            .section {
+                max-width: 1400px;
+            }
+        }
+        
+        /* Large screens */
+        /* タブレット以下での画像サイズ調整 */
+        @media (max-width: 1199px) {
+            .option-icon {
+                width: 35px;
+                height: 35px;
+            }
+        }
+
+        /* スマートフォンでの画像サイズ調整 */
+        @media (max-width: 767px) {
+            .option-icon {
+                width: 30px;
+                height: 30px;
+            }
+        }
+
+        @media (max-width: 1199px) {
+            .main-logo {
+                max-width: clamp(180px, 25vw, 350px);
+            }
+            
+            .features-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            }
+        }
+        
+        /* Medium screens (Tablets) */
+        @media (max-width: 991px) {
+            .hero {
+                padding: 2rem 1rem;
+                min-height: 80vh;
+                height: auto;
+            }
+            
+            .section {
+                padding: 4rem 1.5rem;
+            }
+            
+            .games-section {
+                padding: 4rem 1.5rem;
+            }
+            
+            .games-grid {
+                grid-template-columns: 1fr;
+                gap: 2.5rem;
+                max-width: 600px;
+                margin: 0 auto;
+            }
+            
+            .section-title {
+                font-size: clamp(1.8rem, 4vw, 2.5rem);
+            }
+        }
+        
+        /* Small screens (Large phones) */
+        @media (max-width: 768px) {
+            .hero {
+                padding: 1.5rem 1rem;
+                min-height: 70vh;
+            }
+            
+            .logo-container {
+                margin-bottom: 2rem;
+            }
+            
+            .main-logo {
+                max-width: clamp(150px, 40vw, 280px);
+            }
+            
+            .subtitle {
+                font-size: clamp(1rem, 4vw, 1.4rem);
+                margin-bottom: 1.5rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+                width: 100%;
+            }
+            
+            .cta-btn {
+                width: 100%;
+                max-width: 280px;
+                padding: 1rem 1.5rem;
+                font-size: 1rem;
+            }
+            
+            .section {
+                padding: 3rem 1rem;
+            }
+            
+            .games-section {
+                padding: 3rem 1rem;
+            }
+            
+            .business-details {
+                padding: 3rem 1rem;
+            }
+            
+            .business-content {
+                padding: 2rem;
+            }
+            
+            .business-icon {
+                font-size: 3rem;
+            }
+            
+            .business-title {
+                font-size: 1.5rem;
+            }
+            
+            .business-main-text {
+                font-size: 1rem;
+                padding: 1.25rem;
+            }
+            
+            .feature-item {
+                padding: 1.25rem;
+                flex-direction: column;
+                text-align: center;
+                gap: 0.75rem;
+            }
+            
+            .feature-icon {
+                font-size: 1.75rem;
+                margin-top: 0;
+            }
+            
+            .project-intro {
+                margin-bottom: 3rem;
+            }
+            
+            .project-description {
+                font-size: 1rem;
+                padding: 1.5rem;
+            }
+            
+            .adventure-intro {
+                padding: 2rem;
+            }
+            
+            .adventure-title {
+                font-size: 1.3rem;
+            }
+            
+            .adventure-description {
+                font-size: 1rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .feature-card {
+                padding: 1.5rem 2rem 5rem 2rem;
+                min-height: 250px;
+            }
+            
+            .click-hint {
+                font-size: 0.8rem;
+                bottom: 1.25rem;
+                padding: 0.6rem 1.2rem;
+            }
+            
+            .nft-interactive-showcase {
+                padding: 1.5rem;
+                margin: 2rem 0;
+            }
+            
+            .hero-image {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .customization-options {
+                gap: 0.75rem;
+            }
+            
+            .option-card {
+                min-width: 70px;
+                padding: 0.75rem;
+            }
+            
+            .carousel-slide {
+                flex-direction: column;
+                text-align: center;
+                padding: 1.5rem;
+            }
+            
+            .carousel-image {
+                margin-right: 0;
+                margin-bottom: 1rem;
+                width: 140px;
+                height: 140px;
+            }
+            
+            /* トレーディングカード モバイル用 */
+            .trading-card-carousel .carousel-image {
+                width: 160px;
+                height: 223px; /* 744:1039のアスペクト比を維持 */
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
+            
+            /* モバイル用グリッド調整 */
+            .card-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+                padding: 0.5rem 0;
+            }
+            
+            .card-item .slide-info h5 {
+                font-size: 0.9rem;
+            }
+            
+            .card-item .slide-info p {
+                font-size: 0.8rem;
+            }
+            
+            .game-card {
+                padding: 2rem 1.5rem;
+            }
+            
+            .footer {
+                padding: 2rem 1rem;
+            }
+        }
+        
+        /* Extra small screens (Small phones) */
+        @media (max-width: 480px) {
+            .hero {
+                padding: 1rem 0.75rem;
+                min-height: 60vh;
+            }
+            
+            .main-logo {
+                max-width: clamp(120px, 50vw, 220px);
+            }
+            
+            .subtitle {
+                font-size: clamp(0.9rem, 5vw, 1.2rem);
+            }
+            
+            .cta-btn {
+                padding: 0.875rem 1.25rem;
+                font-size: 0.9rem;
+                min-width: 200px;
+            }
+            
+            .section {
+                padding: 2.5rem 0.75rem;
+            }
+            
+            .games-section {
+                padding: 2.5rem 0.75rem;
+            }
+            
+            .business-details {
+                padding: 2.5rem 0.75rem;
+            }
+            
+            .business-section {
+                margin-bottom: 2.5rem;
+            }
+            
+            .business-content {
+                padding: 1.5rem;
+            }
+            
+            .business-icon {
+                font-size: 2.5rem;
+            }
+            
+            .business-title {
+                font-size: 1.3rem;
+            }
+            
+            .business-subtitle {
+                font-size: 1rem;
+            }
+            
+            .business-main-text {
+                font-size: 0.95rem;
+                padding: 1rem;
+                margin-bottom: 2rem;
+            }
+            
+            .feature-item {
+                padding: 1rem;
+                gap: 0.5rem;
+            }
+            
+            .feature-text h4 {
+                font-size: 1rem;
+            }
+            
+            .feature-text p {
+                font-size: 0.9rem;
+            }
+            
+            .project-intro {
+                margin-bottom: 2.5rem;
+            }
+            
+            .project-description {
+                font-size: 0.95rem;
+                padding: 1.25rem;
+                line-height: 1.7;
+            }
+            
+            .adventure-intro {
+                padding: 1.5rem;
+            }
+            
+            .adventure-title {
+                font-size: 1.2rem;
+            }
+            
+            .adventure-description {
+                font-size: 0.95rem;
+            }
+            
+            .section-title {
+                font-size: clamp(1.5rem, 6vw, 2rem);
+                margin-bottom: 2rem;
+            }
+            
+            .feature-card {
+                padding: 1.25rem 1.5rem 4.5rem 1.5rem;
+                min-height: 230px;
+            }
+            
+            .click-hint {
+                font-size: 0.75rem;
+                bottom: 1rem;
+                padding: 0.5rem 1rem;
+            }
+            
+            .feature-icon {
+                font-size: 2.5rem;
+            }
+            
+            .feature-title {
+                font-size: 1.1rem;
+            }
+            
+            .feature-desc {
+                font-size: 0.9rem;
+            }
+            
+            .game-card {
+                padding: 1.75rem 1.25rem;
+            }
+            
+            .game-title {
+                font-size: 1.5rem;
+            }
+            
+            .game-subtitle {
+                font-size: 1rem;
+            }
+            
+            .game-description {
+                font-size: 0.9rem;
+            }
+            
+            .play-btn {
+                padding: 0.75rem 1.5rem;
+                font-size: 0.9rem;
+            }
+            
+            .footer {
+                padding: 1.5rem 0.75rem;
+            }
+            
+            .footer-logo {
+                max-width: 100px;
+            }
+            
+            .footer-text {
+                font-size: 0.8rem;
+            }
+        }
+        
+        /* Landscape orientation on mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .hero {
+                min-height: 90vh;
+                padding: 1rem;
+            }
+            
+            .logo-container {
+                margin-bottom: 1rem;
+            }
+            
+            .main-logo {
+                max-width: clamp(100px, 20vw, 200px);
+            }
+            
+            .subtitle {
+                font-size: clamp(0.9rem, 3vw, 1.1rem);
+                margin-bottom: 1rem;
+            }
+            
+            .cta-buttons {
+                gap: 0.75rem;
+            }
+            
+            .cta-btn {
+                padding: 0.75rem 1.5rem;
+                font-size: 0.9rem;
+            }
+        }
+        
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .main-logo {
+                image-rendering: -webkit-optimize-contrast;
+                image-rendering: crisp-edges;
+            }
+        }
+        
+        /* Touch devices - larger tap targets */
+        @media (pointer: coarse) {
+            .cta-btn {
+                min-height: 48px;
+                min-width: 48px;
+            }
+            
+            .play-btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+        }
+        
+        /* Reduced motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            
+            .scroll-indicator {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="title">まちサーガ</div>
-        <div class="links">
-            <a href="./mobara/">黒船菓子店</a>
-            <a href="./masuya/">串かつ枡や</a>
+    <!-- ヒーローセクション -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="logo-container">
+                <img src="./lp-assets/logos/logo_white.png" 
+                     alt="まちサーガ ロゴ" 
+                     class="main-logo"
+                     loading="eager">
+                    </div>
+            <p class="subtitle">さぁ冒険へ出よう</p>
+            <p>地域共創サポートゲーム</p>
+                </div>
+        
+        <div class="scroll-indicator">
+            <div style="font-size: 1.5rem;">↓</div>
+            <div style="font-size: 0.8rem;">Scroll Down</div>
+                    </div>
+    </section>
+
+    <!-- プロジェクト紹介 -->
+    <section class="section">
+        <h2 class="section-title">プロジェクトについて</h2>
+        
+        <div class="project-intro">
+            <div class="adventure-intro">
+                <h3 class="adventure-title">🏰 はじまりのまちは千葉県・茂原市</h3>
+                <p class="adventure-description">
+                    まちサーガの物語は、茂原市からスタート。<br>
+                    ここから全国へ、街と人をつなぐ冒険が広がっていきます。
+                </p>
+                </div>
+            </div>
+        
+        <div class="features-grid">
+            <div class="feature-card clickable-card" onclick="scrollToSection('web3-business')">
+                <div class="feature-icon">⚔️</div>
+                <h3 class="feature-title">勇者NFT × きせかえ</h3>
+                <p class="feature-desc">お店やイベントで集めたパーツで、勇者NFTを自由にカスタマイズ！あなたの勇者は、あなただけの姿に進化します。</p>
+                <div class="click-hint">詳細を見る ▼</div>
+                </div>
+            
+            <div class="feature-card clickable-card" onclick="scrollToSection('trading-card-business')">
+                <div class="feature-icon">🦸‍♂️</div>
+                <h3 class="feature-title">まちの英雄たちをトレカ化</h3>
+                <p class="feature-desc">協力店舗がキャラクターに変身！？トレーディングカードとして集め、遊びながらまちをもっと好きになれる。</p>
+                <div class="click-hint">詳細を見る ▼</div>
+                </div>
+            
+            <div class="feature-card clickable-card" onclick="scrollToSection('digital-coin-business')">
+                <div class="feature-icon">💰</div>
+                <h3 class="feature-title">オリジナルデジタルコイン</h3>
+                <p class="feature-desc">来店するたびに手に入る特別なコイン。トレカやサービスと交換して、さらに冒険を広げよう！</p>
+                <div class="click-hint">詳細を見る ▼</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 事業詳細 -->
+    <section class="business-details">
+        <div class="section">
+            <h2 class="section-title">⚔️ 3つの冒険のしかけ</h2>
+            
+            <!-- Web3事業 -->
+            <div class="business-section" id="web3-business">
+                <div class="business-content">
+                    <div class="business-header">
+                        <div class="business-icon">⚔️</div>
+                        <h3 class="business-title">勇者NFT × きせかえ</h3>
+                        <p class="business-subtitle">あなただけの勇者を育てよう</p>
+            </div>
+
+                    <div class="business-description">
+                        <p class="business-main-text">
+                            お店やイベントで集めたパーツで、勇者NFTを自由にカスタマイズ！<br>
+                            あなたの勇者は、あなただけの姿に進化します。
+                        </p>
+                        
+                        <!-- インタラクティブホバー要素 -->
+                        <div class="nft-interactive-showcase">
+                            <div class="interactive-hero" id="interactiveHero">
+                                <img src="./lp-assets/images/nft/hero_base.png" 
+                                     alt="ベース勇者NFT" 
+                                     class="hero-image"
+                                     id="heroImage"
+                                     loading="lazy">
+                                <div class="hero-overlay">
+                                    <p class="hero-label" id="heroLabel">ベース勇者</p>
+                                    <p class="hero-hint">ホバーして変身を見よう！</p>
+                </div>
+            </div>
+                            
+                            <div class="customization-options">
+                                <div class="option-card" 
+                                     data-hero="helmet" 
+                                     data-image="./lp-assets/images/nft/hero_helmet.png"
+                                     data-label="角兜">
+                                    <div class="option-icon">
+                                        <img src="./lp-assets/images/nft/helmet.png" alt="角兜" class="option-icon-img">
+                                    </div>
+                                    <span>角兜</span>
+                                </div>
+                                <div class="option-card" 
+                                     data-hero="armor" 
+                                     data-image="./lp-assets/images/nft/hero_armor.png"
+                                     data-label="鉄の胸当て">
+                                    <div class="option-icon">
+                                        <img src="./lp-assets/images/nft/armor.png" alt="鉄の胸当て" class="option-icon-img">
+                                    </div>
+                                    <span>鉄の胸当て</span>
+                                </div>
+                                <div class="option-card" 
+                                     data-hero="weapon" 
+                                     data-image="./lp-assets/images/nft/hero_weapon.png"
+                                     data-label="青龍偃月刀">
+                                    <div class="option-icon">
+                                        <img src="./lp-assets/images/nft/weapon.png" alt="青龍偃月刀" class="option-icon-img">
+                                    </div>
+                                    <span>青龍偃月刀</span>
+                                </div>
+                                <div class="option-card" 
+                                     data-hero="shield" 
+                                     data-image="./lp-assets/images/nft/hero_shield.png"
+                                     data-label="ドラゴンシールド">
+                                    <div class="option-icon">
+                                        <img src="./lp-assets/images/nft/shield.png" alt="ドラゴンシールド" class="option-icon-img">
+                                    </div>
+                                    <span>ドラゴンシールド</span>
+                                </div>
+                                <div class="option-card" 
+                                     data-hero="bg" 
+                                     data-image="./lp-assets/images/nft/hero_bg.png"
+                                     data-label="ドット">
+                                    <div class="option-icon">
+                                        <img src="./lp-assets/images/nft/bg.png" alt="ドット" class="option-icon-img">
+                                    </div>
+                                    <span>ドット</span>
+                                </div>
+                                <div class="option-card" 
+                                     data-hero="friend" 
+                                     data-image="./lp-assets/images/nft/hero_friend.png"
+                                     data-label="タッツー">
+                                    <div class="option-icon">
+                                        <img src="./lp-assets/images/nft/friend.png" alt="タッツー" class="option-icon-img">
+                                    </div>
+                                    <span>タッツー</span>
+                                </div>
         </div>
     </div>
+
+                        <!-- スライダー・カルーセル -->
+                        <div class="nft-carousel-section">
+                            <h4 class="carousel-title">様々な勇者たちを見てみよう</h4>
+                            <div class="nft-carousel">
+                                <div class="carousel-container" id="carouselContainer">
+                                    <div class="carousel-slide active">
+                                        <img src="./lp-assets/images/nft/hero_base.png" 
+                                             alt="勇者（男）" 
+                                             class="carousel-image"
+                                             loading="lazy">
+                                        <div class="slide-info">
+                                            <h5>勇者（男）</h5>
+                                            <p>伝説の勇者</p>
+        </div>
+    </div>
+
+                                    <div class="carousel-slide">
+                                        <img src="./lp-assets/images/nft/hero1.png" 
+                                             alt="戦士" 
+                                             class="carousel-image"
+                                             loading="lazy">
+                                        <div class="slide-info">
+                                            <h5>戦士</h5>
+                                            <p>高い防御力で仲間を守る</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="carousel-slide">
+                                        <img src="./lp-assets/images/nft/hero2.png" 
+                                             alt="僧侶" 
+                                             class="carousel-image"
+                                             loading="lazy">
+                                        <div class="slide-info">
+                                            <h5>僧侶</h5>
+                                            <p>回復魔法で仲間を救う</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="carousel-slide">
+                                        <img src="./lp-assets/images/nft/hero3.png" 
+                                             alt="魔法使い" 
+                                             class="carousel-image"
+                                             loading="lazy">
+                                        <div class="slide-info">
+                                            <h5>魔法使い</h5>
+                                            <p>強力な魔法で敵を倒す</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="carousel-slide">
+                                        <img src="./lp-assets/images/nft/hero4.png" 
+                                             alt="勇者（女）" 
+                                             class="carousel-image"
+                                             loading="lazy">
+                                        <div class="slide-info">
+                                            <h5>勇者（女）</h5>
+                                            <p>伝説の勇者</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="carousel-slide">
+                                        <img src="./lp-assets/images/nft/hero5.png" 
+                                             alt="闘士" 
+                                             class="carousel-image"
+                                             loading="lazy">
+                                        <div class="slide-info">
+                                            <h5>闘士</h5>
+                                            <p>最強の攻撃力で敵を圧倒</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <button class="carousel-btn prev" id="carouselPrev">‹</button>
+                                <button class="carousel-btn next" id="carouselNext">›</button>
+                                
+                                <div class="carousel-dots" id="carouselDots">
+                                    <span class="dot active" data-slide="0"></span>
+                                    <span class="dot" data-slide="1"></span>
+                                    <span class="dot" data-slide="2"></span>
+                                    <span class="dot" data-slide="3"></span>
+                                    <span class="dot" data-slide="4"></span>
+                                    <span class="dot" data-slide="5"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- お店やイベントで集めたパーツ用カルーセル -->
+                        <div class="nft-carousel-section">
+                            <h4 class="carousel-title">🏪 協力店舗で集めたパーツ</h4>
+                            <p style="text-align: center; color: rgba(255, 255, 255, 0.8); margin-bottom: 2rem; font-size: 1rem;">
+                                協力店舗で手に入れた特別なパーツで勇者をカスタマイズ！
+                            </p>
+                            <div class="nft-carousel">
+                                <div class="carousel-container" id="shopCarouselContainer">
+                                    <div class="carousel-slide active">
+                                        <img src="./lp-assets/images/nft/shop/kurofune.png" 
+                                             alt="茂原黒船の装備でカスタマイズ" 
+                                             class="carousel-image"
+                                             loading="lazy">
+                                        <div class="slide-info">
+                                            <p><a href="https://www.facebook.com/kurofunemobara/?locale=ja_JP" target="_blank" style="color: #4ecdc4; text-decoration: none;">和洋菓子店 茂原黒船</a>で入手できるアイテム</p>
+                                            <div style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.7); margin-top: 0.5rem;">
+                                                <div>• 頭：茂原黒船の帽子</div>
+                                                <div>• 服：茂原黒船の服</div>
+                                                <div>• 武器：茂原黒船の剣</div>
+                                                <div>• 盾：茂原黒船の盾</div>
+                                                <div>• 背景：茂原黒船</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="carousel-slide">
+                                        <img src="./lp-assets/images/nft/shop/vivito.png" 
+                                             alt="ViViTOの装備でカスタマイズ" 
+                                             class="carousel-image"
+                                             loading="lazy">
+                                        <div class="slide-info">
+                                            <p><a href="https://beauty.hotpepper.jp/slnH000127024/?vos=cpahpbprosmaf131118001" target="_blank" style="color: #4ecdc4; text-decoration: none;">美容室 ViViTO</a>で入手できるアイテム</p>
+                                            <div style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.7); margin-top: 0.5rem;">
+                                                <div>• 頭：おしゃれなバンダナ</div>
+                                                <div>• 服：鉄の胸当て</div>
+                                                <div>• 武器：シザーナイフ</div>
+                                                <div>• 盾：ViViTOの盾</div>
+                                                <div>• 背景：美容室 ViViTO</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="carousel-slide">
+                                        <img src="./lp-assets/images/nft/shop/mitsuya.png" 
+                                             alt="三矢菓子店の装備でカスタマイズ" 
+                                             class="carousel-image"
+                                             loading="lazy">
+                                        <div class="slide-info">
+                                            <p><a href="https://tabelog.com/chiba/A1205/A120504/12025143/" target="_blank" style="color: #4ecdc4; text-decoration: none;">三矢菓子店</a>で入手できるアイテム</p>
+                                            <div style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.7); margin-top: 0.5rem;">
+                                                <div>• 頭：維新のはちがね</div>
+                                                <div>• 服：維新の羽織</div>
+                                                <div>• 武器：3色団子刀(業物)</div>
+                                                <div>• 盾：三矢の盾</div>
+                                                <div>• 背景：三矢菓子店</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="carousel-slide">
+                                        <img src="./lp-assets/images/nft/shop/kooh.png" 
+                                             alt="香(xiang)の装備でカスタマイズ" 
+                                             class="carousel-image"
+                                             loading="lazy">
+                                        <div class="slide-info">
+                                            <p><a href="https://kaori-xiang.com/" target="_blank" style="color: #4ecdc4; text-decoration: none;">中国料理 香 xiang</a>で入手できるアイテム</p>
+                                            <div style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.7); margin-top: 0.5rem;">
+                                                <div>• 頭：聖なる帽子</div>
+                                                <div>• 服：聖なるローブ</div>
+                                                <div>• 武器：聖なる杖</div>
+                                                <div>• 盾：香(xiang)の盾</div>
+                                                <div>• 背景：中国料理 香 xiang</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="carousel-slide">
+                                        <img src="./lp-assets/images/nft/shop/mobara_senbe.png" 
+                                             alt="もばら煎餅の装備でカスタマイズ" 
+                                             class="carousel-image"
+                                             loading="lazy">
+                                        <div class="slide-info">
+                                            <p><a href="https://tabelog.com/chiba/A1205/A120504/12037726/" target="_blank" style="color: #4ecdc4; text-decoration: none;">もばら煎餅</a>で入手できるアイテム</p>
+                                            <div style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.7); margin-top: 0.5rem;">
+                                                <div>• 頭：陣笠</div>
+                                                <div>• 服：軽甲(よろい)</div>
+                                                <div>• 武器：純刀(業物)</div>
+                                                <div>• 盾：もばら煎餅の盾</div>
+                                                <div>• 背景：もばら煎餅</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="carousel-slide">
+                                        <img src="./lp-assets/images/nft/shop/yoshimoku.png" 
+                                             alt="ヨシモクの装備でカスタマイズ" 
+                                             class="carousel-image"
+                                             loading="lazy">
+                                        <div class="slide-info">
+                                            <p><a href="https://yoshimoku.com/" target="_blank" style="color: #4ecdc4; text-decoration: none;">株式会社ヨシモク</a>で入手できるアイテム</p>
+                                            <div style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.7); margin-top: 0.5rem;">
+                                                <div>• 頭：角兜</div>
+                                                <div>• 服：闘士の鎧</div>
+                                                <div>• 武器：棍棒</div>
+                                                <div>• 盾：ヨシモクの盾</div>
+                                                <div>• 背景：ヨシモク</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <button class="carousel-btn prev" id="shopCarouselPrev">‹</button>
+                                <button class="carousel-btn next" id="shopCarouselNext">›</button>
+                                
+                                <div class="carousel-dots" id="shopCarouselDots">
+                                    <span class="dot active" data-slide="0"></span>
+                                    <span class="dot" data-slide="1"></span>
+                                    <span class="dot" data-slide="2"></span>
+                                    <span class="dot" data-slide="3"></span>
+                                    <span class="dot" data-slide="4"></span>
+                                    <span class="dot" data-slide="5"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <!-- トレカ事業 -->
+            <div class="business-section" id="trading-card-business">
+                <div class="business-content">
+                    <div class="business-header">
+                        <div class="business-icon">🦸‍♂️</div>
+                        <h3 class="business-title">まちの英雄たちをトレカ化</h3>
+                        <p class="business-subtitle">お店の店長や会社社長、スタッフ、社員、まちのみんながキャラクターに変身！？</p>
+                    </div>
+                    
+                    <div class="business-description">
+                        <p class="business-main-text">
+                            協力店舗がキャラクターに変身！？<br>
+                            トレーディングカードとして集め、遊びながらまちをもっと好きになれる。
+                        </p>
+                        
+                        <!-- トレカカルーセル -->
+                        <div class="trading-card-carousel-section">
+                            <h4 class="carousel-title">🎴 協力店舗のトレーディングカード</h4>
+                            <p style="text-align: center; color: rgba(255, 255, 255, 0.8); margin-bottom: 2rem; font-size: 1rem;">
+                                茂原市の協力店舗がキャラクターに変身したトレーディングカードを集めよう！
+                            </p>
+                            <div class="trading-card-carousel">
+                                <div class="carousel-container" id="tradingCardCarouselContainer">
+                                    <!-- 1ページ目: カード1-4 -->
+                                    <div class="carousel-slide active">
+                                        <div class="card-grid">
+                                            <div class="card-item">
+                                                <img src="./lp-assets/images/trading_card/card1.png" 
+                                                     alt="茂原黒船のトレーディングカード" 
+                                                     class="carousel-image"
+                                                     loading="lazy">
+                                                <div class="slide-info">
+                                                    <h5>茂原黒船</h5>
+                                                    <p>和洋菓子店の英雄</p>
+                                                </div>
+                                            </div>
+                                            <div class="card-item">
+                                                <img src="./lp-assets/images/trading_card/card2.png" 
+                                                     alt="ナルケ薬粧のトレーディングカード" 
+                                                     class="carousel-image"
+                                                     loading="lazy">
+                                                <div class="slide-info">
+                                                    <h5>ナルケ薬粧</h5>
+                                                    <p>薬粧店の守護者</p>
+                                                </div>
+                                            </div>
+                                            <div class="card-item">
+                                                <img src="./lp-assets/images/trading_card/card3.png" 
+                                                     alt="ラフィンのトレーディングカード" 
+                                                     class="carousel-image"
+                                                     loading="lazy">
+                                                <div class="slide-info">
+                                                    <h5>ラフィン</h5>
+                                                    <p>カフェの魔法使い</p>
+                                                </div>
+                                            </div>
+                                            <div class="card-item">
+                                                <img src="./lp-assets/images/trading_card/card4.png" 
+                                                     alt="モルフェのトレーディングカード" 
+                                                     class="carousel-image"
+                                                     loading="lazy">
+                                                <div class="slide-info">
+                                                    <h5>モルフェ</h5>
+                                                    <p>美容院の戦士</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 2ページ目: カード5-8 -->
+                                    <div class="carousel-slide">
+                                        <div class="card-grid">
+                                            <div class="card-item">
+                                                <img src="./lp-assets/images/trading_card/card5.png" 
+                                                     alt="味来のトレーディングカード" 
+                                                     class="carousel-image"
+                                                     loading="lazy">
+                                                <div class="slide-info">
+                                                    <h5>味来</h5>
+                                                    <p>中華料理の勇者</p>
+                                                </div>
+                                            </div>
+                                            <div class="card-item">
+                                                <img src="./lp-assets/images/trading_card/card6.png" 
+                                                     alt="レーヴのトレーディングカード" 
+                                                     class="carousel-image"
+                                                     loading="lazy">
+                                                <div class="slide-info">
+                                                    <h5>レーヴ</h5>
+                                                    <p>美容室の魔導士</p>
+                                                </div>
+                                            </div>
+                                            <div class="card-item">
+                                                <img src="./lp-assets/images/trading_card/card7.png" 
+                                                     alt="ヨシモクのトレーディングカード" 
+                                                     class="carousel-image"
+                                                     loading="lazy">
+                                                <div class="slide-info">
+                                                    <h5>ヨシモク</h5>
+                                                    <p>材木店の大工職人</p>
+                                                </div>
+                                            </div>
+                                            <div class="card-item">
+                                                <img src="./lp-assets/images/trading_card/card8.png" 
+                                                     alt="VIVITOのトレーディングカード" 
+                                                     class="carousel-image"
+                                                     loading="lazy">
+                                                <div class="slide-info">
+                                                    <h5>VIVITO</h5>
+                                                    <p>美容室のスタイリスト</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 3ページ目: カード9-12 -->
+                                    <div class="carousel-slide">
+                                        <div class="card-grid">
+                                            <div class="card-item">
+                                                <img src="./lp-assets/images/trading_card/card9.png" 
+                                                     alt="香 Xiangのトレーディングカード" 
+                                                     class="carousel-image"
+                                                     loading="lazy">
+                                                <div class="slide-info">
+                                                    <h5>香 Xiang</h5>
+                                                    <p>中国料理の料理人</p>
+                                                </div>
+                                            </div>
+                                            <div class="card-item">
+                                                <img src="./lp-assets/images/trading_card/card10.png" 
+                                                     alt="三矢のトレーディングカード" 
+                                                     class="carousel-image"
+                                                     loading="lazy">
+                                                <div class="slide-info">
+                                                    <h5>三矢</h5>
+                                                    <p>和菓子店の職人</p>
+                                                </div>
+                                            </div>
+                                            <div class="card-item">
+                                                <img src="./lp-assets/images/trading_card/card11.png" 
+                                                     alt="マコトのトレーディングカード" 
+                                                     class="carousel-image"
+                                                     loading="lazy">
+                                                <div class="slide-info">
+                                                    <h5>マコト</h5>
+                                                    <p>冒険の案内人</p>
+                                                </div>
+                                            </div>
+                                            <div class="card-item">
+                                                <img src="./lp-assets/images/trading_card/card12.png" 
+                                                     alt="おにちゃんのトレーディングカード" 
+                                                     class="carousel-image"
+                                                     loading="lazy">
+                                                <div class="slide-info">
+                                                    <h5>おにちゃん</h5>
+                                                    <p>まちの守り神</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <button class="carousel-btn prev" id="tradingCardCarouselPrev">‹</button>
+                                <button class="carousel-btn next" id="tradingCardCarouselNext">›</button>
+                                <div class="carousel-dots" id="tradingCardCarouselDots">
+                                    <span class="dot active" data-slide="0"></span>
+                                    <span class="dot" data-slide="1"></span>
+                                    <span class="dot" data-slide="2"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- デジタルコイン事業 -->
+            <div class="business-section" id="digital-coin-business">
+                <div class="business-content">
+                    <div class="business-header">
+                        <div class="business-icon">💰</div>
+                        <h3 class="business-title">オリジナルデジタルコイン</h3>
+                        <p class="business-subtitle">冒険するほど、お得になる</p>
+                    </div>
+                    
+                    <div class="business-description">
+                        <p class="business-main-text">
+                            来店するたびに手に入る特別なコイン。<br>
+                            トレカやサービスと交換して、さらに冒険を広げよう！
+                        </p>
+                        
+                        <div class="business-features">
+                            <div class="feature-item">
+                                <span class="feature-icon">🎁</span>
+                                <div class="feature-text">
+                                    <h4>来店でもらえる</h4>
+                                    <p>お店に行くだけで特別なコインがもらえる、嬉しいサプライズ</p>
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <span class="feature-icon">🔄</span>
+                                <div class="feature-text">
+                                    <h4>楽しい交換</h4>
+                                    <p>貯めたコインで限定トレカやお得なサービスと交換しよう</p>
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <span class="feature-icon">🗺️</span>
+                                <div class="feature-text">
+                                    <h4>冒険が広がる</h4>
+                                    <p>コインを使って新しいお店や体験に挑戦、冒険の扉が開く</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ゲーム紹介 -->
+    <section class="games-section">
+        <div class="section">
+            <h2 class="section-title">バトルを選択</h2>
+            
+            <div class="games-grid">
+                <div class="game-card">
+                    <h3 class="game-title">黒船菓子店</h3>
+                    <p class="game-subtitle">魔王スイッツン との熱いバトル</p>
+                    <p class="game-description">
+                        甘くて美味しい世界を守るため、魔王スイッツンとの壮絶なバトルが今始まる！
+                        ルーレットで技を選択し、エフェクト満載の攻撃で敵を倒そう。
+                    </p>
+                    <a href="./mobara/" class="play-btn">🍰 プレイ開始</a>
+                </div>
+                
+                <div class="game-card">
+                    <h3 class="game-title">串かつ枡や</h3>
+                    <p class="game-subtitle">魔導士チャウダー との激闘</p>
+                    <p class="game-description">
+                        熱々の串かつで心も体も温まる！魔導士チャウダーとの手に汗握るバトルを体験。
+                        様々な必殺技を駆使して勝利を掴め！
+                    </p>
+                    <a href="./masuya/" class="play-btn">🍢 プレイ開始</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- フッター -->
+    <footer class="footer">
+        <img src="./lp-assets/logos/logo_white.png" 
+             alt="まちサーガ ロゴ" 
+             class="footer-logo"
+             loading="lazy">
+        <p class="footer-text">© 2025 まちサーガプロジェクト - 地域共創サポートゲーム</p>
+    </footer>
+
+    <script>
+        // スクロールアニメーション
+        document.addEventListener('DOMContentLoaded', function() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+
+            // 要素にスクロールアニメーションを適用
+            document.querySelectorAll('.feature-card, .game-card').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(el);
+            });
+        });
+
+        // スムーズスクロール
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // スムーズスクロール機能
+        function scrollToSection(sectionId) {
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                // スクロール位置を少し上にオフセット（ヘッダー分など）
+                const offsetTop = targetSection.offsetTop - 100;
+                
+                window.scrollTo({
+                    top: offsetTop,
+                    behavior: 'smooth'
+                });
+                
+                // セクションをハイライト
+                highlightSection(targetSection);
+            }
+        }
+        
+        // セクションハイライト機能
+        function highlightSection(section) {
+            // 既存のハイライトを削除
+            const previousHighlight = document.querySelector('.highlight-section');
+            if (previousHighlight) {
+                previousHighlight.classList.remove('highlight-section');
+            }
+            
+            // 新しいセクションをハイライト
+            section.classList.add('highlight-section');
+            
+            // 3秒後にハイライトを削除
+            setTimeout(() => {
+                section.classList.remove('highlight-section');
+            }, 3000);
+        }
+        
+        // NFTインタラクティブ機能
+        function initNFTInteractive() {
+            const heroImage = document.getElementById('heroImage');
+            const heroLabel = document.getElementById('heroLabel');
+            const optionCards = document.querySelectorAll('.option-card');
+            const baseImage = './lp-assets/images/nft/hero_base.png';
+            const baseLabel = 'ベース勇者';
+            
+            optionCards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    const newImage = card.dataset.image;
+                    const newLabel = card.dataset.label;
+                    if (heroImage && heroLabel) {
+                        heroImage.src = newImage;
+                        heroLabel.textContent = newLabel;
+                    }
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    if (heroImage && heroLabel) {
+                        heroImage.src = baseImage;
+                        heroLabel.textContent = baseLabel;
+                    }
+                });
+            });
+        }
+        
+        // カルーセル機能
+        function initCarousel() {
+            const container = document.getElementById('carouselContainer');
+            const prevBtn = document.getElementById('carouselPrev');
+            const nextBtn = document.getElementById('carouselNext');
+            const dots = document.querySelectorAll('#carouselDots .dot');
+            const slides = document.querySelectorAll('#carouselContainer .carousel-slide');
+            let currentSlide = 0;
+            
+            function showSlide(index) {
+                // 全てのスライドから active クラスを削除
+                slides.forEach(slide => slide.classList.remove('active'));
+                dots.forEach(dot => dot.classList.remove('active'));
+                
+                // 指定されたスライドに active クラスを追加
+                if (slides[index]) {
+                    slides[index].classList.add('active');
+                }
+                if (dots[index]) {
+                    dots[index].classList.add('active');
+                }
+                
+                // コンテナを移動
+                if (container) {
+                    container.style.transform = `translateX(-${index * 100}%)`;
+                }
+                
+                currentSlide = index;
+            }
+            
+            function nextSlide() {
+                const nextIndex = (currentSlide + 1) % slides.length;
+                showSlide(nextIndex);
+            }
+            
+            function prevSlide() {
+                const prevIndex = (currentSlide - 1 + slides.length) % slides.length;
+                showSlide(prevIndex);
+            }
+            
+            // ボタンイベント
+            if (nextBtn) {
+                nextBtn.addEventListener('click', nextSlide);
+            }
+            if (prevBtn) {
+                prevBtn.addEventListener('click', prevSlide);
+            }
+            
+            // ドットイベント
+            dots.forEach((dot, index) => {
+                dot.addEventListener('click', () => showSlide(index));
+            });
+            
+            // 自動スライド（オプション）
+            setInterval(nextSlide, 5000);
+        }
+        
+        // お店パーツカルーセル機能
+        function initShopCarousel() {
+            const container = document.getElementById('shopCarouselContainer');
+            const prevBtn = document.getElementById('shopCarouselPrev');
+            const nextBtn = document.getElementById('shopCarouselNext');
+            const dots = document.querySelectorAll('#shopCarouselDots .dot');
+            const slides = document.querySelectorAll('#shopCarouselContainer .carousel-slide');
+            let currentSlide = 0;
+            
+            function showSlide(index) {
+                // 全てのスライドから active クラスを削除
+                slides.forEach(slide => slide.classList.remove('active'));
+                dots.forEach(dot => dot.classList.remove('active'));
+                
+                // 指定されたスライドに active クラスを追加
+                if (slides[index]) {
+                    slides[index].classList.add('active');
+                }
+                if (dots[index]) {
+                    dots[index].classList.add('active');
+                }
+                
+                // コンテナを移動
+                if (container) {
+                    container.style.transform = `translateX(-${index * 100}%)`;
+                }
+                
+                currentSlide = index;
+            }
+            
+            function nextSlide() {
+                const nextIndex = (currentSlide + 1) % slides.length;
+                showSlide(nextIndex);
+            }
+            
+            function prevSlide() {
+                const prevIndex = (currentSlide - 1 + slides.length) % slides.length;
+                showSlide(prevIndex);
+            }
+            
+            // ボタンイベント
+            if (nextBtn) {
+                nextBtn.addEventListener('click', nextSlide);
+            }
+            if (prevBtn) {
+                prevBtn.addEventListener('click', prevSlide);
+            }
+            
+            // ドットイベント
+            dots.forEach((dot, index) => {
+                dot.addEventListener('click', () => showSlide(index));
+            });
+            
+            // 自動スライド（オプション）
+            setInterval(nextSlide, 5000);
+        }
+        
+            // トレカカルーセル機能
+            function initTradingCardCarousel() {
+                const container = document.getElementById('tradingCardCarouselContainer');
+                const prevBtn = document.getElementById('tradingCardCarouselPrev');
+                const nextBtn = document.getElementById('tradingCardCarouselNext');
+                const dots = document.querySelectorAll('#tradingCardCarouselDots .dot');
+                const slides = document.querySelectorAll('#tradingCardCarouselContainer .carousel-slide');
+                let currentSlide = 0;
+                const totalSlides = 3; // 4枚ずつ3ページ
+                
+                function showSlide(index) {
+                    slides.forEach(slide => slide.classList.remove('active'));
+                    dots.forEach(dot => dot.classList.remove('active'));
+                    if (slides[index]) {
+                        slides[index].classList.add('active');
+                    }
+                    if (dots[index]) {
+                        dots[index].classList.add('active');
+                    }
+                    if (container) {
+                        container.style.transform = `translateX(-${index * 100}%)`;
+                    }
+                    currentSlide = index;
+                }
+                
+                function nextSlide() {
+                    const nextIndex = (currentSlide + 1) % totalSlides;
+                    showSlide(nextIndex);
+                }
+                
+                function prevSlide() {
+                    const prevIndex = (currentSlide - 1 + totalSlides) % totalSlides;
+                    showSlide(prevIndex);
+                }
+                
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', nextSlide);
+                }
+                if (prevBtn) {
+                    prevBtn.addEventListener('click', prevSlide);
+                }
+                
+                dots.forEach((dot, index) => {
+                    dot.addEventListener('click', () => showSlide(index));
+                });
+                
+                // 自動スライド（オプション）
+                setInterval(nextSlide, 5000);
+            }
+
+            // 初期化
+            document.addEventListener('DOMContentLoaded', () => {
+                initNFTInteractive();
+                initCarousel();
+                initShopCarousel();
+                initTradingCardCarousel();
+            });
+    </script>
 </body>
 </html>

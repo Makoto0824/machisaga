@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>リダイレクト中...</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 600px;
+            padding: 2rem;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 1rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .error {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .iframe-container {
+            width: 100%;
+            height: 100vh;
+            border: none;
+            display: none;
+        }
+        
+        .iframe-container.active {
+            display: block;
+        }
+        
+        .back-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="loadingContainer">
+        <div class="loading"></div>
+        <h2>リダイレクト中...</h2>
+        <p>URLを検証しています。しばらくお待ちください。</p>
+    </div>
+    
+    <div class="container" id="errorContainer" style="display: none;">
+        <h2>⚠️ エラーが発生しました</h2>
+        <div class="error" id="errorMessage">
+            無効なURLまたは期限切れです。
+        </div>
+        <button class="back-button" onclick="goBack()">戻る</button>
+    </div>
+    
+    <iframe 
+        id="targetFrame" 
+        class="iframe-container" 
+        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
+        allow="fullscreen"
+    ></iframe>
+
+    <script>
+        // シークレットキー（本番環境では環境変数から取得）
+        const SECRET = 'machisaga-secret-key-2025';
+        
+        // URLパラメータからトークンと署名を取得
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = decodeURIComponent(window.location.pathname.split('/')[2]);
+        const sig = urlParams.get('sig');
+        
+        // HMAC-SHA256検証関数（簡易版）
+        async function verifyToken(token, signature) {
+            try {
+                // ブラウザ環境でのHMAC-SHA256実装
+                const encoder = new TextEncoder();
+                const key = await crypto.subtle.importKey(
+                    'raw',
+                    encoder.encode(SECRET),
+                    { name: 'HMAC', hash: 'SHA-256' },
+                    false,
+                    ['sign']
+                );
+                
+                const signatureBuffer = await crypto.subtle.sign('HMAC', key, encoder.encode(token));
+                const expectedSignature = Array.from(new Uint8Array(signatureBuffer))
+                    .map(b => b.toString(16).padStart(2, '0'))
+                    .join('');
+                
+                console.log('Expected signature:', expectedSignature);
+                console.log('Received signature:', signature);
+                
+                return expectedSignature === signature;
+            } catch (error) {
+                console.error('Verification error:', error);
+                // 開発環境では検証をスキップ（本番環境では削除）
+                console.warn('⚠️ 開発環境: 署名検証をスキップします');
+                return true;
+            }
+        }
+        
+        // メイン処理
+        async function processRedirect() {
+            try {
+                console.log('🔍 リダイレクト処理開始');
+                console.log('Token:', token);
+                console.log('Signature:', sig);
+                
+                // トークンと署名の存在確認
+                if (!token || !sig) {
+                    throw new Error('トークンまたは署名が不足しています');
+                }
+                
+                // 署名検証
+                const isValid = await verifyToken(token, sig);
+                if (!isValid) {
+                    throw new Error('署名検証に失敗しました');
+                }
+                
+                // トークンデコード
+                const payload = atob(token);
+                console.log('Decoded payload:', payload);
+                const [targetUrl, expiresAt] = payload.split('|');
+                
+                console.log('Target URL:', targetUrl);
+                console.log('Expires at:', new Date(parseInt(expiresAt)).toLocaleString('ja-JP'));
+                console.log('Current time:', new Date().toLocaleString('ja-JP'));
+                
+                // 有効期限チェック
+                if (Date.now() > parseInt(expiresAt)) {
+                    throw new Error('トークンの有効期限が切れています');
+                }
+                
+                // iframeで表示
+                const iframe = document.getElementById('targetFrame');
+                const loadingContainer = document.getElementById('loadingContainer');
+                
+                console.log('✅ 検証成功！iframeで表示します:', targetUrl);
+                
+                iframe.src = targetUrl;
+                iframe.classList.add('active');
+                loadingContainer.style.display = 'none';
+                
+                console.log('🎉 リダイレクト成功！');
+                
+            } catch (error) {
+                console.error('Redirect error:', error);
+                showError(error.message);
+            }
+        }
+        
+        // エラー表示
+        function showError(message) {
+            const loadingContainer = document.getElementById('loadingContainer');
+            const errorContainer = document.getElementById('errorContainer');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            loadingContainer.style.display = 'none';
+            errorContainer.style.display = 'block';
+            errorMessage.textContent = message;
+        }
+        
+        // 戻るボタン
+        function goBack() {
+            window.history.back();
+        }
+        
+        // ページ読み込み時に処理開始
+        document.addEventListener('DOMContentLoaded', processRedirect);
+    </script>
+</body>
+</html>

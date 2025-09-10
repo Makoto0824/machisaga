@@ -1,0 +1,304 @@
+/* まちサーガ LP カスタムスタイル */
+
+/* カスタムプロパティ（CSS変数） */
+:root {
+    --primary-color: #4ecdc4;
+    --secondary-color: #ff6b6b;
+    --accent-color: #45b7d1;
+    --background-dark: #1a1a2e;
+    --background-darker: #0f1419;
+    --text-light: #ffffff;
+    --text-muted: rgba(255, 255, 255, 0.7);
+    
+    /* グラデーション */
+    --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    --gradient-secondary: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+    --gradient-background: linear-gradient(135deg, var(--background-dark) 0%, #16213e 50%, var(--background-darker) 100%);
+    
+    /* シャドウ */
+    --shadow-soft: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.15);
+    --shadow-strong: 0 15px 35px rgba(0, 0, 0, 0.2);
+    --shadow-glow: 0 0 30px rgba(78, 205, 196, 0.3);
+    
+    /* ボーダーラジアス */
+    --radius-small: 8px;
+    --radius-medium: 12px;
+    --radius-large: 16px;
+    --radius-pill: 25px;
+    
+    /* スペーシング */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 2rem;
+    --spacing-lg: 3rem;
+    --spacing-xl: 5rem;
+    
+    /* トランジション */
+    --transition-fast: 0.2s ease;
+    --transition-medium: 0.3s ease;
+    --transition-slow: 0.6s ease;
+}
+
+/* カスタムアニメーション */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* ユーティリティクラス */
+.animate-fade-in-up {
+    animation: fadeInUp var(--transition-slow);
+}
+
+.animate-slide-in-left {
+    animation: slideInLeft var(--transition-slow);
+}
+
+.animate-slide-in-right {
+    animation: slideInRight var(--transition-slow);
+}
+
+.animate-pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+/* レスポンシブ画像 */
+.img-responsive {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.img-rounded {
+    border-radius: var(--radius-medium);
+}
+
+.img-circle {
+    border-radius: 50%;
+}
+
+/* カスタムボタンスタイル */
+.btn-custom {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-md);
+    border: 2px solid;
+    border-radius: var(--radius-small);
+    text-decoration: none;
+    font-weight: 600;
+    text-align: center;
+    transition: all var(--transition-medium);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-custom::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    transition: left var(--transition-medium);
+    z-index: -1;
+}
+
+.btn-custom:hover::before {
+    left: 0;
+}
+
+.btn-primary {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background: rgba(78, 205, 196, 0.1);
+}
+
+.btn-primary::before {
+    background: var(--primary-color);
+}
+
+.btn-primary:hover {
+    color: var(--text-light);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+}
+
+.btn-secondary {
+    border-color: var(--secondary-color);
+    color: var(--secondary-color);
+    background: rgba(255, 107, 107, 0.1);
+}
+
+.btn-secondary::before {
+    background: var(--secondary-color);
+}
+
+.btn-secondary:hover {
+    color: var(--text-light);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+}
+
+/* カスタムカードスタイル */
+.card-custom {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-medium);
+    padding: var(--spacing-md);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all var(--transition-medium);
+}
+
+.card-custom:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-strong);
+}
+
+.card-glass {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* テキストユーティリティ */
+.text-gradient {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.text-glow {
+    text-shadow: 0 0 20px rgba(78, 205, 196, 0.5);
+}
+
+/* レイアウトユーティリティ */
+.container-custom {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+}
+
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.grid-responsive {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-md);
+}
+
+/* スクロールバーカスタマイズ */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--background-dark);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-color);
+}
+
+/* ダークモード対応 */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --text-color: var(--text-light);
+        --background-color: var(--background-dark);
+    }
+}
+
+/* 印刷スタイル */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    .print-only {
+        display: block !important;
+    }
+}
+
+/* アクセシビリティ */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* フォーカス可視化 */
+.btn-custom:focus,
+a:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* 高コントラストモード対応 */
+@media (prefers-contrast: high) {
+    :root {
+        --primary-color: #00ffff;
+        --secondary-color: #ff0080;
+    }
+}
