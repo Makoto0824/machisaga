@@ -52,6 +52,15 @@ class KVURLManager {
 
             console.log(`📄 CSVから${urlLines.length}個のURLを読み込み中...`);
 
+            // 既存のURLデータをクリア
+            if (this.isKVAvailable) {
+                const existingKeys = await kv.keys('url:*');
+                for (const key of existingKeys) {
+                    await kv.del(key);
+                }
+                console.log(`🗑️ 既存の${existingKeys.length}個のURLデータをクリアしました`);
+            }
+
             let loadedCount = 0;
             for (const line of urlLines) {
                 const [id, event, url, description] = line.split(',').map(item => item.trim().replace(/"/g, ''));
@@ -68,15 +77,8 @@ class KVURLManager {
                     usedBy: null
                 };
 
-                // KVに保存（既存データがある場合は使用状況を保持）
+                // KVに保存
                 if (this.isKVAvailable) {
-                    const existingData = await kv.get(`url:${urlData.id}`);
-                    if (existingData) {
-                        // 既存データの使用状況を保持
-                        urlData.used = existingData.used;
-                        urlData.usedAt = existingData.usedAt;
-                        urlData.usedBy = existingData.usedBy;
-                    }
                     await kv.set(`url:${urlData.id}`, urlData);
                 }
 
