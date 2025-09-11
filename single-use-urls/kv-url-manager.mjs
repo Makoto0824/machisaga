@@ -53,14 +53,12 @@ class KVURLManager {
             console.log(`📄 CSVから${urlLines.length}個のURLを読み込み中...`);
             console.log(`📄 CSV内容: ${csvContent.substring(0, 200)}...`);
 
-            // 既存のURLデータをクリア
+            // 既存のURLデータをクリア（データ損失を防ぐため無効化）
             if (this.isKVAvailable) {
                 const existingKeys = await kv.keys('url:*');
                 console.log(`🔍 既存のKVキー: ${existingKeys.length}個`, existingKeys);
-                for (const key of existingKeys) {
-                    await kv.del(key);
-                }
-                console.log(`🗑️ 既存の${existingKeys.length}個のURLデータをクリアしました`);
+                // データ損失を防ぐため、既存データのクリアを無効化
+                console.log(`⚠️ データ保護のため、既存データのクリアをスキップしました`);
             }
 
             let loadedCount = 0;
@@ -79,8 +77,16 @@ class KVURLManager {
                     usedBy: null
                 };
 
-                // KVに保存
+                // KVに保存（既存データを保護）
                 if (this.isKVAvailable) {
+                    const existingData = await kv.get(`url:${urlData.id}`);
+                    if (existingData) {
+                        console.log(`⚠️ 既存データを保護: ${urlData.id} (${urlData.event})`);
+                        // 既存データがある場合は、使用状況を保持してURLと説明のみ更新
+                        urlData.used = existingData.used;
+                        urlData.usedAt = existingData.usedAt;
+                        urlData.usedBy = existingData.usedBy;
+                    }
                     await kv.set(`url:${urlData.id}`, urlData);
                 }
 
