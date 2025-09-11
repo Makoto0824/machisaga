@@ -51,10 +51,12 @@ class KVURLManager {
             const urlLines = lines.slice(1); // ヘッダーをスキップ
 
             console.log(`📄 CSVから${urlLines.length}個のURLを読み込み中...`);
+            console.log(`📄 CSV内容: ${csvContent.substring(0, 200)}...`);
 
             // 既存のURLデータをクリア
             if (this.isKVAvailable) {
                 const existingKeys = await kv.keys('url:*');
+                console.log(`🔍 既存のKVキー: ${existingKeys.length}個`, existingKeys);
                 for (const key of existingKeys) {
                     await kv.del(key);
                 }
@@ -165,6 +167,7 @@ class KVURLManager {
 
         try {
             const urlKeys = await kv.keys('url:*');
+            console.log(`🔍 getStats: KVから${urlKeys.length}個のキーを取得`, urlKeys);
             const urls = [];
 
             // 全URLデータを取得
@@ -172,6 +175,9 @@ class KVURLManager {
                 const urlData = await kv.get(key);
                 if (urlData) {
                     urls.push(urlData);
+                    console.log(`📊 URLデータ: ${key} = ${urlData.id} (${urlData.event}) - used: ${urlData.used}`);
+                } else {
+                    console.warn(`⚠️ キー${key}のデータがnullです`);
                 }
             }
 
