@@ -26,6 +26,22 @@ export default async function handler(req, res) {
     try {
         // GET: 未使用URLを取得してリダイレクト
         if (req.method === 'GET') {
+            // 管理画面からの統計取得リクエストは無効化
+            if (req.query.action === 'stats' || req.query.stats === 'true') {
+                return res.status(200).json({
+                    success: false,
+                    message: '統計取得はPOSTリクエストを使用してください'
+                });
+            }
+            
+            // プレビューやテスト用のGETリクエストは無効化
+            if (req.query.preview === 'true' || req.query.test === 'true') {
+                return res.status(200).json({
+                    success: false,
+                    message: 'プレビューモードは無効化されています'
+                });
+            }
+            
             const userId = req.query.userId || generateGuestId(req);
             const eventName = req.query.event || null;
             const availableURL = await kvURLManager.getNextAvailableURL(userId, eventName);
