@@ -288,6 +288,13 @@
                     <button class="button danger" onclick="resetAllUrls()">🔄 全URLリセット</button>
                     
                     <div class="form-group" style="margin-top: 2rem;">
+                        <label for="csvUpload">CSVファイルアップロード:</label>
+                        <input type="file" id="csvUpload" accept=".csv" style="margin-bottom: 1rem;">
+                        <button class="button success" onclick="uploadCSV()">📤 CSVアップロード</button>
+                        <div id="uploadStatus" style="margin-top: 1rem;"></div>
+                    </div>
+                    
+                    <div class="form-group" style="margin-top: 2rem;">
                         <label for="resetUrlId">個別URLリセット:</label>
                         <input type="text" id="resetUrlId" placeholder="URL ID (例: event_001)">
                         <button class="button" onclick="resetSingleUrl()">リセット実行</button>
@@ -511,6 +518,110 @@
             } catch (error) {
                 console.error('Reset error:', error);
                 showMessage('❌ リセットエラー', 'error');
+            }
+        }
+
+        // CSVアップロード
+        async function uploadCSV() {
+            if (!isAuthenticated) return;
+            
+            const fileInput = document.getElementById('csvUpload');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showMessage('CSVファイルを選択してください', 'error');
+                return;
+            }
+            
+            if (!file.name.toLowerCase().endsWith('.csv')) {
+                showMessage('CSVファイルを選択してください', 'error');
+                return;
+            }
+            
+            const uploadStatus = document.getElementById('uploadStatus');
+            uploadStatus.innerHTML = '<p style="color: #3498db;">📤 アップロード中...</p>';
+            
+            try {
+                const formData = new FormData();
+                formData.append('csvFile', file);
+                formData.append('password', currentPassword);
+                
+                const response = await fetch('/api/single-use-redirect', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    uploadStatus.innerHTML = '<p style="color: #27ae60;">✅ アップロード成功！</p>';
+                    showMessage(`✅ CSVファイルが正常にアップロードされました。${data.message}`, 'success');
+                    
+                    // ファイル入力をクリア
+                    fileInput.value = '';
+                    
+                    // 統計を更新
+                    refreshStats();
+                } else {
+                    uploadStatus.innerHTML = '<p style="color: #e74c3c;">❌ アップロード失敗</p>';
+                    showMessage(data.error || 'CSVアップロードに失敗しました', 'error');
+                }
+            } catch (error) {
+                console.error('CSV upload error:', error);
+                uploadStatus.innerHTML = '<p style="color: #e74c3c;">❌ アップロードエラー</p>';
+                showMessage('❌ CSVアップロードエラー', 'error');
+            }
+        }
+
+        // CSVアップロード
+        async function uploadCSV() {
+            if (!isAuthenticated) return;
+            
+            const fileInput = document.getElementById('csvUpload');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showMessage('CSVファイルを選択してください', 'error');
+                return;
+            }
+            
+            if (!file.name.toLowerCase().endsWith('.csv')) {
+                showMessage('CSVファイルを選択してください', 'error');
+                return;
+            }
+            
+            const uploadStatus = document.getElementById('uploadStatus');
+            uploadStatus.innerHTML = '<p style="color: #3498db;">📤 アップロード中...</p>';
+            
+            try {
+                const formData = new FormData();
+                formData.append('csvFile', file);
+                formData.append('password', currentPassword);
+                
+                const response = await fetch('/api/single-use-redirect', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    uploadStatus.innerHTML = '<p style="color: #27ae60;">✅ アップロード成功！</p>';
+                    showMessage(`✅ CSVファイルが正常にアップロードされました。${data.message}`, 'success');
+                    
+                    // ファイル入力をクリア
+                    fileInput.value = '';
+                    
+                    // 統計を更新
+                    refreshStats();
+                } else {
+                    uploadStatus.innerHTML = '<p style="color: #e74c3c;">❌ アップロード失敗</p>';
+                    showMessage(data.error || 'CSVアップロードに失敗しました', 'error');
+                }
+            } catch (error) {
+                console.error('CSV upload error:', error);
+                uploadStatus.innerHTML = '<p style="color: #e74c3c;">❌ アップロードエラー</p>';
+                showMessage('❌ CSVアップロードエラー', 'error');
             }
         }
 
