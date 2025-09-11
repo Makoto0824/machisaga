@@ -2229,15 +2229,15 @@
                     eventButton.textContent = '🎯 イベントURL取得中...';
                     
                     // 使い切りURL APIを呼び出し
-                    const response = await fetch('/api/single-use-redirect?action=get-url');
+                    const response = await fetch('/api/single-use-redirect');
                     const data = await response.json();
                     
                     if (data.success && data.url) {
                         // URL取得成功 - 使用済みマーク
-                        await markUrlAsUsed(data.url.id);
+                        await markUrlAsUsed(data.urlId);
                         
                         // イベントページにリダイレクト
-                        window.location.href = data.url.url;
+                        window.location.href = data.url;
                     } else {
                         // URL取得失敗
                         throw new Error(data.message || '利用可能なイベントURLがありません');
@@ -2266,13 +2266,13 @@
             // URL使用済みマーク機能
             async function markUrlAsUsed(urlId) {
                 try {
-                    await fetch('/api/single-use-redirect?action=mark-used', {
+                    await fetch('/api/single-use-redirect', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({ 
-                            id: urlId, 
+                            urlId: urlId, 
                             usedBy: 'landing_page_user' 
                         })
                     });
