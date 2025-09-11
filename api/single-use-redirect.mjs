@@ -3,11 +3,9 @@
  * T&T提供のURLプールから未使用URLを自動振り分け
  */
 
-import SingleUseURLManager from '../single-use-urls/url-manager.mjs';
+import kvURLManager from '../single-use-urls/kv-url-manager.mjs';
 
-const urlManager = new SingleUseURLManager();
-
-export default function handler(req, res) {
+export default async function handler(req, res) {
     console.log('Single-Use URL API Request:', {
         method: req.method,
         url: req.url,
@@ -30,7 +28,7 @@ export default function handler(req, res) {
         if (req.method === 'GET') {
             const userId = req.query.userId || generateGuestId(req);
             const eventName = req.query.event || null;
-            const availableURL = urlManager.getNextAvailableURL(userId, eventName);
+            const availableURL = await kvURLManager.getNextAvailableURL(userId, eventName);
 
             if (!availableURL) {
                 const eventMessage = eventName ? `イベント${eventName}の` : '';
@@ -38,7 +36,7 @@ export default function handler(req, res) {
                     success: false,
                     error: `${eventMessage}すべてのURLが使用済みです`,
                     message: 'イベントの募集は終了しました。次回の開催をお待ちください。',
-                    stats: urlManager.getStats()
+                    stats: await kvURLManager.getStats()
                 });
             }
 
@@ -58,7 +56,7 @@ export default function handler(req, res) {
                 event: availableURL.event,
                 description: availableURL.description,
                 message: `${availableURL.event}のイベントページにリダイレクトします`,
-                stats: urlManager.getStats()
+                stats: await kvURLManager.getStats()
             });
         }
 
@@ -81,7 +79,7 @@ export default function handler(req, res) {
 
             switch (action) {
                 case 'stats':
-                    const stats = urlManager.getStats();
+                    const stats = await kvURLManager.getStats();
                     const recentUsage = urlManager.urls
                         .filter(url => url.used)
                         .sort((a, b) => new Date(b.usedAt) - new Date(a.usedAt))
@@ -97,13 +95,13 @@ export default function handler(req, res) {
 
                 case 'reset':
                     if (urlId) {
-                        const success = urlManager.resetURL(urlId);
+                        const success = kvURLManager.resetURL(urlId);
                         res.status(200).json({
                             success,
                             message: success ? `URL ${urlId} をリセットしました` : 'URLが見つかりません'
                         });
                     } else {
-                        urlManager.resetAllURLs();
+                        kvURLManager.resetAllURLs();
                         res.status(200).json({
                             success: true,
                             message: '全URLをリセットしました'
@@ -121,11 +119,11 @@ export default function handler(req, res) {
                     break;
 
                 case 'reload':
-                    const loadedCount = urlManager.loadFromCSV();
+                    const loadedCount = await kvURLManager.loadFromCSV();
                     res.status(200).json({
                         success: true,
                         message: `CSVから${loadedCount}個のURLを読み込みました`,
-                        stats: urlManager.getStats()
+                        stats: await kvURLManager.getStats()
                     });
                     break;
 
@@ -214,7 +212,7 @@ async function handleCSVUpload(req, res) {
                     fs.writeFileSync(csvPath, csvContent, 'utf8');
                     
                     // URLマネージャーを再読み込み
-                    loadedCount = urlManager.loadFromCSV();
+                    loadedCount = await kvURLManager.loadFromCSV();
                 } catch (fsError) {
                     console.warn('File system write failed, using in-memory processing:', fsError.message);
                     // ファイルシステムに書き込めない場合は、メモリ内で処理
@@ -232,15 +230,18 @@ async function handleCSVUpload(req, res) {
                         };
                     }).filter(item => item.url && item.url.startsWith('http'));
                     
-                    // メモリ内のURLを更新
-                    urlManager.urls = newUrls;
-                    loadedCount = newUrls.length;
+                                // KVに直接保存
+                                const { kv } = await import('@vercel/kv');
+                                for (const urlData of newUrls) {
+                                    await kv.set(`url:${urlData.id}`, urlData);
+                                }
+                                loadedCount = newUrls.length;
                 }
                 
                 res.status(200).json({
                     success: true,
                     message: `CSVファイルが正常にアップロードされました。${loadedCount}個のURLを読み込みました`,
-                    stats: urlManager.getStats()
+                    stats: await kvURLManager.getStats()
                 });
                 
             } catch (parseError) {
