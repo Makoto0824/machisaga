@@ -80,13 +80,17 @@ class SingleUseURLManager {
     }
 
     /**
-     * URL一覧をJSONファイルに保存
+     * URL一覧をJSONファイルに保存（Vercelでは一時的）
      */
     saveURLs() {
         try {
+            // Vercelではファイルシステムへの書き込みが制限されているため、
+            // エラーが発生しても処理を続行
             fs.writeFileSync(this.urlsFile, JSON.stringify(this.urls, null, 2));
+            console.log(`💾 URL状態を保存: ${this.urls.filter(url => url.used).length}/${this.urls.length} 使用済み`);
         } catch (error) {
-            console.error('❌ URL保存エラー:', error);
+            console.warn('⚠️ URL保存エラー（Vercel環境では正常）:', error.message);
+            // Vercel環境ではファイル保存が失敗してもメモリ内の状態は維持される
         }
     }
 
@@ -108,10 +112,16 @@ class SingleUseURLManager {
             return null; // 使い切り
         }
 
+        // 既に使用済みの場合は重複を防ぐ
+        if (availableURL.used) {
+            console.warn(`⚠️ URL ${availableURL.id} は既に使用済みです`);
+            return null;
+        }
+
         // 使用済みにマーク
         availableURL.used = true;
         availableURL.usedAt = new Date().toISOString();
-        availableURL.usedBy = userId;
+        availableURL.usedBy = userId || 'anonymous';
 
         this.saveURLs();
 
@@ -126,6 +136,9 @@ class SingleUseURLManager {
         const total = this.urls.length;
         const used = this.urls.filter(url => url.used).length;
         const available = total - used;
+        
+        // デバッグ情報をログ出力
+        console.log(`📊 統計計算: 総数=${total}, 使用済み=${used}, 利用可能=${available}`);
         
         // イベント別統計
         const eventStats = {};
@@ -145,6 +158,7 @@ class SingleUseURLManager {
         Object.keys(eventStats).forEach(event => {
             const stats = eventStats[event];
             stats.usageRate = stats.total > 0 ? ((stats.used / stats.total) * 100).toFixed(1) : 0;
+            console.log(`📊 ${event}: 総数=${stats.total}, 使用済み=${stats.used}, 利用率=${stats.usageRate}%`);
         });
         
         return {
