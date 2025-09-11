@@ -2,14 +2,16 @@
 
 ## 使い切りURLシステムのCSV形式
 
-### 現在のCSV構造
+### 現在のCSV構造（複数イベント対応）
 ```csv
-ID,URL,Description
-event_a_001,https://play.ttt.games/worlds/machi-saga/events/HW0q5S0tSNm3KVhKO2R5EjrG01t1CLWX5TC0f01dqqw/checkin,イベントA - 使い切りURL #1
-event_a_002,https://play.ttt.games/worlds/machi-saga/events/tib-mg0SDPBQC2dkF7s1A99KWAT_peePYcivUT0Tu9Q/checkin,イベントA - 使い切りURL #2
-event_a_003,https://play.ttt.games/worlds/machi-saga/events/BxETN5IJaJRYCu37bpWu31FL5k_djTu30fgqhfMarUo/checkin,イベントA - 使い切りURL #3
-event_a_004,https://play.ttt.games/worlds/machi-saga/events/J0s5_USkI1T9oC3iLBJUeWlyGOMpsjOuYvQv6PH5L0E/checkin,イベントA - 使い切りURL #4
-event_a_005,https://play.ttt.games/worlds/machi-saga/events/VEz4hbZrAGm5PYIgIEyPS_2BFSNYAtITYnFeI3y4CRg/checkin,イベントA - 使い切りURL #5
+ID,Event,URL,Description
+event_a_001,EventA,https://play.ttt.games/worlds/machi-saga/events/HW0q5S0tSNm3KVhKO2R5EjrG01t1CLWX5TC0f01dqqw/checkin,イベントA - 使い切りURL #1
+event_a_002,EventA,https://play.ttt.games/worlds/machi-saga/events/tib-mg0SDPBQC2dkF7s1A99KWAT_peePYcivUT0Tu9Q/checkin,イベントA - 使い切りURL #2
+event_a_003,EventA,https://play.ttt.games/worlds/machi-saga/events/BxETN5IJaJRYCu37bpWu31FL5k_djTu30fgqhfMarUo/checkin,イベントA - 使い切りURL #3
+event_b_001,EventB,https://play.ttt.games/worlds/machi-saga/events/sample-b-001-token-here/checkin,イベントB - 使い切りURL #1
+event_b_002,EventB,https://play.ttt.games/worlds/machi-saga/events/sample-b-002-token-here/checkin,イベントB - 使い切りURL #2
+event_c_001,EventC,https://play.ttt.games/worlds/machi-saga/events/sample-c-001-token-here/checkin,イベントC - 使い切りURL #1
+event_c_002,EventC,https://play.ttt.games/worlds/machi-saga/events/sample-c-002-token-here/checkin,イベントC - 使い切りURL #2
 ```
 
 ### 重要なポイント
@@ -50,12 +52,18 @@ event_a_004,https://play.ttt.games/worlds/machi-saga/events/actual-token-4/check
 event_a_005,https://play.ttt.games/worlds/machi-saga/events/actual-token-5/checkin,イベントA - 使い切りURL #5
 ```
 
-### システムの動作
+### システムの動作（複数イベント対応）
 
-#### 1. ユーザーがイベントボタンをクリック
-#### 2. システムが未使用のURLを選択（例：event_a_002）
+#### 1. ユーザーがイベントを選択（または自動選択）
+#### 2. システムが選択されたイベントの未使用URLを取得
 #### 3. 選択されたURLにリダイレクト
 #### 4. URL使用済みマーク（重複使用防止）
+
+#### イベント選択オプション
+- **全イベントから自動選択**: 利用可能なURLから自動で選択
+- **イベントA**: EventAのURLから選択
+- **イベントB**: EventBのURLから選択  
+- **イベントC**: EventCのURLから選択
 
 ### CSVアップロード機能
 

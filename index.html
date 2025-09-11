@@ -167,6 +167,42 @@
             box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
         }
 
+        .event-selection {
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .event-selection label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #fff;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .event-select {
+            padding: 0.8rem 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            min-width: 250px;
+        }
+
+        .event-select:focus {
+            outline: none;
+            border-color: #ffd700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .event-select option {
+            background: #2c3e50;
+            color: #fff;
+        }
+
         /* プロジェクト紹介セクション */
         .section {
             padding: 5rem 2rem;
@@ -1332,6 +1368,15 @@
             
             <!-- イベント参加ボタン -->
             <div class="cta-buttons">
+                <div class="event-selection">
+                    <label for="eventSelect">イベントを選択:</label>
+                    <select id="eventSelect" class="event-select">
+                        <option value="">全イベントから自動選択</option>
+                        <option value="EventA">🎯 イベントA</option>
+                        <option value="EventB">🎯 イベントB</option>
+                        <option value="EventC">🎯 イベントC</option>
+                    </select>
+                </div>
                 <button class="cta-btn btn-event" id="eventButton" onclick="joinEvent()">
                     🎯 イベントに参加する
                 </button>
@@ -2218,50 +2263,58 @@
                 initTradingCardCarousel();
             });
 
-            // イベント参加機能
-            async function joinEvent() {
-                const eventButton = document.getElementById('eventButton');
-                const originalText = eventButton.textContent;
-                
-                try {
-                    // ボタンを無効化してローディング表示
-                    eventButton.disabled = true;
-                    eventButton.textContent = '🎯 イベントURL取得中...';
-                    
-                    // 使い切りURL APIを呼び出し
-                    const response = await fetch('/api/single-use-redirect');
-                    const data = await response.json();
-                    
-                    if (data.success && data.url) {
-                        // URL取得成功 - 使用済みマーク
-                        await markUrlAsUsed(data.urlId);
-                        
-                        // イベントページにリダイレクト
-                        window.location.href = data.url;
-                    } else {
-                        // URL取得失敗
-                        throw new Error(data.message || '利用可能なイベントURLがありません');
-                    }
-                } catch (error) {
-                    console.error('イベント参加エラー:', error);
-                    
-                    // エラー表示
-                    eventButton.textContent = '❌ エラーが発生しました';
-                    eventButton.style.background = 'rgba(255, 107, 107, 0.2)';
-                    eventButton.style.borderColor = '#ff6b6b';
-                    
-                    // 3秒後に元に戻す
-                    setTimeout(() => {
-                        eventButton.disabled = false;
-                        eventButton.textContent = originalText;
-                        eventButton.style.background = '';
-                        eventButton.style.borderColor = '';
-                    }, 3000);
-                    
-                    // エラーメッセージ表示
-                    alert(`イベント参加に失敗しました: ${error.message}\n\nしばらく時間をおいてから再度お試しください。`);
+        // イベント参加機能
+        async function joinEvent() {
+            const eventButton = document.getElementById('eventButton');
+            const eventSelect = document.getElementById('eventSelect');
+            const originalText = eventButton.textContent;
+            const selectedEvent = eventSelect.value;
+
+            try {
+                // ボタンを無効化してローディング表示
+                eventButton.disabled = true;
+                eventButton.textContent = '🎯 イベントURL取得中...';
+
+                // APIエンドポイントを構築
+                let apiUrl = '/api/single-use-redirect';
+                if (selectedEvent) {
+                    apiUrl += `?event=${encodeURIComponent(selectedEvent)}`;
                 }
+
+                // 使い切りURL APIを呼び出し
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                if (data.success && data.url) {
+                    // URL取得成功 - 使用済みマーク
+                    await markUrlAsUsed(data.urlId);
+
+                    // イベントページにリダイレクト
+                    window.location.href = data.url;
+                } else {
+                    // URL取得失敗
+                    throw new Error(data.message || '利用可能なイベントURLがありません');
+                }
+            } catch (error) {
+                console.error('イベント参加エラー:', error);
+
+                // エラー表示
+                eventButton.textContent = '❌ エラーが発生しました';
+                eventButton.style.background = 'rgba(255, 107, 107, 0.2)';
+                eventButton.style.borderColor = '#ff6b6b';
+
+                // 3秒後に元に戻す
+                setTimeout(() => {
+                    eventButton.disabled = false;
+                    eventButton.textContent = originalText;
+                    eventButton.style.background = '';
+                    eventButton.style.borderColor = '';
+                }, 3000);
+
+                // エラーメッセージ表示
+                alert(`イベント参加に失敗しました: ${error.message}\n\nしばらく時間をおいてから再度お試しください。`);
             }
+        }
 
             // URL使用済みマーク機能
             async function markUrlAsUsed(urlId) {

@@ -35,12 +35,12 @@ class SingleUseURLManager {
             const urlLines = lines.slice(1);
             
             const newUrls = urlLines.map((line, index) => {
-                const [id, url, mscAmount, description] = line.split(',').map(item => item.trim().replace(/"/g, ''));
+                const [id, event, url, description] = line.split(',').map(item => item.trim().replace(/"/g, ''));
                 
                 return {
                     id: id || `url_${index + 1}`,
+                    event: event || 'Default',
                     url: url,
-                    mscAmount: parseInt(mscAmount) || 10,
                     description: description || `まちサーガイベント ${index + 1}`,
                     used: false,
                     usedAt: null,
@@ -93,8 +93,16 @@ class SingleUseURLManager {
     /**
      * 未使用URLを1つ取得して使用済みにマーク
      */
-    getNextAvailableURL(userId = null) {
-        const availableURL = this.urls.find(url => !url.used);
+    getNextAvailableURL(userId = null, eventName = null) {
+        let availableURL;
+        
+        if (eventName) {
+            // 特定のイベントから未使用URLを取得
+            availableURL = this.urls.find(url => !url.used && url.event === eventName);
+        } else {
+            // 全イベントから未使用URLを取得
+            availableURL = this.urls.find(url => !url.used);
+        }
         
         if (!availableURL) {
             return null; // 使い切り
@@ -107,7 +115,7 @@ class SingleUseURLManager {
 
         this.saveURLs();
 
-        console.log(`🎯 URL配布: ${availableURL.id} → ${userId || 'anonymous'}`);
+        console.log(`🎯 URL配布: ${availableURL.id} (${availableURL.event}) → ${userId || 'anonymous'}`);
         return availableURL;
     }
 
@@ -119,11 +127,32 @@ class SingleUseURLManager {
         const used = this.urls.filter(url => url.used).length;
         const available = total - used;
         
+        // イベント別統計
+        const eventStats = {};
+        this.urls.forEach(url => {
+            if (!eventStats[url.event]) {
+                eventStats[url.event] = { total: 0, used: 0, available: 0 };
+            }
+            eventStats[url.event].total++;
+            if (url.used) {
+                eventStats[url.event].used++;
+            } else {
+                eventStats[url.event].available++;
+            }
+        });
+        
+        // 各イベントの利用率を計算
+        Object.keys(eventStats).forEach(event => {
+            const stats = eventStats[event];
+            stats.usageRate = stats.total > 0 ? ((stats.used / stats.total) * 100).toFixed(1) : 0;
+        });
+        
         return {
             total,
             used,
             available,
-            usageRate: total > 0 ? ((used / total) * 100).toFixed(1) : 0
+            usageRate: total > 0 ? ((used / total) * 100).toFixed(1) : 0,
+            events: eventStats
         };
     }
 
@@ -159,9 +188,9 @@ class SingleUseURLManager {
      * CSV形式でエクスポート（使用状況レポート）
      */
     exportUsageReport() {
-        const header = 'ID,URL,MSC,Description,Used,UsedAt,UsedBy\n';
+        const header = 'ID,Event,URL,Description,Used,UsedAt,UsedBy\n';
         const rows = this.urls.map(url => 
-            `"${url.id}","${url.url}",${url.mscAmount},"${url.description}",${url.used},"${url.usedAt || ''}","${url.usedBy || ''}"`
+            `"${url.id}","${url.event}","${url.url}","${url.description}",${url.used},"${url.usedAt || ''}","${url.usedBy || ''}"`
         ).join('\n');
         
         const reportContent = header + rows;

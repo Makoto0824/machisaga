@@ -222,6 +222,60 @@
             transition: width 0.3s ease;
         }
 
+        .event-stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .event-stat-card h4 {
+            color: #3498db;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .event-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .event-stat-item {
+            text-align: center;
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        .event-stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        .event-stat-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-top: 0.3rem;
+        }
+
+        .event-progress-bar {
+            width: 100%;
+            height: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .event-progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            transition: width 0.3s ease;
+        }
+
         @media (max-width: 768px) {
             .dashboard {
                 grid-template-columns: 1fr;
@@ -303,6 +357,13 @@
             </div>
 
             <div class="card">
+                <h3>📊 イベント別統計</h3>
+                <div id="eventStatsContainer">
+                    <p>データを読み込み中...</p>
+                </div>
+            </div>
+
+            <div class="card">
                 <h3>📋 最近の使用履歴</h3>
                 <div id="recentUsageContainer">
                     <p>データを読み込み中...</p>
@@ -369,8 +430,54 @@
             const progressFill = document.getElementById('progressFill');
             progressFill.style.width = `${stats.usageRate || 0}%`;
 
+            // イベント別統計更新
+            updateEventStats(stats.events || {});
+
             // 最近の使用履歴更新
             updateRecentUsage(recentUsage);
+        }
+
+        // イベント別統計更新
+        function updateEventStats(eventStats) {
+            const container = document.getElementById('eventStatsContainer');
+            if (!container) return;
+
+            if (!eventStats || Object.keys(eventStats).length === 0) {
+                container.innerHTML = '<p>イベントデータがありません</p>';
+                return;
+            }
+
+            const eventHTML = Object.keys(eventStats).map(eventName => {
+                const stats = eventStats[eventName];
+                return `
+                    <div class="event-stat-card">
+                        <h4>${eventName}</h4>
+                        <div class="event-stats-grid">
+                            <div class="event-stat-item">
+                                <div class="event-stat-number">${stats.total}</div>
+                                <div class="event-stat-label">総数</div>
+                            </div>
+                            <div class="event-stat-item">
+                                <div class="event-stat-number">${stats.used}</div>
+                                <div class="event-stat-label">使用済み</div>
+                            </div>
+                            <div class="event-stat-item">
+                                <div class="event-stat-number">${stats.available}</div>
+                                <div class="event-stat-label">利用可能</div>
+                            </div>
+                            <div class="event-stat-item">
+                                <div class="event-stat-number">${stats.usageRate}%</div>
+                                <div class="event-stat-label">利用率</div>
+                            </div>
+                        </div>
+                        <div class="event-progress-bar">
+                            <div class="event-progress-fill" style="width: ${stats.usageRate}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = eventHTML;
         }
 
         // 最近の使用履歴更新
@@ -387,7 +494,7 @@
                     <thead>
                         <tr>
                             <th>URL ID</th>
-                            <th>MSC</th>
+                            <th>イベント</th>
                             <th>使用者</th>
                             <th>使用日時</th>
                             <th>操作</th>
@@ -397,7 +504,7 @@
                         ${recentUsage.map(item => `
                             <tr>
                                 <td>${item.id}</td>
-                                <td>${item.mscAmount} MSC</td>
+                                <td>${item.event || 'N/A'}</td>
                                 <td>${item.usedBy || 'Anonymous'}</td>
                                 <td>${new Date(item.usedAt).toLocaleString('ja-JP')}</td>
                                 <td>

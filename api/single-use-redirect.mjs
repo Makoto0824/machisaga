@@ -29,12 +29,14 @@ export default function handler(req, res) {
         // GET: 未使用URLを取得してリダイレクト
         if (req.method === 'GET') {
             const userId = req.query.userId || generateGuestId(req);
-            const availableURL = urlManager.getNextAvailableURL(userId);
+            const eventName = req.query.event || null;
+            const availableURL = urlManager.getNextAvailableURL(userId, eventName);
 
             if (!availableURL) {
+                const eventMessage = eventName ? `イベント${eventName}の` : '';
                 return res.status(410).json({
                     success: false,
-                    error: 'すべてのURLが使用済みです',
+                    error: `${eventMessage}すべてのURLが使用済みです`,
                     message: 'イベントの募集は終了しました。次回の開催をお待ちください。',
                     stats: urlManager.getStats()
                 });
@@ -42,7 +44,7 @@ export default function handler(req, res) {
 
             // 直接リダイレクト
             if (req.query.redirect === 'true') {
-                console.log(`🎯 直接リダイレクト: ${availableURL.url}`);
+                console.log(`🎯 直接リダイレクト: ${availableURL.url} (${availableURL.event})`);
                 res.writeHead(302, { 'Location': availableURL.url });
                 res.end();
                 return;
@@ -53,9 +55,9 @@ export default function handler(req, res) {
                 success: true,
                 url: availableURL.url,
                 urlId: availableURL.id,
-                mscAmount: availableURL.mscAmount,
+                event: availableURL.event,
                 description: availableURL.description,
-                message: `${availableURL.mscAmount} MSCを獲得できるイベントページにリダイレクトします`,
+                message: `${availableURL.event}のイベントページにリダイレクトします`,
                 stats: urlManager.getStats()
             });
         }
