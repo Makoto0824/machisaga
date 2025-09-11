@@ -103,6 +103,64 @@
             box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
         }
 
+        /* ローディングアニメーション */
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading.show {
+            display: flex;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            color: white;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .button.loading {
+            position: relative;
+            color: transparent;
+        }
+
+        .button.loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
         .button.danger {
             background: linear-gradient(45deg, #e74c3c, #c0392b);
         }
@@ -292,6 +350,14 @@
     </style>
 </head>
 <body>
+    <!-- ローディング画面 -->
+    <div id="loadingOverlay" class="loading">
+        <div>
+            <div class="spinner"></div>
+            <div class="loading-text" id="loadingText">処理中...</div>
+        </div>
+    </div>
+
     <div class="container">
         <div class="header">
             <h1>🏰 まちサーガ イベント管理画面</h1>
@@ -371,6 +437,7 @@
 
         // ページ読み込み時に自動でデータを取得
         window.onload = function() {
+            showLoading('初期データを読み込み中...');
             refreshStats();
         };
 
@@ -476,6 +543,7 @@
 
         // 統計更新
         async function refreshStats() {
+            showLoading('統計情報を取得中...');
             try {
                 const response = await fetch('/api/single-use-redirect', {
                     method: 'POST',
@@ -488,15 +556,19 @@
                 const data = await response.json();
                 if (data.success) {
                     updateStats(data.stats, data.recentUsage);
+                    showMessage('✅ 統計データを更新しました', 'success');
                 }
             } catch (error) {
                 console.error('Stats refresh error:', error);
                 showMessage('❌ 統計更新エラー', 'error');
+            } finally {
+                hideLoading();
             }
         }
 
         // CSVから再読み込み
         async function reloadFromCSV() {
+            showLoading('CSVデータを読み込み中...');
             try {
                 const response = await fetch('/api/single-use-redirect', {
                     method: 'POST',
@@ -516,11 +588,14 @@
             } catch (error) {
                 console.error('CSV reload error:', error);
                 showMessage('❌ CSV読み込みエラー', 'error');
+            } finally {
+                hideLoading();
             }
         }
 
         // レポート出力
         async function exportReport() {
+            showLoading('レポートを生成中...');
             try {
                 const response = await fetch('/api/single-use-redirect', {
                     method: 'POST',
@@ -539,6 +614,8 @@
             } catch (error) {
                 console.error('Export error:', error);
                 showMessage('❌ レポート出力エラー', 'error');
+            } finally {
+                hideLoading();
             }
         }
 
@@ -548,6 +625,7 @@
                 return;
             }
 
+            showLoading('URLをリセット中...');
             try {
                 const response = await fetch('/api/single-use-redirect', {
                     method: 'POST',
@@ -567,6 +645,8 @@
             } catch (error) {
                 console.error('Reset error:', error);
                 showMessage('❌ リセットエラー', 'error');
+            } finally {
+                hideLoading();
             }
         }
 
@@ -585,6 +665,7 @@
                 return;
             }
             
+            showLoading('CSVファイルをアップロード中...');
             const uploadStatus = document.getElementById('uploadStatus');
             uploadStatus.innerHTML = '<p style="color: #3498db;">📤 アップロード中...</p>';
             
@@ -616,6 +697,8 @@
                 console.error('CSV upload error:', error);
                 uploadStatus.innerHTML = '<p style="color: #e74c3c;">❌ アップロードエラー</p>';
                 showMessage('❌ CSVアップロードエラー', 'error');
+            } finally {
+                hideLoading();
             }
         }
 
@@ -628,6 +711,7 @@
                 return;
             }
 
+            showLoading('URLをリセット中...');
             try {
                 const response = await fetch('/api/single-use-redirect', {
                     method: 'POST',
@@ -649,6 +733,33 @@
             } catch (error) {
                 console.error('Single reset error:', error);
                 showMessage('❌ リセットエラー', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // ローディング表示
+        function showLoading(text = '処理中...') {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const loadingText = document.getElementById('loadingText');
+            loadingText.textContent = text;
+            loadingOverlay.classList.add('show');
+        }
+
+        // ローディング非表示
+        function hideLoading() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.classList.remove('show');
+        }
+
+        // ボタンローディング状態
+        function setButtonLoading(button, loading = true) {
+            if (loading) {
+                button.classList.add('loading');
+                button.disabled = true;
+            } else {
+                button.classList.remove('loading');
+                button.disabled = false;
             }
         }
 
