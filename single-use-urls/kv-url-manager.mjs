@@ -98,6 +98,9 @@ class KVURLManager {
      * 未使用URLを1つ取得して使用済みにマーク
      */
     async getNextAvailableURL(userId = null, eventName = null) {
+        console.log(`🔍 getNextAvailableURL called - userId: ${userId}, eventName: ${eventName}`);
+        console.trace('Call stack:');
+        
         if (!this.isKVAvailable) {
             console.warn('⚠️ KVが利用できません');
             return null;
@@ -147,6 +150,8 @@ class KVURLManager {
      * 使用状況の統計を取得
      */
     async getStats() {
+        console.log('📊 getStats called');
+        
         if (!this.isKVAvailable) {
             return {
                 total: 0,
@@ -250,6 +255,9 @@ class KVURLManager {
      * 全URLをリセット（管理者用）
      */
     async resetAllURLs() {
+        console.log('🔄 resetAllURLs called');
+        console.trace('Call stack:');
+        
         if (!this.isKVAvailable) {
             return { success: false, error: 'KVが利用できません' };
         }
