@@ -327,6 +327,37 @@ class KVURLManager {
             return { connected: false, message: `KV接続エラー: ${error.message}` };
         }
     }
+
+    /**
+     * 使用履歴を取得
+     */
+    async getUsageHistory(limit = 10) {
+        if (!this.isKVAvailable) {
+            return [];
+        }
+
+        try {
+            const urlKeys = await kv.keys('url:*');
+            const usedUrls = [];
+
+            // 全URLデータを取得して使用済みのもののみをフィルタ
+            for (const key of urlKeys) {
+                const urlData = await kv.get(key);
+                if (urlData && urlData.used) {
+                    usedUrls.push(urlData);
+                }
+            }
+
+            // 使用日時でソート（新しい順）
+            usedUrls.sort((a, b) => new Date(b.usedAt) - new Date(a.usedAt));
+
+            // 指定された件数まで返す
+            return usedUrls.slice(0, limit);
+        } catch (error) {
+            console.error('getUsageHistory error:', error);
+            return [];
+        }
+    }
 }
 
 // シングルトンインスタンス
