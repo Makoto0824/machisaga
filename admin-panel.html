@@ -566,6 +566,26 @@
             }
         }
 
+        // 直接統計更新（ローディングなし）
+        async function updateStatsDirectly() {
+            try {
+                const response = await fetch('/api/single-use-redirect', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        action: 'stats'
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    updateStats(data.stats, data.recentUsage);
+                }
+            } catch (error) {
+                console.error('Direct stats update error:', error);
+            }
+        }
+
         // CSVから再読み込み
         async function reloadFromCSV() {
             showLoading('CSVデータを読み込み中...');
@@ -581,7 +601,8 @@
                 const data = await response.json();
                 if (data.success) {
                     showMessage(data.message, 'success');
-                    updateStats(data.stats);
+                    // CSV再読み込み後は直接統計を更新（ローディングなし）
+                    await updateStatsDirectly();
                 } else {
                     showMessage(data.error || 'CSV読み込みに失敗しました', 'error');
                 }
@@ -638,7 +659,8 @@
                 const data = await response.json();
                 if (data.success) {
                     showMessage(data.message, 'success');
-                    refreshStats();
+                    // リセット後は直接統計を更新（ローディングなし）
+                    await updateStatsDirectly();
                 } else {
                     showMessage(data.error || 'リセットに失敗しました', 'error');
                 }
@@ -687,8 +709,8 @@
                     // ファイル入力をクリア
                     fileInput.value = '';
                     
-                    // 統計を更新
-                    refreshStats();
+                    // CSVアップロード後は直接統計を更新（ローディングなし）
+                    await updateStatsDirectly();
                 } else {
                     uploadStatus.innerHTML = '<p style="color: #e74c3c;">❌ アップロード失敗</p>';
                     showMessage(data.error || 'CSVアップロードに失敗しました', 'error');
@@ -726,7 +748,8 @@
                 if (data.success) {
                     showMessage(data.message, 'success');
                     document.getElementById('resetUrlId').value = '';
-                    refreshStats();
+                    // 個別リセット後は直接統計を更新（ローディングなし）
+                    await updateStatsDirectly();
                 } else {
                     showMessage(data.error || 'リセットに失敗しました', 'error');
                 }
