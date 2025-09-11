@@ -24,24 +24,20 @@ export default async function handler(req, res) {
     }
 
     try {
-        // GET: 未使用URLを取得してリダイレクト
+        // GET: 未使用URLを取得してリダイレクト（一時的に無効化）
         if (req.method === 'GET') {
-            // 管理画面からの統計取得リクエストは無効化
-            if (req.query.action === 'stats' || req.query.stats === 'true') {
-                return res.status(200).json({
-                    success: false,
-                    message: '統計取得はPOSTリクエストを使用してください'
-                });
-            }
+            // GETリクエストを完全に無効化（デバッグ用）
+            return res.status(200).json({
+                success: false,
+                message: 'GETリクエストは一時的に無効化されています。POSTリクエストを使用してください。',
+                debug: {
+                    query: req.query,
+                    userAgent: req.headers['user-agent']
+                }
+            });
             
-            // プレビューやテスト用のGETリクエストは無効化
-            if (req.query.preview === 'true' || req.query.test === 'true') {
-                return res.status(200).json({
-                    success: false,
-                    message: 'プレビューモードは無効化されています'
-                });
-            }
-            
+            // 以下のコードは一時的にコメントアウト
+            /*
             const userId = req.query.userId || generateGuestId(req);
             const eventName = req.query.event || null;
             const availableURL = await kvURLManager.getNextAvailableURL(userId, eventName);
@@ -74,6 +70,7 @@ export default async function handler(req, res) {
                 message: `${availableURL.event}のイベントページにリダイレクトします`,
                 stats: await kvURLManager.getStats()
             });
+            */
         }
 
         // POST: 管理者機能（リセット、統計など）
