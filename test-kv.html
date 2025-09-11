@@ -50,6 +50,64 @@
         button:hover {
             transform: translateY(-2px);
         }
+
+        /* ローディングアニメーション */
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading.show {
+            display: flex;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            color: white;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .button.loading {
+            position: relative;
+            color: transparent;
+        }
+
+        .button.loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
         button:disabled {
             background: #ccc;
             cursor: not-allowed;
@@ -98,6 +156,14 @@
     </style>
 </head>
 <body>
+    <!-- ローディング画面 -->
+    <div id="loadingOverlay" class="loading">
+        <div>
+            <div class="spinner"></div>
+            <div class="loading-text" id="loadingText">処理中...</div>
+        </div>
+    </div>
+
     <div class="container">
         <h1>🔧 KV (Redis) 接続テスト</h1>
         
@@ -141,6 +207,20 @@
     <script>
         const API_BASE = window.location.origin;
 
+        // ローディング表示
+        function showLoading(text = '処理中...') {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const loadingText = document.getElementById('loadingText');
+            loadingText.textContent = text;
+            loadingOverlay.classList.add('show');
+        }
+
+        // ローディング非表示
+        function hideLoading() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.classList.remove('show');
+        }
+
         async function callKVTestAPI(action) {
             try {
                 const response = await fetch(`${API_BASE}/api/test-kv?action=${action}`);
@@ -162,54 +242,85 @@
         }
 
         async function testKVStatus() {
-            const result = await callKVTestAPI('status');
-            showResult('statusResult', result, result.success ? 'success' : 'error');
+            showLoading('接続状態を確認中...');
+            try {
+                const result = await callKVTestAPI('status');
+                showResult('statusResult', result, result.success ? 'success' : 'error');
+            } finally {
+                hideLoading();
+            }
         }
 
         async function getStats() {
-            const result = await callKVTestAPI('stats');
-            showResult('statsResult', result, result.success ? 'success' : 'error');
+            showLoading('統計情報を取得中...');
+            try {
+                const result = await callKVTestAPI('stats');
+                showResult('statsResult', result, result.success ? 'success' : 'error');
+            } finally {
+                hideLoading();
+            }
         }
 
         async function loadFromCSV() {
-            const result = await callKVTestAPI('load');
-            showResult('loadResult', result, result.success ? 'success' : 'error');
+            showLoading('CSVデータを読み込み中...');
+            try {
+                const result = await callKVTestAPI('load');
+                showResult('loadResult', result, result.success ? 'success' : 'error');
+            } finally {
+                hideLoading();
+            }
         }
 
         async function testWrite() {
-            const result = await callKVTestAPI('test-write');
-            showResult('writeResult', result, result.success ? 'success' : 'error');
+            showLoading('テストデータを書き込み中...');
+            try {
+                const result = await callKVTestAPI('test-write');
+                showResult('writeResult', result, result.success ? 'success' : 'error');
+            } finally {
+                hideLoading();
+            }
         }
 
         async function getRecentUsage() {
-            const result = await callKVTestAPI('recent');
-            showResult('recentResult', result, result.success ? 'success' : 'error');
+            showLoading('使用履歴を取得中...');
+            try {
+                const result = await callKVTestAPI('recent');
+                showResult('recentResult', result, result.success ? 'success' : 'error');
+            } finally {
+                hideLoading();
+            }
         }
 
         async function runAllTests() {
-            const allResults = {};
-            
-            // 各テストを順次実行
-            allResults.status = await callKVTestAPI('status');
-            allResults.stats = await callKVTestAPI('stats');
-            allResults.load = await callKVTestAPI('load');
-            allResults.write = await callKVTestAPI('test-write');
-            allResults.recent = await callKVTestAPI('recent');
-            
-            // 成功/失敗の集計
-            const successCount = Object.values(allResults).filter(r => r.success).length;
-            const totalCount = Object.keys(allResults).length;
-            
-            const summary = {
-                summary: `${successCount}/${totalCount} テストが成功`,
-                results: allResults
-            };
-            
-            showResult('allTestsResult', summary, successCount === totalCount ? 'success' : 'error');
+            showLoading('全テストを実行中...');
+            try {
+                const allResults = {};
+                
+                // 各テストを順次実行
+                allResults.status = await callKVTestAPI('status');
+                allResults.stats = await callKVTestAPI('stats');
+                allResults.load = await callKVTestAPI('load');
+                allResults.write = await callKVTestAPI('test-write');
+                allResults.recent = await callKVTestAPI('recent');
+                
+                // 成功/失敗の集計
+                const successCount = Object.values(allResults).filter(r => r.success).length;
+                const totalCount = Object.keys(allResults).length;
+                
+                const summary = {
+                    summary: `${successCount}/${totalCount} テストが成功`,
+                    results: allResults
+                };
+                
+                showResult('allTestsResult', summary, successCount === totalCount ? 'success' : 'error');
+            } finally {
+                hideLoading();
+            }
         }
 
         // ページ読み込み時に接続状態を確認
         window.addEventListener('load', () => {
+            showLoading('初期接続状態を確認中...');
             testKVStatus();
         });
     </script>
