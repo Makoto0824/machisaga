@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>まちサーガ URL監視システム</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .warning {
+            background: rgba(255, 152, 0, 0.2);
+            border: 1px solid rgba(255, 152, 0, 0.5);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .solution {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid rgba(76, 175, 80, 0.5);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .action-button {
+            background: linear-gradient(45deg, #4caf50, #2ecc71);
+            border: none;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            margin: 1rem 0;
+        }
+
+        .monitoring-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .status-card.active {
+            border: 2px solid #4caf50;
+        }
+
+        .status-card.inactive {
+            border: 2px solid #ff6b6b;
+        }
+
+        .intercept-form {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+
+        .intercept-form input[type="url"] {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏰 まちサーガ URL監視システム</h1>
+        
+        <div class="warning">
+            <h3>⚠️ 現在の問題</h3>
+            <p><strong>T&TイベントURL</strong> が直接アクセス可能な状態です：</p>
+            <p><code>https://play.ttt.games/worlds/machi-saga/events/b-mjFuRIEBL3xROr64xXA3qaSkZ5L926lSWCOXVtH60/checkin</code></p>
+            <ul style="text-align: left;">
+                <li>使い切りURL管理システムが適用されていない</li>
+                <li>重複アクセスの制御ができない</li>
+                <li>統計情報が取得できない</li>
+            </ul>
+        </div>
+
+        <div class="monitoring-status">
+            <div class="status-card inactive">
+                <h4>T&T側リダイレクト</h4>
+                <p>❌ 未設定</p>
+                <p>JavaScriptリダイレクトが必要</p>
+            </div>
+            <div class="status-card active">
+                <h4>まちサーガシステム</h4>
+                <p>✅ 稼働中</p>
+                <p>使い切りURL管理準備完了</p>
+            </div>
+            <div class="status-card inactive">
+                <h4>URL監視</h4>
+                <p>⏳ 準備中</p>
+                <p>自動検知システム</p>
+            </div>
+            <div class="status-card active">
+                <h4>管理画面</h4>
+                <p>✅ 利用可能</p>
+                <p>リアルタイム統計</p>
+            </div>
+        </div>
+
+        <div class="solution">
+            <h3>✅ 解決策</h3>
+            
+            <h4>Option 1: T&T側対応（推奨）</h4>
+            <p>T&Tチームに以下のJavaScriptコード追加を依頼：</p>
+            <pre style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 5px; overflow-x: auto; font-size: 0.9rem;">
+&lt;script&gt;
+// まちサーガ自動リダイレクト
+setTimeout(() => {
+    window.location.href = 'https://machisaga.vercel.app/event-redirect-strategy?target=' + 
+                          encodeURIComponent(window.location.href);
+}, 3000);
+&lt;/script&gt;</pre>
+            
+            <h4>Option 2: QRコード戦略変更（即座実装可能）</h4>
+            <p>配布するQRコードを以下のURLに変更：</p>
+            <ul style="text-align: left;">
+                <li><strong>エントリーページ</strong>: https://machisaga.vercel.app/event-entry</li>
+                <li><strong>自動リダイレクト</strong>: https://machisaga.vercel.app/event-redirect-strategy</li>
+            </ul>
+        </div>
+
+        <div class="intercept-form">
+            <h3>🔧 URL インターセプト設定</h3>
+            <p>特定のT&T URLにアクセスされた際の自動リダイレクト設定：</p>
+            <input type="url" id="interceptUrl" placeholder="監視対象URL" 
+                   value="https://play.ttt.games/worlds/machi-saga/events/b-mjFuRIEBL3xROr64xXA3qaSkZ5L926lSWCOXVtH60/checkin">
+            <button class="action-button" onclick="generateInterceptLink()">
+                インターセプトリンク生成
+            </button>
+            <div id="interceptResult" style="margin-top: 1rem;"></div>
+        </div>
+
+        <div style="text-align: center; margin: 2rem 0;">
+            <button class="action-button" onclick="window.open('/qr-generator', '_blank')">
+                📱 QRコード生成ツール
+            </button>
+            <button class="action-button" onclick="window.open('/admin', '_blank')">
+                🔧 管理画面
+            </button>
+            <button class="action-button" onclick="window.open('/event-entry', '_blank')">
+                🎯 エントリーページ
+            </button>
+        </div>
+
+        <div style="background: rgba(255, 255, 255, 0.1); padding: 1.5rem; border-radius: 15px; margin: 2rem 0;">
+            <h3>📋 推奨アクション</h3>
+            <ol style="text-align: left; line-height: 1.8;">
+                <li><strong>即座実施</strong>: QRコード配布戦略をエントリーページに変更</li>
+                <li><strong>T&T連携</strong>: JavaScriptリダイレクトの実装依頼</li>
+                <li><strong>テスト実行</strong>: 新しいフローでの動作確認</li>
+                <li><strong>統計監視</strong>: 管理画面でのリアルタイム追跡</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function generateInterceptLink() {
+            const url = document.getElementById('interceptUrl').value;
+            if (!url) {
+                alert('URLを入力してください');
+                return;
+            }
+            
+            const interceptLink = `https://machisaga.vercel.app/event-redirect-strategy?target=${encodeURIComponent(url)}`;
+            
+            document.getElementById('interceptResult').innerHTML = `
+                <div style="background: rgba(76, 175, 80, 0.2); padding: 1rem; border-radius: 5px; margin-top: 1rem;">
+                    <h4>✅ インターセプトリンク生成完了</h4>
+                    <p><strong>リダイレクトURL:</strong></p>
+                    <p style="word-break: break-all; background: rgba(0,0,0,0.3); padding: 0.5rem; border-radius: 3px; font-family: monospace;">${interceptLink}</p>
+                    <button onclick="copyToClipboard('${interceptLink}')" style="
+                        background: #4caf50;
+                        color: white;
+                        border: none;
+                        padding: 0.5rem 1rem;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        margin-top: 0.5rem;
+                    ">📋 クリップボードにコピー</button>
+                    <button onclick="window.open('${interceptLink}', '_blank')" style="
+                        background: #2196f3;
+                        color: white;
+                        border: none;
+                        padding: 0.5rem 1rem;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        margin-left: 0.5rem;
+                        margin-top: 0.5rem;
+                    ">🔗 テスト実行</button>
+                </div>
+            `;
+        }
+        
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('クリップボードにコピーしました！');
+            });
+        }
+    </script>
+</body>
+</html>

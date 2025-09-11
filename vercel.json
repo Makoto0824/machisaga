@@ -20,6 +20,10 @@
     {
       "source": "/qr-generator",
       "destination": "/qr-redirect-generator.html"
+    },
+    {
+      "source": "/url-monitoring",
+      "destination": "/url-monitoring-system.html"
     }
   ],
   "headers": [
