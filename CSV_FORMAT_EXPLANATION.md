@@ -4,12 +4,12 @@
 
 ### 現在のCSV構造
 ```csv
-ID,URL,MSC,Description
-event_a_001,"https://play.ttt.games/worlds/machi-saga/events/b-mjFuRIEBL3xROr64xXA3qaSkZ5L926lSWCOXVtH60/checkin",1,"イベントA - 使い切りURL #1"
-event_a_002,"https://play.ttt.games/worlds/machi-saga/events/c-xyz123ABC456DEF789GHI012JKL345MNO678PQR/checkin",1,"イベントA - 使い切りURL #2"
-event_a_003,"https://play.ttt.games/worlds/machi-saga/events/d-uvw789XYZ012ABC345DEF678GHI901JKL234MNO567/checkin",1,"イベントA - 使い切りURL #3"
-event_a_004,"https://play.ttt.games/worlds/machi-saga/events/e-rst456UVW789XYZ012ABC345DEF678GHI901JKL234/checkin",1,"イベントA - 使い切りURL #4"
-event_a_005,"https://play.ttt.games/worlds/machi-saga/events/f-mno123PQR456STU789VWX012YZA345BCD678EFG901/checkin",1,"イベントA - 使い切りURL #5"
+ID,URL
+event_a_001,https://play.ttt.games/worlds/machi-saga/events/HW0q5S0tSNm3KVhKO2R5EjrG01t1CLWX5TC0f01dqqw/checkin
+event_a_002,https://play.ttt.games/worlds/machi-saga/events/tib-mg0SDPBQC2dkF7s1A99KWAT_peePYcivUT0Tu9Q/checkin
+event_a_003,https://play.ttt.games/worlds/machi-saga/events/BxETN5IJaJRYCu37bpWu31FL5k_djTu30fgqhfMarUo/checkin
+event_a_004,https://play.ttt.games/worlds/machi-saga/events/J0s5_USkI1T9oC3iLBJUeWlyGOMpsjOuYvQv6PH5L0E/checkin
+event_a_005,https://play.ttt.games/worlds/machi-saga/events/VEz4hbZrAGm5PYIgIEyPS_2BFSNYAtITYnFeI3y4CRg/checkin
 ```
 
 ### 重要なポイント
@@ -42,12 +42,12 @@ https://play.ttt.games/worlds/machi-saga/events/unique-token-5/checkin
 #### 2. CSVファイルの更新
 T&Tから提供された実際のURLでCSVファイルを更新：
 ```csv
-ID,URL,MSC,Description
-event_a_001,"https://play.ttt.games/worlds/machi-saga/events/actual-token-1/checkin",1,"イベントA - 使い切りURL #1"
-event_a_002,"https://play.ttt.games/worlds/machi-saga/events/actual-token-2/checkin",1,"イベントA - 使い切りURL #2"
-event_a_003,"https://play.ttt.games/worlds/machi-saga/events/actual-token-3/checkin",1,"イベントA - 使い切りURL #3"
-event_a_004,"https://play.ttt.games/worlds/machi-saga/events/actual-token-4/checkin",1,"イベントA - 使い切りURL #4"
-event_a_005,"https://play.ttt.games/worlds/machi-saga/events/actual-token-5/checkin",1,"イベントA - 使い切りURL #5"
+ID,URL
+event_a_001,https://play.ttt.games/worlds/machi-saga/events/actual-token-1/checkin
+event_a_002,https://play.ttt.games/worlds/machi-saga/events/actual-token-2/checkin
+event_a_003,https://play.ttt.games/worlds/machi-saga/events/actual-token-3/checkin
+event_a_004,https://play.ttt.games/worlds/machi-saga/events/actual-token-4/checkin
+event_a_005,https://play.ttt.games/worlds/machi-saga/events/actual-token-5/checkin
 ```
 
 ### システムの動作
