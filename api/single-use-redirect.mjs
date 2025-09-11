@@ -74,28 +74,24 @@ export default async function handler(req, res) {
             switch (action) {
                 case 'stats':
                     const stats = await kvURLManager.getStats();
-                    const recentUsage = urlManager.urls
-                        .filter(url => url.used)
-                        .sort((a, b) => new Date(b.usedAt) - new Date(a.usedAt))
-                        .slice(0, 10);
+                    const recentUsage = await kvURLManager.getUsageHistory(10);
                     
                     res.status(200).json({
                         success: true,
                         stats,
-                        recentUsage,
-                        totalUrls: urlManager.urls.length
+                        recentUsage
                     });
                     break;
 
                 case 'reset':
                     if (urlId) {
-                        const success = kvURLManager.resetURL(urlId);
+                        const success = await kvURLManager.resetURL(urlId);
                         res.status(200).json({
                             success,
                             message: success ? `URL ${urlId} をリセットしました` : 'URLが見つかりません'
                         });
                     } else {
-                        kvURLManager.resetAllURLs();
+                        await kvURLManager.resetAllURLs();
                         res.status(200).json({
                             success: true,
                             message: '全URLをリセットしました'
@@ -104,11 +100,11 @@ export default async function handler(req, res) {
                     break;
 
                 case 'export':
-                    const reportFile = urlManager.exportUsageReport();
+                    // TODO: KVマネージャーにexport機能を実装
                     res.status(200).json({
                         success: true,
-                        message: '使用状況レポートを生成しました',
-                        reportFile
+                        message: '使用状況レポート機能は準備中です',
+                        reportFile: null
                     });
                     break;
 
