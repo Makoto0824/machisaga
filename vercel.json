@@ -12,6 +12,14 @@
     {
       "source": "/admin",
       "destination": "/admin-panel.html"
+    },
+    {
+      "source": "/event-redirect-strategy",
+      "destination": "/event-redirect-strategy.html"
+    },
+    {
+      "source": "/qr-generator",
+      "destination": "/qr-redirect-generator.html"
     }
   ],
   "headers": [

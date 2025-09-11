@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>まちサーガ QRコード生成（リダイレクト戦略）</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .qr-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .qr-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .qr-card h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+
+        .qr-code {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            display: inline-block;
+        }
+
+        .strategy-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .strategy {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+        }
+
+        .strategy.recommended {
+            border: 2px solid #4caf50;
+        }
+
+        .strategy h4 {
+            color: #4caf50;
+            margin-bottom: 1rem;
+        }
+
+        .pros-cons {
+            text-align: left;
+        }
+
+        .pros-cons h5 {
+            color: #ffd700;
+            margin: 1rem 0 0.5rem 0;
+        }
+
+        .pros-cons ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .pros-cons .pro::before {
+            content: "✅ ";
+            color: #4caf50;
+        }
+
+        .pros-cons .con::before {
+            content: "❌ ";
+            color: #ff6b6b;
+        }
+
+        .url-input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            margin: 0.5rem 0;
+        }
+
+        .generate-btn {
+            background: linear-gradient(45deg, #4caf50, #2ecc71);
+            border: none;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏰 まちサーガ QRコード生成（リダイレクト戦略）</h1>
+        
+        <div class="strategy-comparison">
+            <div class="strategy">
+                <h4>❌ 従来方式（問題あり）</h4>
+                <div class="pros-cons">
+                    <h5>問題点:</h5>
+                    <ul>
+                        <li class="con">T&T URLに直接アクセス</li>
+                        <li class="con">使い切りURL管理不可</li>
+                        <li class="con">重複アクセス制御なし</li>
+                        <li class="con">統計追跡困難</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="strategy recommended">
+                <h4>✅ 新方式（推奨）</h4>
+                <div class="pros-cons">
+                    <h5>利点:</h5>
+                    <ul>
+                        <li class="pro">まちサーガエントリーページ経由</li>
+                        <li class="pro">使い切りURL自動振り分け</li>
+                        <li class="pro">重複防止機能</li>
+                        <li class="pro">リアルタイム統計</li>
+                        <li class="pro">管理画面での制御</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="qr-section">
+            <div class="qr-card">
+                <h3>🎯 エントリーページQR（推奨）</h3>
+                <div class="qr-code" id="qr-entry"></div>
+                <p><strong>URL:</strong> https://machisaga.vercel.app/event-entry</p>
+                <p>ユーザーは自動的に使い切りURLに誘導されます</p>
+            </div>
+
+            <div class="qr-card">
+                <h3>🔄 自動リダイレクトQR</h3>
+                <div class="qr-code" id="qr-auto"></div>
+                <p><strong>URL:</strong> https://machisaga.vercel.app/event-redirect-strategy</p>
+                <p>5秒カウントダウン後に自動リダイレクト</p>
+            </div>
+        </div>
+
+        <div style="background: rgba(255, 255, 255, 0.1); padding: 1.5rem; border-radius: 15px; margin: 2rem 0;">
+            <h3>🔧 カスタムリダイレクト URL生成</h3>
+            <p>特定のT&T URLを監視対象にする場合:</p>
+            <input type="text" class="url-input" id="customUrl" 
+                   value="https://play.ttt.games/worlds/machi-saga/events/b-mjFuRIEBL3xROr64xXA3qaSkZ5L926lSWCOXVtH60/checkin"
+                   placeholder="T&T イベントURL">
+            <button class="generate-btn" onclick="generateCustomQR()">カスタムQR生成</button>
+            <div class="qr-code" id="qr-custom" style="display: none;"></div>
+            <p id="custom-url-display"></p>
+        </div>
+
+        <div style="background: rgba(76, 175, 80, 0.2); padding: 1.5rem; border-radius: 15px; margin: 2rem 0; border: 1px solid rgba(76, 175, 80, 0.5);">
+            <h3>🎯 実装推奨フロー</h3>
+            <ol style="text-align: left; line-height: 1.8;">
+                <li><strong>QRコード配布</strong>: エントリーページQRを使用</li>
+                <li><strong>ユーザーアクセス</strong>: まちサーガエントリーページに誘導</li>
+                <li><strong>自動振り分け</strong>: 使い切りURLから未使用を選択</li>
+                <li><strong>T&Tページ表示</strong>: 実際のMSC獲得ページを表示</li>
+                <li><strong>使用済み管理</strong>: URLを自動的に使用済みに変更</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // QRコード生成
+        function generateQR(elementId, url) {
+            QRCode.toCanvas(document.getElementById(elementId), url, {
+                width: 256,
+                margin: 2,
+                color: {
+                    dark: '#000000',
+                    light: '#ffffff'
+                }
+            }, function(error) {
+                if (error) console.error(error);
+            });
+        }
+
+        // カスタムQR生成
+        function generateCustomQR() {
+            const customUrl = document.getElementById('customUrl').value;
+            const redirectUrl = `https://machisaga.vercel.app/event-redirect-strategy?target=${encodeURIComponent(customUrl)}`;
+            
+            generateQR('qr-custom', redirectUrl);
+            document.getElementById('qr-custom').style.display = 'inline-block';
+            document.getElementById('custom-url-display').innerHTML = `<strong>生成されたURL:</strong> ${redirectUrl}`;
+        }
+
+        // ページ読み込み時に基本QRコードを生成
+        document.addEventListener('DOMContentLoaded', () => {
+            generateQR('qr-entry', 'https://machisaga.vercel.app/event-entry');
+            generateQR('qr-auto', 'https://machisaga.vercel.app/event-redirect-strategy');
+        });
+    </script>
+</body>
+</html>
