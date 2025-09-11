@@ -264,6 +264,7 @@ class KVURLManager {
 
     /**
      * 全URLをリセット（管理者用）
+     * 注意: 使用済みURLは恒久的に使用済みのまま保持される
      */
     async resetAllURLs() {
         console.log('🔄 resetAllURLs called');
@@ -274,21 +275,35 @@ class KVURLManager {
 
         try {
             const urlKeys = await kv.keys('url:*');
-            let resetCount = 0;
+            let totalCount = 0;
+            let usedCount = 0;
+            let availableCount = 0;
 
+            // 統計情報を取得（リセットは行わない）
             for (const key of urlKeys) {
                 const urlData = await kv.get(key);
-                if (urlData && urlData.used) {
-                    urlData.used = false;
-                    urlData.usedAt = null;
-                    urlData.usedBy = null;
-                    await kv.set(key, urlData);
-                    resetCount++;
+                if (urlData) {
+                    totalCount++;
+                    if (urlData.used) {
+                        usedCount++;
+                    } else {
+                        availableCount++;
+                    }
                 }
             }
 
-            console.log(`🔄 全URLリセット: ${resetCount}個のURLをリセットしました`);
-            return { success: true, message: `${resetCount}個のURLをリセットしました` };
+            console.log(`🔄 全URLリセット: 使用済みURLは恒久的に保持されます`);
+            console.log(`📊 現在の状況: 総数=${totalCount}, 使用済み=${usedCount}, 利用可能=${availableCount}`);
+            
+            return { 
+                success: true, 
+                message: `使用済みURLは恒久的に保持されます。現在: 使用済み${usedCount}個、利用可能${availableCount}個`,
+                stats: {
+                    total: totalCount,
+                    used: usedCount,
+                    available: availableCount
+                }
+            };
 
         } catch (error) {
             console.error('❌ 全URLリセットエラー:', error);
