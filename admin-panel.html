@@ -298,16 +298,7 @@
             <p>使い切りURL システム管理</p>
         </div>
 
-        <div class="auth-section">
-            <h4>🔐 管理者認証</h4>
-            <div class="form-group">
-                <label for="adminPassword">管理者パスワード:</label>
-                <input type="password" id="adminPassword" placeholder="管理者パスワードを入力">
-            </div>
-            <button class="button" onclick="authenticateAdmin()">認証</button>
-        </div>
-
-        <div id="adminContent" style="display: none;">
+        <div id="adminContent">
             <div class="dashboard">
                 <div class="card">
                     <h3>📊 使用状況統計</h3>
@@ -375,49 +366,13 @@
     </div>
 
     <script>
-        let isAuthenticated = false;
-        let currentPassword = '';
+        let isAuthenticated = true; // 認証を無効化
+        let currentPassword = 'admin'; // ダミーパスワード
 
-        // 管理者認証
-        async function authenticateAdmin() {
-            const password = document.getElementById('adminPassword').value;
-            
-            if (!password) {
-                showMessage('パスワードを入力してください', 'error');
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/single-use-redirect', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        action: 'stats', 
-                        password: password 
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    isAuthenticated = true;
-                    currentPassword = password;
-                    
-                    document.querySelector('.auth-section').style.display = 'none';
-                    document.getElementById('adminContent').style.display = 'block';
-                    
-                    showMessage('✅ 認証成功！管理画面にアクセスできます', 'success');
-                    
-                    // 初回データ読み込み
-                    updateStats(data.stats, data.recentUsage);
-                } else {
-                    showMessage('❌ 認証に失敗しました。パスワードを確認してください', 'error');
-                }
-            } catch (error) {
-                console.error('Authentication error:', error);
-                showMessage('❌ 認証エラーが発生しました', 'error');
-            }
-        }
+        // ページ読み込み時に自動でデータを取得
+        window.onload = function() {
+            refreshStats();
+        };
 
         // 統計データ更新
         function updateStats(stats, recentUsage = []) {
@@ -521,22 +476,18 @@
 
         // 統計更新
         async function refreshStats() {
-            if (!isAuthenticated) return;
-
             try {
                 const response = await fetch('/api/single-use-redirect', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        action: 'stats', 
-                        password: currentPassword 
+                        action: 'stats'
                     })
                 });
 
                 const data = await response.json();
                 if (data.success) {
                     updateStats(data.stats, data.recentUsage);
-                    showMessage('✅ 統計データを更新しました', 'success');
                 }
             } catch (error) {
                 console.error('Stats refresh error:', error);
@@ -546,15 +497,12 @@
 
         // CSVから再読み込み
         async function reloadFromCSV() {
-            if (!isAuthenticated) return;
-
             try {
                 const response = await fetch('/api/single-use-redirect', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        action: 'reload', 
-                        password: currentPassword 
+                        action: 'reload'
                     })
                 });
 
@@ -573,15 +521,12 @@
 
         // レポート出力
         async function exportReport() {
-            if (!isAuthenticated) return;
-
             try {
                 const response = await fetch('/api/single-use-redirect', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        action: 'export', 
-                        password: currentPassword 
+                        action: 'export'
                     })
                 });
 
@@ -599,8 +544,6 @@
 
         // 全URLリセット
         async function resetAllUrls() {
-            if (!isAuthenticated) return;
-            
             if (!confirm('⚠️ 本当に全URLをリセットしますか？この操作は取り消せません。')) {
                 return;
             }
@@ -610,8 +553,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        action: 'reset', 
-                        password: currentPassword 
+                        action: 'reset'
                     })
                 });
 
@@ -630,8 +572,6 @@
 
         // CSVアップロード
         async function uploadCSV() {
-            if (!isAuthenticated) return;
-            
             const fileInput = document.getElementById('csvUpload');
             const file = fileInput.files[0];
             
@@ -651,7 +591,6 @@
             try {
                 const formData = new FormData();
                 formData.append('csvFile', file);
-                formData.append('password', currentPassword);
                 
                 const response = await fetch('/api/single-use-redirect', {
                     method: 'POST',
@@ -682,8 +621,6 @@
 
         // 個別URLリセット
         async function resetSingleUrl(urlId = null) {
-            if (!isAuthenticated) return;
-            
             const targetUrlId = urlId || document.getElementById('resetUrlId').value;
             
             if (!targetUrlId) {
@@ -696,8 +633,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        action: 'reset', 
-                        password: currentPassword,
+                        action: 'reset',
                         urlId: targetUrlId
                     })
                 });
@@ -735,9 +671,7 @@
 
         // 定期的に統計を更新（60秒ごと）
         setInterval(() => {
-            if (isAuthenticated) {
-                refreshStats();
-            }
+            refreshStats();
         }, 60000);
     </script>
 </body>

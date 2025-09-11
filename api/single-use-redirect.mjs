@@ -67,15 +67,9 @@ export default async function handler(req, res) {
                 return handleCSVUpload(req, res);
             }
             
-            const { action, password, urlId } = req.body || {};
+            const { action, urlId } = req.body || {};
             
-            // 簡易認証（本番では強化）
-            if (password !== 'machisaga-admin-2025') {
-                return res.status(401).json({
-                    success: false,
-                    error: '認証が必要です'
-                });
-            }
+            // 認証チェックを無効化
 
             switch (action) {
                 case 'stats':
@@ -187,13 +181,7 @@ async function handleCSVUpload(req, res) {
                     }
                 }
                 
-                // 認証チェック
-                if (password !== 'machisaga-admin-2025') {
-                    return res.status(401).json({
-                        success: false,
-                        error: '認証が必要です'
-                    });
-                }
+                // 認証チェックを無効化
                 
                 if (!csvContent) {
                     return res.status(400).json({
