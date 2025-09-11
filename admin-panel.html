@@ -554,9 +554,15 @@
                 });
 
                 const data = await response.json();
+                console.log('API Response:', data); // デバッグ用
                 if (data.success) {
-                    updateStats(data.stats, data.recentUsage);
+                    // APIレスポンスの形式に応じて統計データを取得
+                    const stats = data.stats || data.result;
+                    const recentUsage = data.recentUsage || [];
+                    updateStats(stats, recentUsage);
                     showMessage('✅ 統計データを更新しました', 'success');
+                } else {
+                    showMessage('❌ 統計データの取得に失敗しました', 'error');
                 }
             } catch (error) {
                 console.error('Stats refresh error:', error);
@@ -579,7 +585,10 @@
 
                 const data = await response.json();
                 if (data.success) {
-                    updateStats(data.stats, data.recentUsage);
+                    // APIレスポンスの形式に応じて統計データを取得
+                    const stats = data.stats || data.result;
+                    const recentUsage = data.recentUsage || [];
+                    updateStats(stats, recentUsage);
                 }
             } catch (error) {
                 console.error('Direct stats update error:', error);
