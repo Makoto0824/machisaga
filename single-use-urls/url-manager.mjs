@@ -15,7 +15,19 @@ class SingleUseURLManager {
         this.urlsFile = path.join(__dirname, 'urls.json');
         this.csvFile = path.join(__dirname, 'tnt-urls.csv');
         this.urls = [];
-        this.loadURLs();
+        
+        // Vercel環境ではJSONファイルが存在しない可能性があるため、
+        // まずJSONを試し、失敗したらCSVから読み込む
+        try {
+            this.loadURLs();
+            if (this.urls.length === 0) {
+                console.log('📄 JSONファイルが空または存在しません。CSVから読み込みます。');
+                this.loadFromCSV();
+            }
+        } catch (error) {
+            console.log('📄 JSONファイルの読み込みに失敗しました。CSVから読み込みます。');
+            this.loadFromCSV();
+        }
     }
 
     /**
@@ -23,16 +35,22 @@ class SingleUseURLManager {
      */
     loadFromCSV() {
         try {
+            console.log(`📂 CSVファイルパス: ${this.csvFile}`);
+            
             if (!fs.existsSync(this.csvFile)) {
                 console.warn('⚠️ CSVファイルが見つかりません:', this.csvFile);
-                return;
+                return 0;
             }
 
             const csvContent = fs.readFileSync(this.csvFile, 'utf-8');
+            console.log(`📄 CSVファイルサイズ: ${csvContent.length} 文字`);
+            
             const lines = csvContent.split('\n').filter(line => line.trim());
+            console.log(`📊 CSV行数: ${lines.length} (ヘッダー含む)`);
             
             // CSVヘッダーをスキップ（最初の行）
             const urlLines = lines.slice(1);
+            console.log(`📊 URL行数: ${urlLines.length}`);
             
             const newUrls = urlLines.map((line, index) => {
                 const [id, event, url, description] = line.split(',').map(item => item.trim().replace(/"/g, ''));
@@ -52,6 +70,11 @@ class SingleUseURLManager {
             this.saveURLs();
             
             console.log(`✅ CSVから${newUrls.length}個のURLを読み込みました`);
+            console.log(`📊 イベント別内訳:`, this.urls.reduce((acc, url) => {
+                acc[url.event] = (acc[url.event] || 0) + 1;
+                return acc;
+            }, {}));
+            
             return newUrls.length;
             
         } catch (error) {
