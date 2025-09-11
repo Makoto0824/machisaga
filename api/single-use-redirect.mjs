@@ -167,7 +167,7 @@ async function handleCSVUpload(req, res) {
             body += chunk.toString();
         });
         
-        req.on('end', () => {
+        req.on('end', async () => {
             try {
                 // 簡易的なmultipart解析（本番では適切なライブラリを使用）
                 const boundary = req.headers['content-type'].split('boundary=')[1];
@@ -204,15 +204,38 @@ async function handleCSVUpload(req, res) {
                     });
                 }
                 
-                // CSVファイルを保存
-                const fs = await import('fs');
-                const path = await import('path');
-                const csvPath = path.join(process.cwd(), 'single-use-urls', 'tnt-urls.csv');
-                
-                fs.writeFileSync(csvPath, csvContent, 'utf8');
-                
-                // URLマネージャーを再読み込み
-                const loadedCount = urlManager.loadFromCSV();
+                // CSVファイルを保存（Vercelでは一時的な処理）
+                let loadedCount = 0;
+                try {
+                    const fs = await import('fs');
+                    const path = await import('path');
+                    const csvPath = path.join(process.cwd(), 'single-use-urls', 'tnt-urls.csv');
+                    
+                    fs.writeFileSync(csvPath, csvContent, 'utf8');
+                    
+                    // URLマネージャーを再読み込み
+                    loadedCount = urlManager.loadFromCSV();
+                } catch (fsError) {
+                    console.warn('File system write failed, using in-memory processing:', fsError.message);
+                    // ファイルシステムに書き込めない場合は、メモリ内で処理
+                    const lines = csvContent.split('\n').filter(line => line.trim());
+                    const newUrls = lines.slice(1).map((line, index) => {
+                        const [id, event, url, description] = line.split(',').map(item => item.trim().replace(/"/g, ''));
+                        return {
+                            id: id || `url_${index + 1}`,
+                            event: event || 'Default',
+                            url: url,
+                            description: description || `まちサーガイベント ${index + 1}`,
+                            used: false,
+                            usedAt: null,
+                            usedBy: null
+                        };
+                    }).filter(item => item.url && item.url.startsWith('http'));
+                    
+                    // メモリ内のURLを更新
+                    urlManager.urls = newUrls;
+                    loadedCount = newUrls.length;
+                }
                 
                 res.status(200).json({
                     success: true,
