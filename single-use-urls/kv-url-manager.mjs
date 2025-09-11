@@ -107,7 +107,6 @@ class KVURLManager {
      */
     async getNextAvailableURL(userId = null, eventName = null) {
         console.log(`🔍 getNextAvailableURL called - userId: ${userId}, eventName: ${eventName}`);
-        console.trace('Call stack:');
         
         if (!this.isKVAvailable) {
             console.warn('⚠️ KVが利用できません');
@@ -268,7 +267,6 @@ class KVURLManager {
      */
     async resetAllURLs() {
         console.log('🔄 resetAllURLs called');
-        console.trace('Call stack:');
         
         if (!this.isKVAvailable) {
             return { success: false, error: 'KVが利用できません' };
