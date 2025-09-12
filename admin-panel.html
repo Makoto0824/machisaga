@@ -236,6 +236,43 @@
             font-weight: bold;
         }
 
+        /* 重複情報表示 */
+        .no-duplicates {
+            color: #27ae60;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .duplicates-warning {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .duplicate-section {
+            margin-bottom: 15px;
+        }
+
+        .duplicate-section h4 {
+            color: #721c24;
+            margin-bottom: 8px;
+        }
+
+        .duplicate-section ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .duplicate-section li {
+            color: #721c24;
+            margin-bottom: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
         .usage-table tr:hover {
             background: rgba(255, 255, 255, 0.05);
         }
@@ -451,6 +488,13 @@
             </div>
 
             <div class="card">
+                <h3>⚠️ 重複チェック</h3>
+                <div id="duplicatesContainer">
+                    <p>データを読み込み中...</p>
+                </div>
+            </div>
+
+            <div class="card">
                 <h3>📋 最近の使用履歴</h3>
                 <div id="recentUsageContainer">
                     <p>データを読み込み中...</p>
@@ -484,6 +528,9 @@
 
             // イベント別統計更新
             updateEventStats(stats.events || {});
+
+            // 重複情報更新
+            updateDuplicates(stats.duplicates || {});
 
             // 最近の使用履歴更新
             updateRecentUsage(recentUsage);
@@ -530,6 +577,50 @@
             }).join('');
 
             container.innerHTML = eventHTML;
+        }
+
+        // 重複情報更新
+        function updateDuplicates(duplicates) {
+            const container = document.getElementById('duplicatesContainer');
+            
+            if (!duplicates) {
+                container.innerHTML = '<p>重複情報がありません</p>';
+                return;
+            }
+
+            const hasDuplicates = duplicates.idDuplicates > 0 || duplicates.urlDuplicates > 0;
+            
+            if (!hasDuplicates) {
+                container.innerHTML = '<p class="no-duplicates">✅ 重複なし</p>';
+                return;
+            }
+
+            let duplicateHTML = '<div class="duplicates-warning">';
+            
+            if (duplicates.idDuplicates > 0) {
+                duplicateHTML += `
+                    <div class="duplicate-section">
+                        <h4>⚠️ ID重複 (${duplicates.idDuplicates}個)</h4>
+                        <ul>
+                            ${duplicates.duplicateIds.map(id => `<li>${id}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            if (duplicates.urlDuplicates > 0) {
+                duplicateHTML += `
+                    <div class="duplicate-section">
+                        <h4>⚠️ URL重複 (${duplicates.urlDuplicates}個)</h4>
+                        <ul>
+                            ${duplicates.duplicateUrls.map(url => `<li>${url}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            duplicateHTML += '</div>';
+            container.innerHTML = duplicateHTML;
         }
 
         // 最近の使用履歴更新

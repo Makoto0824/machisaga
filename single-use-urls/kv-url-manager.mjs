@@ -62,6 +62,15 @@ class KVURLManager {
             }
 
             let loadedCount = 0;
+            
+            // 重複チェック用のセット
+            const urlSet = new Set();
+            const idSet = new Set();
+            const duplicates = {
+                urls: [],
+                ids: []
+            };
+
             for (const line of urlLines) {
                 const [id, event, url, description] = line.split(',').map(item => item.trim().replace(/"/g, ''));
                 
@@ -77,6 +86,20 @@ class KVURLManager {
                     usedBy: null
                 };
 
+                // ID重複チェック
+                if (idSet.has(urlData.id)) {
+                    console.warn(`⚠️ ID重複: ${urlData.id}`);
+                    duplicates.ids.push(urlData.id);
+                }
+                idSet.add(urlData.id);
+
+                // URL重複チェック
+                if (urlSet.has(urlData.url)) {
+                    console.warn(`⚠️ URL重複: ${urlData.url}`);
+                    duplicates.urls.push(urlData.url);
+                }
+                urlSet.add(urlData.url);
+
                 // KVに保存（既存データを保護）
                 if (this.isKVAvailable) {
                     const existingData = await kv.get(`url:${urlData.id}`);
@@ -91,6 +114,22 @@ class KVURLManager {
                 }
 
                 loadedCount++;
+            }
+
+            // 重複チェック結果をログ出力
+            if (duplicates.ids.length > 0) {
+                console.warn(`❌ ID重複検出: ${duplicates.ids.join(', ')}`);
+            }
+            if (duplicates.urls.length > 0) {
+                console.warn(`❌ URL重複検出: ${duplicates.urls.join(', ')}`);
+            }
+            if (duplicates.ids.length === 0 && duplicates.urls.length === 0) {
+                console.log('✅ 重複なし');
+            }
+
+            // 重複情報をKVに保存（統計情報で使用）
+            if (this.isKVAvailable) {
+                await kv.set('duplicates', duplicates);
             }
 
             console.log(`✅ ${loadedCount}個のURLをKVに保存しました`);
@@ -213,12 +252,24 @@ class KVURLManager {
 
             console.log(`📊 統計: 総数=${total}, 使用済み=${used}, 利用可能=${available}`);
 
+            // 重複情報を取得
+            const duplicates = await kv.get('duplicates') || { urls: [], ids: [] };
+
+            console.log(`📊 統計: 総数=${total}, 使用済み=${used}, 利用可能=${available}, 利用率=${((used / total) * 100).toFixed(1)}%`);
+            console.log(`📊 重複: ID重複=${duplicates.ids.length}個, URL重複=${duplicates.urls.length}個`);
+
             return {
                 total,
                 used,
                 available,
                 usageRate: total > 0 ? ((used / total) * 100).toFixed(1) : 0,
-                events: eventStats
+                events: eventStats,
+                duplicates: {
+                    idDuplicates: duplicates.ids.length,
+                    urlDuplicates: duplicates.urls.length,
+                    duplicateIds: duplicates.ids,
+                    duplicateUrls: duplicates.urls
+                }
             };
 
         } catch (error) {
