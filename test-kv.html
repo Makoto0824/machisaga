@@ -197,15 +197,20 @@
             <div id="recentResult" class="result" style="display: none;"></div>
         </div>
 
-        <div class="test-section">
-            <h3>🎯 次のURLを取得（イベント別）</h3>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
-                <button onclick="getNextURLForEvent('233')">イベント233 (ネコ背でネコパンチ)</button>
-                <button onclick="getNextURLForEvent('234')">イベント234 (タイ風キック)</button>
-                <button onclick="getNextURLForEvent('235')">イベント235 (青春のけつバット)</button>
+            <div class="test-section">
+                <h3>🎯 次のURLを取得（イベント別）</h3>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
+                    <button onclick="getNextURLForEvent('233')">イベント233 (ネコ背でネコパンチ)</button>
+                    <button onclick="getNextURLForEvent('234')">イベント234 (タイ風キック)</button>
+                    <button onclick="getNextURLForEvent('235')">イベント235 (青春のけつバット)</button>
+                    <button onclick="getNextURLForEvent('242')">イベント242 (ネコパンチ)</button>
+                    <button onclick="getNextURLForEvent('243')">イベント243 (メガローキック)</button>
+                    <button onclick="getNextURLForEvent('244')">イベント244 (ギガドヤストライク)</button>
+                    <button onclick="getNextURLForEvent('245')">イベント245 (テラオーバーキル)</button>
+                    <button onclick="getNextURLForEvent('246')">イベント246 (ペタインパクト MUGEN)</button>
+                </div>
+                <div id="nextURLResult" class="result" style="display: none;"></div>
             </div>
-            <div id="nextURLResult" class="result" style="display: none;"></div>
-        </div>
 
         <div class="test-section">
             <h3>🔄 全テスト実行</h3>
@@ -306,7 +311,12 @@
                 '233': 'ネコ背でネコパンチ',
                 '234': 'タイ風キック', 
                 '235': '青春のけつバット',
-                '236': '新しいイベント'
+                '236': '新しいイベント',
+                '242': 'ネコパンチ',
+                '243': 'メガローキック',
+                '244': 'ギガドヤストライク',
+                '245': 'テラオーバーキル',
+                '246': 'ペタインパクト MUGEN'
             };
             const eventName = eventNames[eventId] || `イベント${eventId}`;
             
@@ -322,6 +332,20 @@
                         message: result.result.nextURL.message,
                         duplicates: result.result.nextURL.duplicates
                     }, 'error');
+                } else if (result.success && result.result && result.result.nextURL && result.result.nextURL.url) {
+                    // URLが取得できた場合は自動的に開く
+                    const url = result.result.nextURL.url;
+                    showResult('nextURLResult', {
+                        success: true,
+                        message: `${eventName}のURLを取得しました。自動的に開きます...`,
+                        url: url,
+                        eventName: eventName
+                    }, 'success');
+                    
+                    // 2秒後に自動的にURLを開く
+                    setTimeout(() => {
+                        window.open(url, '_blank');
+                    }, 2000);
                 } else {
                     showResult('nextURLResult', result, result.success ? 'success' : 'error');
                 }
