@@ -379,17 +379,22 @@ const commandEventIds = {
 // 使い切りURL取得関数
 async function getSingleUseURL(eventId) {
     try {
+        console.log(`🔍 URL取得開始: イベント${eventId}`);
         const response = await fetch(`/api/test-kv?action=getNextURL&event=${eventId}`);
+        console.log(`📡 API応答:`, response.status, response.statusText);
+        
         const data = await response.json();
+        console.log(`📊 APIデータ:`, data);
         
         if (data.success && data.result && data.result.nextURL && data.result.nextURL.url) {
+            console.log(`✅ URL取得成功:`, data.result.nextURL.url);
             return data.result.nextURL.url;
         } else {
-            console.error('URL取得エラー:', data);
+            console.error('❌ URL取得エラー:', data);
             return null;
         }
     } catch (error) {
-        console.error('URL取得エラー:', error);
+        console.error('❌ URL取得エラー:', error);
         return null;
     }
 }
