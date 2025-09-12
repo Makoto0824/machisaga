@@ -291,6 +291,12 @@
             text-decoration: underline;
         }
 
+        .error-text {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
         .status-used {
             color: #e74c3c;
             font-weight: bold;
@@ -477,7 +483,6 @@
                     <h3>🔧 システム管理</h3>
                     <button class="button success" onclick="reloadFromCSV()">📥 CSVから再読み込み</button>
                     <button class="button" onclick="exportReport()">📊 使用状況レポート出力</button>
-                    <button class="button danger" onclick="resetAllUrls()">📊 統計確認（使用済みURLは保持）</button>
                     
                     <div class="form-group" style="margin-top: 2rem;">
                         <label for="csvUpload">CSVファイルアップロード:</label>
@@ -664,14 +669,20 @@
                                 <td>${item.id}</td>
                                 <td>${item.event || 'N/A'}</td>
                                 <td class="url-cell">
-                                    <a href="${item.url}" target="_blank" title="${item.url}">
-                                        ${item.url && item.url.length > 50 ? item.url.substring(0, 50) + '...' : item.url || 'N/A'}
-                                    </a>
+                                    ${item.url ? 
+                                        `<a href="${item.url}" target="_blank" title="${item.url}">
+                                            ${item.url.length > 50 ? item.url.substring(0, 50) + '...' : item.url}
+                                        </a>` : 
+                                        '<span class="error-text">エラー: URL不明</span>'
+                                    }
                                 </td>
                                 <td>${item.usedBy || 'Anonymous'}</td>
-                                <td>${new Date(item.usedAt).toLocaleString('ja-JP')}</td>
+                                <td>${item.usedAt ? new Date(item.usedAt).toLocaleString('ja-JP') : 'N/A'}</td>
                                 <td>
-                                    <button class="button" onclick="resetSingleUrl('${item.id}')">リセット</button>
+                                    ${item.error ? 
+                                        `<span class="error-text">${item.error}</span>` :
+                                        `<button class="button" onclick="resetSingleUrl('${item.id}')">リセット</button>`
+                                    }
                                 </td>
                             </tr>
                         `).join('')}
@@ -802,41 +813,6 @@
             }
         }
 
-        // 統計確認（使用済みURLは保持）
-        async function resetAllUrls() {
-            if (!confirm('📊 現在の統計情報を確認しますか？使用済みURLは恒久的に保持されます。')) {
-                return;
-            }
-
-            showLoading('統計情報を確認中...');
-            try {
-                const response = await fetch('/api/single-use-redirect', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        action: 'reset'
-                    })
-                });
-
-                const data = await response.json();
-                
-                // ローディングアニメーションを停止
-                hideLoading();
-                
-                if (data.success) {
-                    alert(`✅ ${data.message}`);
-                    // リセット後は直接統計を更新（ローディングなし）
-                    await updateStatsDirectly();
-                } else {
-                    alert(`❌ ${data.error || 'リセットに失敗しました'}`);
-                }
-            } catch (error) {
-                console.error('Reset error:', error);
-                // エラー時もローディングを停止
-                hideLoading();
-                alert('❌ リセットエラー');
-            }
-        }
 
         // CSVアップロード
         async function uploadCSV() {
