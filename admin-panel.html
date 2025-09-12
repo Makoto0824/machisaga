@@ -297,6 +297,14 @@
             font-size: 0.9em;
         }
 
+        .error-row {
+            background-color: rgba(231, 76, 60, 0.1);
+        }
+
+        .error-row:hover {
+            background-color: rgba(231, 76, 60, 0.2);
+        }
+
         .status-used {
             color: #e74c3c;
             font-weight: bold;
@@ -665,22 +673,25 @@
                     </thead>
                     <tbody>
                         ${recentUsage.map(item => `
-                            <tr>
+                            <tr class="${item.type === 'error' ? 'error-row' : ''}">
                                 <td>${item.id}</td>
                                 <td>${item.event || 'N/A'}</td>
                                 <td class="url-cell">
-                                    ${item.url ? 
-                                        `<a href="${item.url}" target="_blank" title="${item.url}">
-                                            ${item.url.length > 50 ? item.url.substring(0, 50) + '...' : item.url}
-                                        </a>` : 
-                                        '<span class="error-text">エラー: URL不明</span>'
+                                    ${item.type === 'error' ? 
+                                        '<span class="error-text">エラー: URL配布停止</span>' :
+                                        (item.url ? 
+                                            `<a href="${item.url}" target="_blank" title="${item.url}">
+                                                ${item.url.length > 50 ? item.url.substring(0, 50) + '...' : item.url}
+                                            </a>` : 
+                                            '<span class="error-text">エラー: URL不明</span>'
+                                        )
                                     }
                                 </td>
                                 <td>${item.usedBy || 'Anonymous'}</td>
                                 <td>${item.usedAt ? new Date(item.usedAt).toLocaleString('ja-JP') : 'N/A'}</td>
                                 <td>
-                                    ${item.error ? 
-                                        `<span class="error-text">${item.error}</span>` :
+                                    ${item.type === 'error' ? 
+                                        `<span class="error-text" title="${item.message || ''}">${item.error || 'エラー'}</span>` :
                                         `<button class="button" onclick="resetSingleUrl('${item.id}')">リセット</button>`
                                     }
                                 </td>

@@ -158,6 +158,17 @@ class KVURLManager {
             if (duplicates.urls.length > 0 || duplicates.ids.length > 0) {
                 console.warn(`❌ 重複URL/IDが検出されているため、URL配布を停止します`);
                 console.warn(`❌ URL重複: ${duplicates.urls.length}個, ID重複: ${duplicates.ids.length}個`);
+                
+                // エラー履歴を保存
+                await this.saveErrorHistory({
+                    type: 'duplicate_detected',
+                    message: '重複URL/IDが検出されているため、URL配布を停止しました。CSVファイルを修正してください。',
+                    eventId: eventId,
+                    userId: userId || 'anonymous',
+                    timestamp: new Date().toISOString(),
+                    duplicates: duplicates
+                });
+                
                 return {
                     error: 'duplicate_detected',
                     message: '重複URL/IDが検出されているため、URL配布を停止しました。CSVファイルを修正してください。',
@@ -418,7 +429,24 @@ class KVURLManager {
     }
 
     /**
-     * 使用履歴を取得
+     * エラー履歴を保存
+     */
+    async saveErrorHistory(errorData) {
+        if (!this.isKVAvailable) {
+            return;
+        }
+
+        try {
+            const errorId = `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            await kv.set(`error:${errorId}`, errorData);
+            console.log(`📝 エラー履歴を保存: ${errorId} - ${errorData.type}`);
+        } catch (error) {
+            console.error('❌ エラー履歴保存エラー:', error);
+        }
+    }
+
+    /**
+     * 使用履歴を取得（エラー履歴も含む）
      */
     async getUsageHistory(limit = 10) {
         if (!this.isKVAvailable) {
@@ -427,21 +455,45 @@ class KVURLManager {
 
         try {
             const urlKeys = await kv.keys('url:*');
-            const usedUrls = [];
+            const errorKeys = await kv.keys('error:*');
+            const allHistory = [];
 
-            // 全URLデータを取得して使用済みのもののみをフィルタ
+            // 使用済みURL履歴を取得
             for (const key of urlKeys) {
                 const urlData = await kv.get(key);
                 if (urlData && urlData.used) {
-                    usedUrls.push(urlData);
+                    allHistory.push({
+                        id: urlData.id,
+                        event: urlData.event,
+                        url: urlData.url,
+                        usedBy: urlData.usedBy,
+                        usedAt: urlData.usedAt,
+                        type: 'success'
+                    });
                 }
             }
 
-            // 使用日時でソート（新しい順）
-            usedUrls.sort((a, b) => new Date(b.usedAt) - new Date(a.usedAt));
+            // エラー履歴を取得
+            for (const key of errorKeys) {
+                const errorData = await kv.get(key);
+                if (errorData) {
+                    allHistory.push({
+                        id: `error_${key.split(':')[1]}`,
+                        event: errorData.eventId || 'N/A',
+                        url: null,
+                        usedBy: errorData.userId || 'anonymous',
+                        usedAt: errorData.timestamp,
+                        type: 'error',
+                        error: errorData.type,
+                        message: errorData.message
+                    });
+                }
+            }
 
-            // 指定された件数まで返す
-            return usedUrls.slice(0, limit);
+            // 日時でソート（新しい順）
+            allHistory.sort((a, b) => new Date(b.usedAt) - new Date(a.usedAt));
+
+            return allHistory.slice(0, limit);
         } catch (error) {
             console.error('getUsageHistory error:', error);
             return [];
