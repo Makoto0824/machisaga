@@ -523,12 +523,6 @@
                     <button class="button success" onclick="reloadFromCSV()">📥 CSVから再読み込み</button>
                     <button class="button" onclick="exportReport()">📊 使用状況レポート出力</button>
                     
-                    <div class="form-group" style="margin-top: 2rem;">
-                        <label for="csvUpload">CSVファイルアップロード:</label>
-                        <input type="file" id="csvUpload" accept=".csv" style="margin-bottom: 1rem;">
-                        <button class="button success" onclick="uploadCSV()">📤 CSVアップロード</button>
-                        <div id="uploadStatus" style="margin-top: 1rem;"></div>
-                    </div>
                     
                     <div class="form-group" style="margin-top: 2rem;">
                         <label for="resetUrlId">個別URLリセット:</label>
@@ -869,60 +863,6 @@
         }
 
 
-        // CSVアップロード
-        async function uploadCSV() {
-            const fileInput = document.getElementById('csvUpload');
-            const file = fileInput.files[0];
-            
-            if (!file) {
-                alert('❌ CSVファイルを選択してください');
-                return;
-            }
-            
-            if (!file.name.toLowerCase().endsWith('.csv')) {
-                alert('❌ CSVファイルを選択してください');
-                return;
-            }
-            
-            showLoading('CSVファイルをアップロード中...');
-            const uploadStatus = document.getElementById('uploadStatus');
-            uploadStatus.innerHTML = '<p style="color: #3498db;">📤 アップロード中...</p>';
-            
-            try {
-                const formData = new FormData();
-                formData.append('csvFile', file);
-                
-                const response = await fetch('/api/single-use-redirect', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const data = await response.json();
-                
-                // ローディングアニメーションを停止
-                hideLoading();
-                
-                if (data.success) {
-                    uploadStatus.innerHTML = '<p style="color: #27ae60;">✅ アップロード成功！</p>';
-                    alert(`✅ CSVファイルが正常にアップロードされました。${data.message}`);
-                    
-                    // ファイル入力をクリア
-                    fileInput.value = '';
-                    
-                    // CSVアップロード後は直接統計を更新（ローディングなし）
-                    await updateStatsDirectly();
-                } else {
-                    uploadStatus.innerHTML = '<p style="color: #e74c3c;">❌ アップロード失敗</p>';
-                    alert(`❌ ${data.error || 'CSVアップロードに失敗しました'}`);
-                }
-            } catch (error) {
-                console.error('CSV upload error:', error);
-                // エラー時もローディングを停止
-                hideLoading();
-                uploadStatus.innerHTML = '<p style="color: #e74c3c;">❌ アップロードエラー</p>';
-                alert('❌ CSVアップロードエラー');
-            }
-        }
 
         // エラー詳細表示
         function showErrorDetails(errorId) {
