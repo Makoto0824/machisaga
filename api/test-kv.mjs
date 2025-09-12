@@ -83,6 +83,16 @@ export default async function handler(req, res) {
                     timestamp: new Date().toISOString()
                 });
 
+            case 'getNextURL':
+                // 次の利用可能なURLを取得
+                const nextURL = await kvURLManager.getNextAvailableURL();
+                return res.status(200).json({
+                    success: true,
+                    action: 'getNextURL',
+                    result: { nextURL },
+                    timestamp: new Date().toISOString()
+                });
+
             default:
                 return res.status(400).json({
                     success: false,

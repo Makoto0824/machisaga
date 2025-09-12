@@ -198,6 +198,12 @@
         </div>
 
         <div class="test-section">
+            <h3>🎯 次のURLを取得</h3>
+            <button onclick="getNextURL()">次のURLを取得</button>
+            <div id="nextURLResult" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
             <h3>🔄 全テスト実行</h3>
             <button onclick="runAllTests()">全テストを実行</button>
             <div id="allTestsResult" class="result" style="display: none;"></div>
@@ -286,6 +292,16 @@
             try {
                 const result = await callKVTestAPI('recent');
                 showResult('recentResult', result, result.success ? 'success' : 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function getNextURL() {
+            showLoading('次のURLを取得中...');
+            try {
+                const result = await callKVTestAPI('getNextURL');
+                showResult('nextURLResult', result, result.success ? 'success' : 'error');
             } finally {
                 hideLoading();
             }
