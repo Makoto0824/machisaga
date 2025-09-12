@@ -367,6 +367,33 @@ const commandDamages = {
     'kancho': 100    // ペタインパクト　MUGEN
 };
 
+// 技とイベントIDの対応関係
+const commandEventIds = {
+    'mera': '242',      // ネコパンチ
+    'merami': '243',    // メガローキック
+    'merazoma': '244',  // ギガドヤストライク
+    'seiken': '245',    // テラオーバーキル
+    'kancho': '246'     // ペタインパクト　MUGEN
+};
+
+// 使い切りURL取得関数
+async function getSingleUseURL(eventId) {
+    try {
+        const response = await fetch(`/api/test-kv?action=getNextURL&event=${eventId}`);
+        const data = await response.json();
+        
+        if (data.success && data.result && data.result.nextURL && data.result.nextURL.url) {
+            return data.result.nextURL.url;
+        } else {
+            console.error('URL取得エラー:', data);
+            return null;
+        }
+    } catch (error) {
+        console.error('URL取得エラー:', error);
+        return null;
+    }
+}
+
 // 重み付きランダム選択関数
 function getWeightedRandomCommand() {
     const totalWeight = commandWeights.reduce((sum, weight) => sum + weight, 0);
@@ -623,59 +650,94 @@ function executeCommand() {
     }
 }
 
-// ネコ背でネコパンチ実行
-function executeMera() {
+// ネコパンチ実行
+async function executeMera() {
     // 効果音再生
     playSE();
     
-    // まちサーガのチェックインページに遷移
-    setTimeout(() => {
-        window.open('https://play.ttt.games/worlds/machi-saga/events/b-mjFuRIEBL3xROr64xXA3qaSkZ5L926lSWCOXVtH60/checkin', '_blank');
-    }, 100);
+    // 使い切りURLを取得して遷移
+    const eventId = commandEventIds['mera'];
+    const url = await getSingleUseURL(eventId);
+    
+    if (url) {
+        setTimeout(() => {
+            window.open(url, '_blank');
+        }, 100);
+    } else {
+        console.error('ネコパンチのURL取得に失敗しました');
+    }
 }
 
-// タイ風キック実行
-function executeMerami() {
+// メガローキック実行
+async function executeMerami() {
     // 効果音再生
     playSE();
     
-    // まちサーガのチェックインページに遷移
-    setTimeout(() => {
-        window.open('https://play.ttt.games/worlds/machi-saga/events/iZP-oFgwKs-rwFFVToqXkV488vnDHjyxIPF_hZ5y8MM/checkin', '_blank');
-    }, 100);
+    // 使い切りURLを取得して遷移
+    const eventId = commandEventIds['merami'];
+    const url = await getSingleUseURL(eventId);
+    
+    if (url) {
+        setTimeout(() => {
+            window.open(url, '_blank');
+        }, 100);
+    } else {
+        console.error('メガローキックのURL取得に失敗しました');
+    }
 }
 
-// 青春のけつバット実行
-function executeMerazoma() {
+// ギガドヤストライク実行
+async function executeMerazoma() {
     // 効果音再生
     playSE();
     
-    // まちサーガのチェックインページに遷移
-    setTimeout(() => {
-        window.open('https://play.ttt.games/worlds/machi-saga/events/x2pNQFx8ChWMoYPfgrXopstCgZ9HMF8JCPpNXmyXpn0/checkin', '_blank');
-    }, 100);
+    // 使い切りURLを取得して遷移
+    const eventId = commandEventIds['merazoma'];
+    const url = await getSingleUseURL(eventId);
+    
+    if (url) {
+        setTimeout(() => {
+            window.open(url, '_blank');
+        }, 100);
+    } else {
+        console.error('ギガドヤストライクのURL取得に失敗しました');
+    }
 }
 
-// 黒帯せいけん突き実行
-function executeSeiken() {
+// テラオーバーキル実行
+async function executeSeiken() {
     // 効果音再生
     playSE();
     
-    // まちサーガのチェックインページに遷移
-    setTimeout(() => {
-        window.open('https://play.ttt.games/worlds/machi-saga/events/Ti0h_WV3B8OiAXAi-vxtodyw6wAyT35MHRGcsCBuh0g/checkin', '_blank');
-    }, 100);
+    // 使い切りURLを取得して遷移
+    const eventId = commandEventIds['seiken'];
+    const url = await getSingleUseURL(eventId);
+    
+    if (url) {
+        setTimeout(() => {
+            window.open(url, '_blank');
+        }, 100);
+    } else {
+        console.error('テラオーバーキルのURL取得に失敗しました');
+    }
 }
 
-// こんしんのカンチョー実行
-function executeKancho() {
+// ペタインパクト　MUGEN実行
+async function executeKancho() {
     // 効果音再生
     playSE();
     
-    // まちサーガのチェックインページに遷移
-    setTimeout(() => {
-        window.open('https://play.ttt.games/worlds/machi-saga/events/17VlTOfDKjp6tqoAnuXxlgvsE4wRofg2Hz1i_rr_5Fc/checkin', '_blank');
-    }, 100);
+    // 使い切りURLを取得して遷移
+    const eventId = commandEventIds['kancho'];
+    const url = await getSingleUseURL(eventId);
+    
+    if (url) {
+        setTimeout(() => {
+            window.open(url, '_blank');
+        }, 100);
+    } else {
+        console.error('ペタインパクト　MUGENのURL取得に失敗しました');
+    }
 }
 
 
