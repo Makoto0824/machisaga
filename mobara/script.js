@@ -365,22 +365,18 @@ function getRandomInt(min, max) {
 }
 
 // 技のリスト（出現率順）
-const allCommands = ['mera', 'merami', 'merazoma', 'seiken', 'kancho', '99punch', 'kiru', 'foot', 'golden'];
+const allCommands = ['mera', 'merami', 'merazoma', 'seiken', 'kancho'];
 
 // 重み付きランダム選択用の重み配列（数字が大きいほど出現率が低い）
-const commandWeights = [9, 8, 7, 6, 5, 4, 3, 2, 1];
+const commandWeights = [5, 4, 3, 2, 1];
 
 // 各技のダメージ値
 const commandDamages = {
-    'mera': 10,      // ネコ背でネコパンチ
-    'merami': 40,    // タイ風キック
-    'merazoma': 55,  // 青春のけつバット
-    'seiken': 75,    // 黒帯せいけん突き
-    'kancho': 100,   // こんしんのカンチョー
-    '99punch': 115,  // 99れつ拳
-    'kiru': 135,     // お前はもう斬られてる
-    'foot': 160,     // 極フットプレッシャー
-    'golden': 210    // G・B・クラッシャー
+    'mera': 10,      // ネコパンチ
+    'merami': 40,    // メガローキック
+    'merazoma': 55,  // ギガドヤストライク
+    'seiken': 75,    // テラオーバーキル
+    'kancho': 100    // ペタインパクト　MUGEN
 };
 
 // 重み付きランダム選択関数
@@ -636,18 +632,6 @@ function executeCommand() {
         case 'kancho':
             executeKancho();
             break;
-        case '99punch':
-            execute99Punch();
-            break;
-        case 'kiru':
-            executeKiru();
-            break;
-        case 'foot':
-            executeFoot();
-            break;
-        case 'golden':
-            executeGolden();
-            break;
     }
 }
 
@@ -706,49 +690,6 @@ function executeKancho() {
     }, 100);
 }
 
-// 99れつ拳実行
-function execute99Punch() {
-    // 効果音再生
-    playSE();
-    
-    // まちサーガのチェックインページに遷移
-    setTimeout(() => {
-        window.open('https://play.ttt.games/worlds/machi-saga/events/MyKXAlK_qOWpn9hKrZEWrQKypMoE8Ess9C1PhKBXg0A/checkin', '_blank');
-    }, 100);
-}
-
-// お前はもう斬られてる実行
-function executeKiru() {
-    // 効果音再生
-    playSE();
-    
-    // まちサーガのチェックインページに遷移
-    setTimeout(() => {
-        window.open('https://play.ttt.games/worlds/machi-saga/events/CrXfZStcu7XMtyDI77JE5lKlk7RYsZVcF5Xdk2XyiB0/checkin', '_blank');
-    }, 100);
-}
-
-// 極フットプレッシャー実行
-function executeFoot() {
-    // 効果音再生
-    playSE();
-    
-    // まちサーガのチェックインページに遷移
-    setTimeout(() => {
-        window.open('https://play.ttt.games/worlds/machi-saga/events/in7B9olSOc9H-W7yoxpV3T9WFJQwgM9vYUVrkKyHgBU/checkin', '_blank');
-    }, 100);
-}
-
-// G・B・クラッシャー実行
-function executeGolden() {
-    // 効果音再生
-    playSE();
-    
-    // まちサーガのチェックインページに遷移
-    setTimeout(() => {
-        window.open('https://play.ttt.games/worlds/machi-saga/events/WsDzeA-BjEOjN833J0-tTzRDHnnLLzFMytiCf5gseD4/checkin', '_blank');
-    }, 100);
-}
 
 
 
@@ -849,7 +790,7 @@ function setupEventListeners() {
 
 // コマンドナビゲーション
 function navigateCommands(key) {
-    const commands = ['mera', 'merami', 'merazoma', 'seiken', 'kancho', '99punch', 'kiru', 'foot', 'golden'];
+    const commands = ['mera', 'merami', 'merazoma', 'seiken', 'kancho'];
     const currentIndex = commands.indexOf(game.currentCommand);
     let newIndex = currentIndex;
     
