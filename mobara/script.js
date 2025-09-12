@@ -9,11 +9,30 @@ class GameState {
         this.hasStarted = false; // かいしが押されたかどうか
         this.isSkillDetermined = false; // 技が確定したかどうか
         this.hasPlayedDamageVideo = false; // ダメージ動画を再生したかどうか
+        this.isLoading = false; // ローディング中かどうか
     }
 }
 
 // ゲームインスタンス
 let game = new GameState();
+
+// ローディング表示関数
+function showLoading() {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+        overlay.style.display = 'flex';
+        game.isLoading = true;
+    }
+}
+
+// ローディング非表示関数
+function hideLoading() {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+        overlay.style.display = 'none';
+        game.isLoading = false;
+    }
+}
 
 // DOM要素の取得
 const gameOverModal = document.getElementById('game-over-modal');
@@ -640,22 +659,36 @@ function stopRandomSelection() {
 
 // コマンド実行
 async function executeCommand() {
-    switch (game.currentCommand) {
-        case 'mera':
-            await executeMera();
-            break;
-        case 'merami':
-            await executeMerami();
-            break;
-        case 'merazoma':
-            await executeMerazoma();
-            break;
-        case 'seiken':
-            await executeSeiken();
-            break;
-        case 'kancho':
-            await executeKancho();
-            break;
+    // ローディング中は実行しない
+    if (game.isLoading) {
+        console.log('⚠️ ローディング中のため実行をスキップします');
+        return;
+    }
+
+    // ローディング開始
+    showLoading();
+
+    try {
+        switch (game.currentCommand) {
+            case 'mera':
+                await executeMera();
+                break;
+            case 'merami':
+                await executeMerami();
+                break;
+            case 'merazoma':
+                await executeMerazoma();
+                break;
+            case 'seiken':
+                await executeSeiken();
+                break;
+            case 'kancho':
+                await executeKancho();
+                break;
+        }
+    } finally {
+        // ローディング終了
+        hideLoading();
     }
 }
 
