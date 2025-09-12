@@ -153,27 +153,28 @@ class KVURLManager {
         }
 
         try {
-            // 重複チェック: 重複URLがある場合は配布を停止
+            // 重複チェック: 重複URLがある場合は配布を停止（一時的に無効化）
             const duplicates = await kv.get('duplicates') || { urls: [], ids: [] };
             if (duplicates.urls.length > 0 || duplicates.ids.length > 0) {
-                console.warn(`❌ 重複URL/IDが検出されているため、URL配布を停止します`);
-                console.warn(`❌ URL重複: ${duplicates.urls.length}個, ID重複: ${duplicates.ids.length}個`);
+                console.warn(`⚠️ 重複URL/IDが検出されていますが、配布を継続します`);
+                console.warn(`⚠️ URL重複: ${duplicates.urls.length}個, ID重複: ${duplicates.ids.length}個`);
                 
-                // エラー履歴を保存
+                // エラー履歴を保存（警告として）
                 await this.saveErrorHistory({
-                    type: 'duplicate_detected',
-                    message: '重複URL/IDが検出されているため、URL配布を停止しました。CSVファイルを修正してください。',
+                    type: 'duplicate_warning',
+                    message: '重複URL/IDが検出されていますが、配布を継続します。',
                     eventId: eventId,
                     userId: userId || 'anonymous',
                     timestamp: new Date().toISOString(),
                     duplicates: duplicates
                 });
                 
-                return {
-                    error: 'duplicate_detected',
-                    message: '重複URL/IDが検出されているため、URL配布を停止しました。CSVファイルを修正してください。',
-                    duplicates: duplicates
-                };
+                // 配布を停止せずに継続
+                // return {
+                //     error: 'duplicate_detected',
+                //     message: '重複URL/IDが検出されているため、URL配布を停止しました。CSVファイルを修正してください。',
+                //     duplicates: duplicates
+                // };
             }
 
             // 全URLキーを取得
@@ -196,15 +197,20 @@ class KVURLManager {
 
             if (!availableURL) {
                 console.log(`❌ 利用可能なURLがありません (イベント: ${eventId || '全イベント'})`);
+                console.log(`🔍 デバッグ: urlKeys数 = ${urlKeys.length}`);
                 
                 // エラー履歴を保存
-                await this.saveErrorHistory({
+                const errorData = {
                     type: 'no_available_url',
                     message: `利用可能なURLがありません (イベント: ${eventId || '全イベント'})`,
                     eventId: eventId,
                     userId: userId || 'anonymous',
                     timestamp: new Date().toISOString()
-                });
+                };
+                
+                console.log(`📝 エラー履歴保存開始:`, errorData);
+                await this.saveErrorHistory(errorData);
+                console.log(`✅ エラー履歴保存完了`);
                 
                 return null;
             }
