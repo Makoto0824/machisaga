@@ -132,6 +132,19 @@ class KVURLManager {
                 await kv.set('duplicates', duplicates);
             }
 
+            // 読み込み情報をKVに保存
+            const loadInfo = {
+                fileName: 'tnt-urls.csv',
+                loadedAt: new Date().toISOString(),
+                urlCount: loadedCount,
+                timestamp: Date.now()
+            };
+            
+            if (this.isKVAvailable) {
+                await kv.set('csv_load_info', loadInfo);
+                console.log(`📊 読み込み情報を保存:`, loadInfo);
+            }
+
             console.log(`✅ ${loadedCount}個のURLをKVに保存しました`);
             return loadedCount;
 
@@ -496,6 +509,23 @@ class KVURLManager {
                 success: false,
                 message: `削除エラー: ${error.message}`
             };
+        }
+    }
+
+    /**
+     * CSV読み込み情報を取得
+     */
+    async getCSVLoadInfo() {
+        if (!this.isKVAvailable) {
+            return null;
+        }
+
+        try {
+            const loadInfo = await kv.get('csv_load_info');
+            return loadInfo;
+        } catch (error) {
+            console.error('❌ CSV読み込み情報取得エラー:', error);
+            return null;
         }
     }
 

@@ -84,11 +84,13 @@ export default async function handler(req, res) {
                 case 'stats':
                     const stats = await kvURLManager.getStats();
                     const recentUsage = await kvURLManager.getUsageHistory(10);
+                    const loadInfo = await kvURLManager.getCSVLoadInfo();
                     
                     res.status(200).json({
                         success: true,
                         stats,
-                        recentUsage
+                        recentUsage,
+                        loadInfo
                     });
                     break;
 
@@ -119,10 +121,12 @@ export default async function handler(req, res) {
 
                 case 'reload':
                     const loadedCount = await kvURLManager.loadFromCSV();
+                    const loadInfo = await kvURLManager.getCSVLoadInfo();
                     res.status(200).json({
                         success: true,
                         message: `CSVから${loadedCount}個のURLを読み込みました`,
-                        stats: await kvURLManager.getStats()
+                        stats: await kvURLManager.getStats(),
+                        loadInfo: loadInfo
                     });
                     break;
 
