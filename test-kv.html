@@ -194,6 +194,7 @@
         <div class="test-section">
             <h3>📋 使用履歴</h3>
             <button onclick="getRecentUsage()">最近の使用履歴を取得</button>
+            <button onclick="clearAllData()" style="background-color: #e74c3c; color: white;">🗑️ 全データ削除</button>
             <div id="recentResult" class="result" style="display: none;"></div>
         </div>
 
@@ -301,6 +302,24 @@
             try {
                 const result = await callKVTestAPI('recent');
                 showResult('recentResult', result, result.success ? 'success' : 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function clearAllData() {
+            if (!confirm('⚠️ 警告: すべてのKVデータが削除されます。\n\nURL使用履歴、エラー履歴、統計データなど、すべてのデータが失われます。\n\n本当に削除しますか？')) {
+                return;
+            }
+
+            showLoading('全データを削除中...');
+            try {
+                const result = await callKVTestAPI('clearAllData');
+                showResult('recentResult', result, result.success ? 'success' : 'error');
+                
+                if (result.success) {
+                    alert(`✅ データ削除完了\n\n${result.result.message}`);
+                }
             } finally {
                 hideLoading();
             }

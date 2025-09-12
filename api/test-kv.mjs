@@ -97,11 +97,21 @@ export default async function handler(req, res) {
                     timestamp: new Date().toISOString()
                 });
 
+            case 'clearAllData':
+                // KVデータを全削除
+                const clearResult = await kvURLManager.clearAllData();
+                return res.status(200).json({
+                    success: true,
+                    action: 'clearAllData',
+                    result: clearResult,
+                    timestamp: new Date().toISOString()
+                });
+
             default:
                 return res.status(400).json({
                     success: false,
                     error: '無効なアクション',
-                    availableActions: ['status', 'stats', 'load', 'test-write', 'recent']
+                    availableActions: ['status', 'stats', 'load', 'test-write', 'recent', 'getNextURL', 'clearAllData']
                 });
         }
 

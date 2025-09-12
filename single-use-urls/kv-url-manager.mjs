@@ -456,6 +456,44 @@ class KVURLManager {
     }
 
     /**
+     * KVデータを全削除（デバッグ用）
+     */
+    async clearAllData() {
+        if (!this.isKVAvailable) {
+            return { success: false, message: 'KVが利用できません' };
+        }
+
+        try {
+            // 全キーを取得
+            const urlKeys = await kv.keys('url:*');
+            const errorKeys = await kv.keys('error:*');
+            const duplicateKeys = await kv.keys('duplicates');
+            const statsKeys = await kv.keys('stats');
+
+            // 全キーを削除
+            const allKeys = [...urlKeys, ...errorKeys, ...duplicateKeys, ...statsKeys];
+            
+            for (const key of allKeys) {
+                await kv.del(key);
+            }
+
+            console.log(`🗑️ KVデータを全削除: ${allKeys.length}個のキーを削除`);
+            
+            return {
+                success: true,
+                message: `${allKeys.length}個のキーを削除しました`,
+                deletedKeys: allKeys.length
+            };
+        } catch (error) {
+            console.error('❌ KVデータ削除エラー:', error);
+            return {
+                success: false,
+                message: `削除エラー: ${error.message}`
+            };
+        }
+    }
+
+    /**
      * 使用履歴を取得（エラー履歴も含む）
      */
     async getUsageHistory(limit = 10) {
