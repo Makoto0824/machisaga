@@ -22,7 +22,7 @@
 1. **依存関係のインストール**
 
    ```bash
-   cd mobara_sandbox
+   cd kurofune
    npm install
    ```
 
@@ -78,7 +78,7 @@
 ## ファイル構成
 
 ```
-mobara_sandbox/
+kurofune/
 ├── index.html      # メインHTMLファイル
 ├── styles.css      # スタイルシート
 ├── script.js       # JavaScriptゲームロジック
