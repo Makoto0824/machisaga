@@ -385,12 +385,15 @@ async function getSingleUseURL(eventId) {
         
         const data = await response.json();
         console.log(`📊 APIデータ:`, data);
+        console.log(`📊 result:`, data.result);
+        console.log(`📊 nextURL:`, data.result?.nextURL);
         
         if (data.success && data.result && data.result.nextURL && data.result.nextURL.url) {
             console.log(`✅ URL取得成功:`, data.result.nextURL.url);
             return data.result.nextURL.url;
         } else {
             console.error('❌ URL取得エラー:', data);
+            console.error('❌ nextURL詳細:', data.result?.nextURL);
             return null;
         }
     } catch (error) {
