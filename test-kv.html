@@ -346,6 +346,13 @@
                     setTimeout(() => {
                         window.open(url, '_blank');
                     }, 2000);
+                } else if (result.success && result.result && result.result.nextURL === null) {
+                    // 利用可能なURLがない場合
+                    showResult('nextURLResult', {
+                        success: false,
+                        error: '利用可能なURLがありません',
+                        message: `${eventName}の利用可能なURLがありません。すべて使用済みの可能性があります。`
+                    }, 'error');
                 } else {
                     showResult('nextURLResult', result, result.success ? 'success' : 'error');
                 }
