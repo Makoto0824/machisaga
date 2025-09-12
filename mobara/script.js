@@ -326,31 +326,19 @@ function updateDescriptionText() {
     
     switch (game.currentCommand) {
         case 'mera':
-            descriptionText.textContent = 'ネコ背で　ネコパンチを　くりだし　ダメージを　あたえる';
+            descriptionText.textContent = 'ネコパンチを　くりだし　ダメージを　あたえる';
             break;
         case 'merami':
-            descriptionText.textContent = 'タイっぽいキックで　ダメージを　あたえる';
+            descriptionText.textContent = 'きょうれつな　ローキックを　くりだし　ダメージを　あたえる';
             break;
         case 'merazoma':
-            descriptionText.textContent = '忘れもしないあの夏の　けつバットで　ダメージを　あたえる';
+            descriptionText.textContent = 'ドヤ顔で　剣をふり下ろし　ばくふうをおこし　ダメージを　あたえる';
             break;
         case 'seiken':
-            descriptionText.textContent = '黒帯を　まいて　せいけん突きを　うち　ダメージを　あたえる';
+            descriptionText.textContent = 'けたちがいの　ダメージを　あたえる';
             break;
         case 'kancho':
-            descriptionText.textContent = 'たましいを　こめた　カンチョーで　ダメージを　あたえる';
-            break;
-        case '99punch':
-            descriptionText.textContent = '1びょう間に　99発の　パンチを出して　ダメージを　あたえる';
-            break;
-        case 'kiru':
-            descriptionText.textContent = '斬られたことに　気づかないほどの　スピードで　斬りつけ　ダメージを　あたえる';
-            break;
-        case 'foot':
-            descriptionText.textContent = '究極にイタイと　いわれている　足ツボをおし　ダメージを　あたえる';
-            break;
-        case 'golden':
-            descriptionText.textContent = 'ゴールデンボールを…。　ダメージを　あたえる';
+            descriptionText.textContent = 'きょだいかした剣が　天からふりそそぎ　ダメージを　あたえる';
             break;
         default:
             descriptionText.textContent = '';
