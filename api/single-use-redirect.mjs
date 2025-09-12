@@ -98,16 +98,16 @@ export default async function handler(req, res) {
 
                 case 'reset':
                     if (urlId) {
-                        const success = await kvURLManager.resetURL(urlId);
+                        const result = await kvURLManager.resetURL(urlId);
                         res.status(200).json({
-                            success,
-                            message: success ? `URL ${urlId} をリセットしました` : 'URLが見つかりません'
+                            success: result.success,
+                            message: result.message || (result.success ? `URL ${urlId} をリセットしました` : 'URLが見つかりません')
                         });
                     } else {
-                        await kvURLManager.resetAllURLs();
+                        const result = await kvURLManager.resetAllURLs();
                         res.status(200).json({
-                            success: true,
-                            message: '全URLをリセットしました'
+                            success: result.success,
+                            message: result.message || '全URLをリセットしました'
                         });
                     }
                     break;
