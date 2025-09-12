@@ -589,13 +589,13 @@
                     const stats = data.stats || data.result;
                     const recentUsage = data.recentUsage || [];
                     updateStats(stats, recentUsage);
-                    showMessage('✅ 統計データを更新しました', 'success', true);
+                    alert('✅ 統計データを更新しました');
                 } else {
-                    showMessage('❌ 統計データの取得に失敗しました', 'error');
+                    alert('❌ 統計データの取得に失敗しました');
                 }
             } catch (error) {
                 console.error('Stats refresh error:', error);
-                showMessage('❌ 統計更新エラー', 'error');
+                alert('❌ 統計更新エラー');
             } finally {
                 hideLoading();
             }
@@ -638,15 +638,15 @@
 
                 const data = await response.json();
                 if (data.success) {
-                    showMessage(data.message, 'success', true);
+                    alert(`✅ ${data.message}`);
                     // CSV再読み込み後は直接統計を更新（ローディングなし）
                     await updateStatsDirectly();
                 } else {
-                    showMessage(data.error || 'CSV読み込みに失敗しました', 'error');
+                    alert(`❌ ${data.error || 'CSV読み込みに失敗しました'}`);
                 }
             } catch (error) {
                 console.error('CSV reload error:', error);
-                showMessage('❌ CSV読み込みエラー', 'error');
+                alert('❌ CSV読み込みエラー');
             } finally {
                 hideLoading();
             }
@@ -666,13 +666,13 @@
 
                 const data = await response.json();
                 if (data.success) {
-                    showMessage(`✅ ${data.message}`, 'success', true);
+                    alert(`✅ ${data.message}`);
                 } else {
-                    showMessage(data.error || 'レポート出力に失敗しました', 'error');
+                    alert(`❌ ${data.error || 'レポート出力に失敗しました'}`);
                 }
             } catch (error) {
                 console.error('Export error:', error);
-                showMessage('❌ レポート出力エラー', 'error');
+                alert('❌ レポート出力エラー');
             } finally {
                 hideLoading();
             }
@@ -696,15 +696,15 @@
 
                 const data = await response.json();
                 if (data.success) {
-                    showMessage(data.message, 'success', true);
+                    alert(`✅ ${data.message}`);
                     // リセット後は直接統計を更新（ローディングなし）
                     await updateStatsDirectly();
                 } else {
-                    showMessage(data.error || 'リセットに失敗しました', 'error');
+                    alert(`❌ ${data.error || 'リセットに失敗しました'}`);
                 }
             } catch (error) {
                 console.error('Reset error:', error);
-                showMessage('❌ リセットエラー', 'error');
+                alert('❌ リセットエラー');
             } finally {
                 hideLoading();
             }
@@ -716,12 +716,12 @@
             const file = fileInput.files[0];
             
             if (!file) {
-                showMessage('CSVファイルを選択してください', 'error');
+                alert('❌ CSVファイルを選択してください');
                 return;
             }
             
             if (!file.name.toLowerCase().endsWith('.csv')) {
-                showMessage('CSVファイルを選択してください', 'error');
+                alert('❌ CSVファイルを選択してください');
                 return;
             }
             
@@ -742,7 +742,7 @@
                 
                 if (data.success) {
                     uploadStatus.innerHTML = '<p style="color: #27ae60;">✅ アップロード成功！</p>';
-                    showMessage(`✅ CSVファイルが正常にアップロードされました。${data.message}`, 'success', true);
+                    alert(`✅ CSVファイルが正常にアップロードされました。${data.message}`);
                     
                     // ファイル入力をクリア
                     fileInput.value = '';
@@ -751,12 +751,12 @@
                     await updateStatsDirectly();
                 } else {
                     uploadStatus.innerHTML = '<p style="color: #e74c3c;">❌ アップロード失敗</p>';
-                    showMessage(data.error || 'CSVアップロードに失敗しました', 'error');
+                    alert(`❌ ${data.error || 'CSVアップロードに失敗しました'}`);
                 }
             } catch (error) {
                 console.error('CSV upload error:', error);
                 uploadStatus.innerHTML = '<p style="color: #e74c3c;">❌ アップロードエラー</p>';
-                showMessage('❌ CSVアップロードエラー', 'error');
+                alert('❌ CSVアップロードエラー');
             } finally {
                 hideLoading();
             }
@@ -767,7 +767,7 @@
             const targetUrlId = urlId || document.getElementById('resetUrlId').value;
             
             if (!targetUrlId) {
-                showMessage('URL IDを入力してください', 'error');
+                alert('❌ URL IDを入力してください');
                 return;
             }
 
