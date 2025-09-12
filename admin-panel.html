@@ -690,13 +690,13 @@
             }
         }
 
-        // 全URLリセット
+        // 統計確認（使用済みURLは保持）
         async function resetAllUrls() {
-            if (!confirm('⚠️ 本当に全URLをリセットしますか？この操作は取り消せません。')) {
+            if (!confirm('📊 現在の統計情報を確認しますか？使用済みURLは恒久的に保持されます。')) {
                 return;
             }
 
-            showLoading('URLをリセット中...');
+            showLoading('統計情報を確認中...');
             try {
                 const response = await fetch('/api/single-use-redirect', {
                     method: 'POST',
