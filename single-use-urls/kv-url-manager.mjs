@@ -466,6 +466,7 @@ class KVURLManager {
         try {
             const urlKeys = await kv.keys('url:*');
             const errorKeys = await kv.keys('error:*');
+            console.log(`🔍 getUsageHistory: URLキー${urlKeys.length}個, エラーキー${errorKeys.length}個`);
             const allHistory = [];
 
             // 使用済みURL履歴を取得
@@ -486,6 +487,7 @@ class KVURLManager {
             // エラー履歴を取得
             for (const key of errorKeys) {
                 const errorData = await kv.get(key);
+                console.log(`🔍 エラーキー: ${key}, データ:`, errorData);
                 if (errorData) {
                     allHistory.push({
                         id: `error_${key.split(':')[1]}`,
