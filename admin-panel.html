@@ -277,6 +277,20 @@
             background: rgba(255, 255, 255, 0.05);
         }
 
+        .url-cell {
+            max-width: 300px;
+            word-break: break-all;
+        }
+
+        .url-cell a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .url-cell a:hover {
+            text-decoration: underline;
+        }
+
         .status-used {
             color: #e74c3c;
             font-weight: bold;
@@ -638,6 +652,7 @@
                         <tr>
                             <th>URL ID</th>
                             <th>イベント</th>
+                            <th>URL</th>
                             <th>使用者</th>
                             <th>使用日時</th>
                             <th>操作</th>
@@ -648,6 +663,11 @@
                             <tr>
                                 <td>${item.id}</td>
                                 <td>${item.event || 'N/A'}</td>
+                                <td class="url-cell">
+                                    <a href="${item.url}" target="_blank" title="${item.url}">
+                                        ${item.url && item.url.length > 50 ? item.url.substring(0, 50) + '...' : item.url || 'N/A'}
+                                    </a>
+                                </td>
                                 <td>${item.usedBy || 'Anonymous'}</td>
                                 <td>${new Date(item.usedAt).toLocaleString('ja-JP')}</td>
                                 <td>

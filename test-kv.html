@@ -305,14 +305,26 @@
             const eventNames = {
                 '233': 'ネコ背でネコパンチ',
                 '234': 'タイ風キック', 
-                '235': '青春のけつバット'
+                '235': '青春のけつバット',
+                '236': '新しいイベント'
             };
             const eventName = eventNames[eventId] || `イベント${eventId}`;
             
             showLoading(`${eventName}の次のURLを取得中...`);
             try {
                 const result = await callKVTestAPI(`getNextURL&event=${eventId}`);
-                showResult('nextURLResult', result, result.success ? 'success' : 'error');
+                
+                // 重複エラーの場合は特別な表示
+                if (result.success && result.result && result.result.nextURL && result.result.nextURL.error === 'duplicate_detected') {
+                    showResult('nextURLResult', {
+                        success: false,
+                        error: '重複検出',
+                        message: result.result.nextURL.message,
+                        duplicates: result.result.nextURL.duplicates
+                    }, 'error');
+                } else {
+                    showResult('nextURLResult', result, result.success ? 'success' : 'error');
+                }
             } finally {
                 hideLoading();
             }

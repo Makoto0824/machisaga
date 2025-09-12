@@ -153,6 +153,18 @@ class KVURLManager {
         }
 
         try {
+            // 重複チェック: 重複URLがある場合は配布を停止
+            const duplicates = await kv.get('duplicates') || { urls: [], ids: [] };
+            if (duplicates.urls.length > 0 || duplicates.ids.length > 0) {
+                console.warn(`❌ 重複URL/IDが検出されているため、URL配布を停止します`);
+                console.warn(`❌ URL重複: ${duplicates.urls.length}個, ID重複: ${duplicates.ids.length}個`);
+                return {
+                    error: 'duplicate_detected',
+                    message: '重複URL/IDが検出されているため、URL配布を停止しました。CSVファイルを修正してください。',
+                    duplicates: duplicates
+                };
+            }
+
             // 全URLキーを取得
             const urlKeys = await kv.keys('url:*');
             
