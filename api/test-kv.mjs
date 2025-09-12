@@ -86,21 +86,13 @@ export default async function handler(req, res) {
             case 'getNextURL':
                 // 次の利用可能なURLを取得（イベント指定可能）
                 const eventId = req.query.event;
-                // eventIdをeventNameに変換
-                const eventNameMap = {
-                    '233': 'EventA',
-                    '234': 'EventB', 
-                    '235': 'EventC'
-                };
-                const eventName = eventNameMap[eventId] || null;
-                const nextURL = await kvURLManager.getNextAvailableURL(null, eventName);
+                const nextURL = await kvURLManager.getNextAvailableURL(null, eventId);
                 return res.status(200).json({
                     success: true,
                     action: 'getNextURL',
                     result: { 
                         nextURL,
-                        eventId: eventId || 'all',
-                        eventName: eventName || 'all'
+                        eventId: eventId || 'all'
                     },
                     timestamp: new Date().toISOString()
                 });

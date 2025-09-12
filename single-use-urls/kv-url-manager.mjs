@@ -105,8 +105,8 @@ class KVURLManager {
     /**
      * 未使用URLを1つ取得して使用済みにマーク
      */
-    async getNextAvailableURL(userId = null, eventName = null) {
-        console.log(`🔍 getNextAvailableURL called - userId: ${userId}, eventName: ${eventName}`);
+    async getNextAvailableURL(userId = null, eventId = null) {
+        console.log(`🔍 getNextAvailableURL called - userId: ${userId}, eventId: ${eventId}`);
         
         if (!this.isKVAvailable) {
             console.warn('⚠️ KVが利用できません');
@@ -125,14 +125,15 @@ class KVURLManager {
                 
                 if (!urlData || urlData.used) continue;
                 
-                if (eventName && urlData.event !== eventName) continue;
+                // eventIdが指定されている場合、数値として比較
+                if (eventId && urlData.event !== eventId) continue;
                 
                 availableURL = urlData;
                 break;
             }
 
             if (!availableURL) {
-                console.log(`❌ 利用可能なURLがありません (イベント: ${eventName || '全イベント'})`);
+                console.log(`❌ 利用可能なURLがありません (イベント: ${eventId || '全イベント'})`);
                 return null;
             }
 
