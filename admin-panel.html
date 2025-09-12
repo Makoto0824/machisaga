@@ -854,10 +854,10 @@
             container.innerHTML = '';
         }
 
-        // 定期的に統計を更新（60秒ごと）
-        setInterval(() => {
-            refreshStats();
-        }, 60000);
+        // 定期的な統計更新は停止（手動更新のみ）
+        // setInterval(() => {
+        //     refreshStats();
+        // }, 60000);
     </script>
 </body>
 </html>
