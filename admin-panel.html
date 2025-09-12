@@ -589,7 +589,7 @@
                     const stats = data.stats || data.result;
                     const recentUsage = data.recentUsage || [];
                     updateStats(stats, recentUsage);
-                    showMessage('✅ 統計データを更新しました', 'success');
+                    showMessage('✅ 統計データを更新しました', 'success', true);
                 } else {
                     showMessage('❌ 統計データの取得に失敗しました', 'error');
                 }
@@ -638,7 +638,7 @@
 
                 const data = await response.json();
                 if (data.success) {
-                    showMessage(data.message, 'success');
+                    showMessage(data.message, 'success', true);
                     // CSV再読み込み後は直接統計を更新（ローディングなし）
                     await updateStatsDirectly();
                 } else {
@@ -666,7 +666,7 @@
 
                 const data = await response.json();
                 if (data.success) {
-                    showMessage(`✅ ${data.message}`, 'success');
+                    showMessage(`✅ ${data.message}`, 'success', true);
                 } else {
                     showMessage(data.error || 'レポート出力に失敗しました', 'error');
                 }
@@ -696,7 +696,7 @@
 
                 const data = await response.json();
                 if (data.success) {
-                    showMessage(data.message, 'success');
+                    showMessage(data.message, 'success', true);
                     // リセット後は直接統計を更新（ローディングなし）
                     await updateStatsDirectly();
                 } else {
@@ -742,7 +742,7 @@
                 
                 if (data.success) {
                     uploadStatus.innerHTML = '<p style="color: #27ae60;">✅ アップロード成功！</p>';
-                    showMessage(`✅ CSVファイルが正常にアップロードされました。${data.message}`, 'success');
+                    showMessage(`✅ CSVファイルが正常にアップロードされました。${data.message}`, 'success', true);
                     
                     // ファイル入力をクリア
                     fileInput.value = '';
@@ -783,19 +783,24 @@
                 });
 
                 const data = await response.json();
+                
+                // ローディングアニメーションを停止
+                hideLoading();
+                
                 if (data.success) {
-                    showMessage(data.message, 'success');
+                    // リセット完了後にダイアログを表示（自動で閉じない）
+                    showMessage(data.message, 'success', false);
                     document.getElementById('resetUrlId').value = '';
                     // 個別リセット後は直接統計を更新（ローディングなし）
                     await updateStatsDirectly();
                 } else {
-                    showMessage(data.error || 'リセットに失敗しました', 'error');
+                    showMessage(data.error || 'リセットに失敗しました', 'error', false);
                 }
             } catch (error) {
                 console.error('Single reset error:', error);
-                showMessage('❌ リセットエラー', 'error');
-            } finally {
+                // エラー時もローディングを停止
                 hideLoading();
+                showMessage('❌ リセットエラー', 'error', false);
             }
         }
 
@@ -825,7 +830,7 @@
         }
 
         // メッセージ表示
-        function showMessage(message, type = 'info') {
+        function showMessage(message, type = 'info', autoClose = false) {
             const container = document.getElementById('messageContainer');
             const className = type === 'error' ? 'error' : 'success';
             
@@ -836,10 +841,12 @@
                 </div>
             `;
 
-            // 10秒後にメッセージを自動削除
-            setTimeout(() => {
-                closeMessage();
-            }, 10000);
+            // autoCloseがtrueの場合のみ自動削除
+            if (autoClose) {
+                setTimeout(() => {
+                    closeMessage();
+                }, 10000);
+            }
         }
 
         function closeMessage() {
