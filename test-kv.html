@@ -198,8 +198,12 @@
         </div>
 
         <div class="test-section">
-            <h3>🎯 次のURLを取得</h3>
-            <button onclick="getNextURL()">次のURLを取得</button>
+            <h3>🎯 次のURLを取得（イベント別）</h3>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
+                <button onclick="getNextURLForEvent('233')">イベント233 (ネコ背でネコパンチ)</button>
+                <button onclick="getNextURLForEvent('234')">イベント234 (タイ風キック)</button>
+                <button onclick="getNextURLForEvent('235')">イベント235 (青春のけつバット)</button>
+            </div>
             <div id="nextURLResult" class="result" style="display: none;"></div>
         </div>
 
@@ -297,10 +301,17 @@
             }
         }
 
-        async function getNextURL() {
-            showLoading('次のURLを取得中...');
+        async function getNextURLForEvent(eventId) {
+            const eventNames = {
+                '233': 'ネコ背でネコパンチ',
+                '234': 'タイ風キック', 
+                '235': '青春のけつバット'
+            };
+            const eventName = eventNames[eventId] || `イベント${eventId}`;
+            
+            showLoading(`${eventName}の次のURLを取得中...`);
             try {
-                const result = await callKVTestAPI('getNextURL');
+                const result = await callKVTestAPI(`getNextURL&event=${eventId}`);
                 showResult('nextURLResult', result, result.success ? 'success' : 'error');
             } finally {
                 hideLoading();
