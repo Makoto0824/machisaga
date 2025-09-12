@@ -251,17 +251,21 @@
             padding: 1rem;
             border-radius: 8px;
             margin: 1rem 0;
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .message.success {
-            background: rgba(39, 174, 96, 0.2);
-            border: 1px solid rgba(39, 174, 96, 0.5);
+            background: rgba(39, 174, 96, 0.3);
+            border: 2px solid #2ecc71;
             color: #2ecc71;
         }
 
         .message.error {
-            background: rgba(231, 76, 60, 0.2);
-            border: 1px solid rgba(231, 76, 60, 0.5);
+            background: rgba(231, 76, 60, 0.3);
+            border: 2px solid #e74c3c;
             color: #e74c3c;
         }
 
@@ -428,7 +432,7 @@
             </div>
         </div>
 
-        <div id="messageContainer"></div>
+        <div id="messageContainer" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; max-width: 500px; width: 90%;"></div>
     </div>
 
     <script>
@@ -545,7 +549,7 @@
         async function refreshStats() {
             showLoading('統計情報を取得中...');
             try {
-                const response = await fetch('/api/single-use-redirect', {
+                const response = await fetch('  /api/single-use-redirect', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
@@ -806,10 +810,10 @@
                 </div>
             `;
 
-            // 5秒後にメッセージを削除
+            // 8秒後にメッセージを削除（より長く表示）
             setTimeout(() => {
                 container.innerHTML = '';
-            }, 5000);
+            }, 8000);
         }
 
         // 定期的に統計を更新（60秒ごと）
