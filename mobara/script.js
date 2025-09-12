@@ -388,8 +388,8 @@ async function getSingleUseURL(eventId) {
         console.log(`📊 result:`, data.result);
         console.log(`📊 nextURL:`, data.result?.nextURL);
         
-        if (data.success && data.result && data.result.nextURL) {
-            const url = data.result.nextURL.url || data.result.nextURL;
+        if (data.success && data.result && data.result.nextURL && data.result.nextURL.url) {
+            const url = data.result.nextURL.url;
             console.log(`✅ URL取得成功:`, url);
             return url;
         } else {
