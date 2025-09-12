@@ -718,7 +718,9 @@
                                     ${item.type === 'error' ? 
                                         `<div class="error-details">
                                             <span class="error-text" onclick="showErrorDetails('${item.id}')" style="cursor: pointer;">
-                                                ${item.error || 'エラー'} ▼
+                                                ${item.error === 'duplicate_detected' ? '重複検出' : 
+                                                  item.error === 'no_available_url' ? '利用可能URLなし' : 
+                                                  item.error || 'エラー'} ▼
                                             </span>
                                             <div id="error-details-${item.id}" class="error-details-content" style="display: none;">
                                                 <div class="error-message">${item.message || 'エラー詳細なし'}</div>

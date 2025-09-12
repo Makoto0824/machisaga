@@ -196,6 +196,16 @@ class KVURLManager {
 
             if (!availableURL) {
                 console.log(`❌ 利用可能なURLがありません (イベント: ${eventId || '全イベント'})`);
+                
+                // エラー履歴を保存
+                await this.saveErrorHistory({
+                    type: 'no_available_url',
+                    message: `利用可能なURLがありません (イベント: ${eventId || '全イベント'})`,
+                    eventId: eventId,
+                    userId: userId || 'anonymous',
+                    timestamp: new Date().toISOString()
+                });
+                
                 return null;
             }
 
