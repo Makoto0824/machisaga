@@ -668,9 +668,15 @@ async function executeMera() {
     const url = await getSingleUseURL(eventId);
     
     if (url) {
-        setTimeout(() => {
-            window.open(url, '_blank');
-        }, 100);
+        console.log(`🎯 ネコパンチ遷移開始: ${url}`);
+        try {
+            setTimeout(() => {
+                window.open(url, '_blank');
+                console.log(`✅ ネコパンチ遷移完了: ${url}`);
+            }, 100);
+        } catch (error) {
+            console.error('❌ ネコパンチ遷移エラー:', error);
+        }
     } else {
         console.error('ネコパンチのURL取得に失敗しました');
     }
@@ -686,9 +692,15 @@ async function executeMerami() {
     const url = await getSingleUseURL(eventId);
     
     if (url) {
-        setTimeout(() => {
-            window.open(url, '_blank');
-        }, 100);
+        console.log(`🎯 メガローキック遷移開始: ${url}`);
+        try {
+            setTimeout(() => {
+                window.open(url, '_blank');
+                console.log(`✅ メガローキック遷移完了: ${url}`);
+            }, 100);
+        } catch (error) {
+            console.error('❌ メガローキック遷移エラー:', error);
+        }
     } else {
         console.error('メガローキックのURL取得に失敗しました');
     }
