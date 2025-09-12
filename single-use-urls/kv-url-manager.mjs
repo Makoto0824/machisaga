@@ -485,7 +485,8 @@ class KVURLManager {
                         usedAt: errorData.timestamp,
                         type: 'error',
                         error: errorData.type,
-                        message: errorData.message
+                        message: errorData.message,
+                        duplicates: errorData.duplicates
                     });
                 }
             }

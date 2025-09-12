@@ -305,6 +305,37 @@
             background-color: rgba(231, 76, 60, 0.2);
         }
 
+        .error-details {
+            position: relative;
+        }
+
+        .error-details-content {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: #2c3e50;
+            border: 1px solid #e74c3c;
+            border-radius: 4px;
+            padding: 10px;
+            z-index: 1000;
+            min-width: 300px;
+            max-width: 500px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-weight: bold;
+            margin-bottom: 8px;
+            word-wrap: break-word;
+        }
+
+        .error-duplicates {
+            color: #f39c12;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
         .status-used {
             color: #e74c3c;
             font-weight: bold;
@@ -691,7 +722,20 @@
                                 <td>${item.usedAt ? new Date(item.usedAt).toLocaleString('ja-JP') : 'N/A'}</td>
                                 <td>
                                     ${item.type === 'error' ? 
-                                        `<span class="error-text" title="${item.message || ''}">${item.error || 'エラー'}</span>` :
+                                        `<div class="error-details">
+                                            <span class="error-text" onclick="showErrorDetails('${item.id}')" style="cursor: pointer;">
+                                                ${item.error || 'エラー'} ▼
+                                            </span>
+                                            <div id="error-details-${item.id}" class="error-details-content" style="display: none;">
+                                                <div class="error-message">${item.message || 'エラー詳細なし'}</div>
+                                                ${item.duplicates ? `
+                                                    <div class="error-duplicates">
+                                                        <strong>重複URL:</strong> ${item.duplicates.urls.length}個<br>
+                                                        <strong>重複ID:</strong> ${item.duplicates.ids.length}個
+                                                    </div>
+                                                ` : ''}
+                                            </div>
+                                        </div>` :
                                         `<button class="button" onclick="resetSingleUrl('${item.id}')">リセット</button>`
                                     }
                                 </td>
@@ -877,6 +921,21 @@
                 hideLoading();
                 uploadStatus.innerHTML = '<p style="color: #e74c3c;">❌ アップロードエラー</p>';
                 alert('❌ CSVアップロードエラー');
+            }
+        }
+
+        // エラー詳細表示
+        function showErrorDetails(errorId) {
+            const detailsElement = document.getElementById(`error-details-${errorId}`);
+            if (detailsElement) {
+                const isVisible = detailsElement.style.display !== 'none';
+                detailsElement.style.display = isVisible ? 'none' : 'block';
+                
+                // 矢印の向きを変更
+                const arrowElement = detailsElement.previousElementSibling;
+                if (arrowElement) {
+                    arrowElement.textContent = arrowElement.textContent.replace(/[▼▲]/, isVisible ? '▼' : '▲');
+                }
             }
         }
 
