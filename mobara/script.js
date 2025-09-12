@@ -630,22 +630,22 @@ function stopRandomSelection() {
 
 
 // コマンド実行
-function executeCommand() {
+async function executeCommand() {
     switch (game.currentCommand) {
         case 'mera':
-            executeMera();
+            await executeMera();
             break;
         case 'merami':
-            executeMerami();
+            await executeMerami();
             break;
         case 'merazoma':
-            executeMerazoma();
+            await executeMerazoma();
             break;
         case 'seiken':
-            executeSeiken();
+            await executeSeiken();
             break;
         case 'kancho':
-            executeKancho();
+            await executeKancho();
             break;
     }
 }
