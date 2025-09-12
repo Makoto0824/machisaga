@@ -30,7 +30,7 @@ function hideLoading() {
     const overlay = document.getElementById('loading-overlay');
     if (overlay) {
         overlay.style.display = 'none';
-        game.isLoading = false;
+        // game.isLoading = false; // 再有効化しない
     }
 }
 
@@ -687,7 +687,7 @@ async function executeCommand() {
                 break;
         }
     } finally {
-        // ローディング終了
+        // ローディング終了（再有効化はしない）
         hideLoading();
     }
 }
