@@ -248,25 +248,50 @@
         }
 
         .message {
-            padding: 1rem;
-            border-radius: 8px;
-            margin: 1rem 0;
+            padding: 1.5rem;
+            border-radius: 12px;
             font-weight: bold;
             font-size: 1.1rem;
             text-align: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            min-width: 300px;
+            max-width: 500px;
         }
 
         .message.success {
-            background: rgba(39, 174, 96, 0.3);
+            background: #ffffff;
             border: 2px solid #2ecc71;
             color: #2ecc71;
         }
 
         .message.error {
-            background: rgba(231, 76, 60, 0.3);
+            background: #ffffff;
             border: 2px solid #e74c3c;
             color: #e74c3c;
+        }
+
+        .message-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .message-close:hover {
+            color: #333;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
         }
 
         .progress-bar {
@@ -806,14 +831,20 @@
             
             container.innerHTML = `
                 <div class="message ${className}">
+                    <button class="message-close" onclick="closeMessage()">&times;</button>
                     ${message}
                 </div>
             `;
 
-            // 8秒後にメッセージを削除（より長く表示）
+            // 10秒後にメッセージを自動削除
             setTimeout(() => {
-                container.innerHTML = '';
-            }, 8000);
+                closeMessage();
+            }, 10000);
+        }
+
+        function closeMessage() {
+            const container = document.getElementById('messageContainer');
+            container.innerHTML = '';
         }
 
         // 定期的に統計を更新（60秒ごと）
