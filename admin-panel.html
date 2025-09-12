@@ -788,19 +788,19 @@
                 hideLoading();
                 
                 if (data.success) {
-                    // リセット完了後にダイアログを表示（自動で閉じない）
-                    showMessage(data.message, 'success', false);
+                    // システムダイアログで確実に表示
+                    alert(`✅ ${data.message}`);
                     document.getElementById('resetUrlId').value = '';
                     // 個別リセット後は直接統計を更新（ローディングなし）
                     await updateStatsDirectly();
                 } else {
-                    showMessage(data.error || 'リセットに失敗しました', 'error', false);
+                    alert(`❌ ${data.error || 'リセットに失敗しました'}`);
                 }
             } catch (error) {
                 console.error('Single reset error:', error);
                 // エラー時もローディングを停止
                 hideLoading();
-                showMessage('❌ リセットエラー', 'error', false);
+                alert('❌ リセットエラー');
             }
         }
 
