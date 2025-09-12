@@ -201,8 +201,8 @@ class KVURLManager {
                 
                 if (!urlData || urlData.used) continue;
                 
-                // eventIdが指定されている場合、数値として比較
-                if (eventId && urlData.event !== eventId) continue;
+                // eventIdが指定されている場合、文字列として比較
+                if (eventId && String(urlData.event) !== String(eventId)) continue;
                 
                 availableURL = urlData;
                 break;
