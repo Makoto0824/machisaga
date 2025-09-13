@@ -10,11 +10,138 @@ class GameState {
         this.isSkillDetermined = false; // 技が確定したかどうか
         this.hasPlayedDamageVideo = false; // ダメージ動画を再生したかどうか
         this.isLoading = false; // ローディング中かどうか
+        this.accessControl = {
+            status: null, // 'ok', 'locked', 'error'
+            retryAt: null, // 次回アクセス可能時刻
+            isChecked: false // アクセス制御チェック済みか
+        };
     }
 }
 
 // ゲームインスタンス
 let game = new GameState();
+
+// アクセス制御関連の関数
+async function checkAccessControl() {
+    try {
+        const response = await fetch(`${window.location.origin}/api/access/kurofune`);
+        const data = await response.json();
+        
+        game.accessControl.status = data.status;
+        game.accessControl.retryAt = data.retryAt;
+        game.accessControl.isChecked = true;
+        
+        if (data.status === 'locked') {
+            showAccessLockedDialog(data.retryAt);
+            return false;
+        } else if (data.status === 'ok') {
+            return true;
+        } else {
+            showAccessErrorDialog(data.message);
+            return false;
+        }
+    } catch (error) {
+        console.error('アクセス制御チェックエラー:', error);
+        game.accessControl.status = 'error';
+        game.accessControl.isChecked = true;
+        showAccessErrorDialog('サーバーエラーが発生しました');
+        return false;
+    }
+}
+
+// アクセス制限ダイアログを表示
+function showAccessLockedDialog(retryAt) {
+    const modal = document.getElementById('popup-block-modal');
+    const modalContent = modal.querySelector('.popup-block-content');
+    const title = modalContent.querySelector('h3');
+    const description = modalContent.querySelector('p');
+    const openBtn = document.getElementById('open-url-btn');
+    
+    // タイトルと説明文を変更
+    title.innerHTML = 'アクセス制限中';
+    description.innerHTML = `次回プレイ可能時刻:<br><strong>${formatRetryTime(retryAt)}</strong>`;
+    
+    // ボタンを非表示にする
+    openBtn.style.display = 'none';
+    
+    // ダイアログを表示
+    modal.style.display = 'flex';
+    
+    // カウントダウン開始
+    startCountdown(retryAt);
+}
+
+// アクセスエラーダイアログを表示
+function showAccessErrorDialog(message) {
+    const modal = document.getElementById('popup-block-modal');
+    const modalContent = modal.querySelector('.popup-block-content');
+    const title = modalContent.querySelector('h3');
+    const description = modalContent.querySelector('p');
+    const openBtn = document.getElementById('open-url-btn');
+    
+    // タイトルと説明文を変更
+    title.innerHTML = 'アクセスエラー';
+    description.textContent = message;
+    
+    // ボタンを非表示にする
+    openBtn.style.display = 'none';
+    
+    // ダイアログを表示
+    modal.style.display = 'flex';
+}
+
+// 再試行時刻をフォーマット
+function formatRetryTime(retryAt) {
+    const date = new Date(retryAt);
+    return date.toLocaleString('ja-JP', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+}
+
+// カウントダウン表示
+function startCountdown(retryAt) {
+    const modal = document.getElementById('popup-block-modal');
+    const description = modal.querySelector('p');
+    
+    const updateCountdown = () => {
+        const now = new Date();
+        const retry = new Date(retryAt);
+        const diff = retry - now;
+        
+        if (diff <= 0) {
+            // 制限解除
+            description.innerHTML = 'アクセス制限が解除されました！<br>ページをリロードしてください。';
+            return;
+        }
+        
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        description.innerHTML = `次回プレイ可能時刻:<br><strong>${formatRetryTime(retryAt)}</strong><br><br>残り時間: ${hours}時間${minutes}分${seconds}秒`;
+    };
+    
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    
+    // モーダルが閉じられたらカウントダウンを停止
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                if (modal.style.display === 'none') {
+                    clearInterval(interval);
+                    observer.disconnect();
+                }
+            }
+        });
+    });
+    observer.observe(modal, { attributes: true });
+}
 
 // ローディング表示関数
 function showLoading() {
@@ -1043,6 +1170,12 @@ function navigateCommands(key) {
 }
 
 // ゲーム初期化
-document.addEventListener('DOMContentLoaded', () => {
-    initGame();
+document.addEventListener('DOMContentLoaded', async () => {
+    // アクセス制御をチェック
+    const hasAccess = await checkAccessControl();
+    
+    if (hasAccess) {
+        // アクセス許可された場合のみゲームを初期化
+        initGame();
+    }
 });
