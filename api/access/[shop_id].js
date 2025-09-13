@@ -16,6 +16,28 @@ export default async function handler(req, res) {
         return res.status(200).end();
     }
 
+    if (req.method === 'DELETE') {
+        // アクセス履歴をクリア（デバッグ用）
+        const { shop_id } = req.query;
+        if (!shop_id) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'shop_id is required',
+                retryAt: null
+            });
+        }
+        
+        const userUuid = await getUserUuid(req, res);
+        const accessKey = `access:${userUuid}:${shop_id}`;
+        await kv.del(accessKey);
+        
+        return res.status(200).json({
+            status: 'ok',
+            message: 'Access history cleared',
+            retryAt: null
+        });
+    }
+
     if (req.method !== 'GET') {
         return res.status(405).json({
             status: 'error',
