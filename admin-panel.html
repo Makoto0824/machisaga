@@ -1181,8 +1181,17 @@
                 const maxPossiblePerDay = Math.floor(24 / intervalHours);
                 
                 if (maxPerDay > maxPossiblePerDay) {
-                    showRulesResult(`設定に矛盾があります。${intervalHours}時間間隔では1日最大${maxPossiblePerDay}回までです。`, 'error');
+                    showRulesResult(`設定に矛盾があります。${intervalHours.toFixed(2)}時間間隔では1日最大${maxPossiblePerDay}回までです。`, 'error');
                     return;
+                }
+                
+                // 逆の矛盾チェック：1日の回数が少なすぎる場合
+                if (maxPerDay < maxPossiblePerDay && maxPerDay > 0) {
+                    const actualIntervalHours = 24 / maxPerDay;
+                    if (intervalHours < actualIntervalHours) {
+                        showRulesResult(`設定に矛盾があります。1日${maxPerDay}回なら間隔は${actualIntervalHours.toFixed(2)}時間（${Math.round(actualIntervalHours * 3600)}秒）以上にする必要があります。`, 'error');
+                        return;
+                    }
                 }
             }
             
