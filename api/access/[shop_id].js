@@ -77,6 +77,79 @@ export default async function handler(req, res) {
         const now = Math.floor(Date.now() / 1000);
         
         // 4. アクセス制御ロジック
+        // 無制限の場合は常に許可
+        if (rule.intervalSeconds === 0) {
+            return res.status(200).json({
+                status: 'ok',
+                retryAt: null
+            });
+        }
+        
+        // 1日の回数制限が0（無制限）の場合は間隔制限のみ適用
+        if (rule.maxPerDay === 0) {
+            // 間隔制限のみの処理
+            if (!accessHistory) {
+                // 初回アクセス - 許可
+                const nextAvailableAt = now + rule.intervalSeconds;
+                const newAccessHistory = {
+                    nextAvailableAt: nextAvailableAt,
+                    lastAccessAt: now
+                };
+                
+                // アクセス履歴を保存（TTL設定）
+                await kv.setex(accessKey, rule.intervalSeconds, JSON.stringify(newAccessHistory));
+                
+                return res.status(200).json({
+                    status: 'ok',
+                    retryAt: new Date(nextAvailableAt * 1000).toISOString()
+                });
+            } else {
+                // 既存アクセス - 間隔制限のみチェック
+                let history;
+                try {
+                    history = typeof accessHistory === 'string' ? JSON.parse(accessHistory) : accessHistory;
+                } catch (parseError) {
+                    console.error('JSON parse error:', parseError, 'accessHistory:', accessHistory);
+                    // パースエラーの場合は初回アクセスとして扱う
+                    const nextAvailableAt = now + rule.intervalSeconds;
+                    const newAccessHistory = {
+                        nextAvailableAt: nextAvailableAt,
+                        lastAccessAt: now
+                    };
+                    
+                    await kv.setex(accessKey, rule.intervalSeconds, JSON.stringify(newAccessHistory));
+                    
+                    return res.status(200).json({
+                        status: 'ok',
+                        retryAt: new Date(nextAvailableAt * 1000).toISOString()
+                    });
+                }
+                
+                if (now < history.nextAvailableAt) {
+                    // 間隔制限中
+                    return res.status(200).json({
+                        status: 'locked',
+                        retryAt: new Date(history.nextAvailableAt * 1000).toISOString()
+                    });
+                } else {
+                    // 間隔制限解除 - 許可
+                    const nextAvailableAt = now + rule.intervalSeconds;
+                    const updatedHistory = {
+                        nextAvailableAt: nextAvailableAt,
+                        lastAccessAt: now
+                    };
+                    
+                    // アクセス履歴を更新（TTL更新）
+                    await kv.setex(accessKey, rule.intervalSeconds, JSON.stringify(updatedHistory));
+                    
+                    return res.status(200).json({
+                        status: 'ok',
+                        retryAt: new Date(nextAvailableAt * 1000).toISOString()
+                    });
+                }
+            }
+        }
+        
         if (!accessHistory) {
             // 初回アクセス - 許可
             const nextAvailableAt = now + rule.intervalSeconds;
