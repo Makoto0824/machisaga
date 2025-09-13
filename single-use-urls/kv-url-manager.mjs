@@ -192,21 +192,41 @@ class KVURLManager {
 
             // 全URLキーを取得
             const urlKeys = await kv.keys('url:*');
+            console.log(`🔍 デバッグ: 全URLキー数 = ${urlKeys.length}`);
+            console.log(`🔍 デバッグ: 検索対象イベント = ${eventId}`);
             
             let availableURL = null;
+            let debugCount = 0;
             
             // イベント別または全イベントから未使用URLを検索
             for (const key of urlKeys) {
                 const urlData = await kv.get(key);
+                debugCount++;
                 
-                if (!urlData || urlData.used) continue;
+                if (!urlData) {
+                    console.log(`🔍 デバッグ: ${key} - データなし`);
+                    continue;
+                }
+                
+                if (urlData.used) {
+                    console.log(`🔍 デバッグ: ${key} - 使用済み (${urlData.event})`);
+                    continue;
+                }
+                
+                console.log(`🔍 デバッグ: ${key} - 未使用 (${urlData.event})`);
                 
                 // eventIdが指定されている場合、文字列として比較
-                if (eventId && String(urlData.event) !== String(eventId)) continue;
+                if (eventId && String(urlData.event) !== String(eventId)) {
+                    console.log(`🔍 デバッグ: ${key} - イベント不一致 (${urlData.event} !== ${eventId})`);
+                    continue;
+                }
                 
                 availableURL = urlData;
+                console.log(`✅ デバッグ: 利用可能URL発見 = ${key}`);
                 break;
             }
+            
+            console.log(`🔍 デバッグ: 検索完了 - 処理したキー数 = ${debugCount}`);
 
             if (!availableURL) {
                 console.log(`❌ 利用可能なURLがありません (イベント: ${eventId || '全イベント'})`);
