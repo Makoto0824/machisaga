@@ -853,8 +853,8 @@ async function executeMerazoma() {
             console.log(`✅ ギガドヤストライク遷移完了: ${url}`);
         } else {
             console.warn('⚠️ ポップアップがブロックされました');
-            // ユーザーに通知
-            alert('⚠️ ポップアップがブロックされました。\n\nブラウザの設定でポップアップを許可するか、以下のURLを手動で開いてください：\n\n' + url);
+            // カスタムダイアログで通知
+            showPopupBlockDialog(url);
         }
     } else {
         console.error('ギガドヤストライクのURL取得に失敗しました');
@@ -879,8 +879,8 @@ async function executeSeiken() {
             console.log(`✅ テラオーバーキル遷移完了: ${url}`);
         } else {
             console.warn('⚠️ ポップアップがブロックされました');
-            // ユーザーに通知
-            alert('⚠️ ポップアップがブロックされました。\n\nブラウザの設定でポップアップを許可するか、以下のURLを手動で開いてください：\n\n' + url);
+            // カスタムダイアログで通知
+            showPopupBlockDialog(url);
         }
     } else {
         console.error('テラオーバーキルのURL取得に失敗しました');
@@ -905,8 +905,8 @@ async function executeKancho() {
             console.log(`✅ ペタインパクト　MUGEN遷移完了: ${url}`);
         } else {
             console.warn('⚠️ ポップアップがブロックされました');
-            // ユーザーに通知
-            alert('⚠️ ポップアップがブロックされました。\n\nブラウザの設定でポップアップを許可するか、以下のURLを手動で開いてください：\n\n' + url);
+            // カスタムダイアログで通知
+            showPopupBlockDialog(url);
         }
     } else {
         console.error('ペタインパクト　MUGENのURL取得に失敗しました');
