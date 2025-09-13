@@ -697,20 +697,16 @@ async function executeCommand() {
             // ローディング終了（再有効化はしない）
             hideLoading();
             
-            // 「つぎへ」ボタンを非表示にして、リンク設定を削除
+            // 「つぎへ」ボタンのみを非表示にして、リンク設定を削除
             const nextButton = document.getElementById('next-button');
             if (nextButton) {
-                // ボタンを完全に非表示にする
+                // ボタンのみを完全に非表示にする
                 nextButton.style.display = 'none';
                 nextButton.style.visibility = 'hidden';
                 nextButton.style.opacity = '0';
                 // リンク設定を削除
                 nextButton.onclick = null;
-                // ボタンの親要素も非表示にする
-                const parentElement = nextButton.parentElement;
-                if (parentElement) {
-                    parentElement.style.display = 'none';
-                }
+                // 親要素は非表示にしない（技名を残すため）
             }
         }
     }
