@@ -86,16 +86,30 @@ export default async function handler(req, res) {
             case 'getNextURL':
                 // 次の利用可能なURLを取得（イベント指定可能）
                 const eventId = req.query.event;
-                const nextURL = await kvURLManager.getNextAvailableURL(null, eventId);
-                return res.status(200).json({
-                    success: true,
-                    action: 'getNextURL',
-                    result: { 
-                        nextURL,
-                        eventId: eventId || 'all'
-                    },
-                    timestamp: new Date().toISOString()
-                });
+                console.log(`🔍 API: getNextURL called with eventId=${eventId}`);
+                
+                try {
+                    const nextURL = await kvURLManager.getNextAvailableURL(null, eventId);
+                    console.log(`🔍 API: getNextAvailableURL result:`, nextURL);
+                    
+                    return res.status(200).json({
+                        success: true,
+                        action: 'getNextURL',
+                        result: { 
+                            nextURL,
+                            eventId: eventId || 'all'
+                        },
+                        timestamp: new Date().toISOString()
+                    });
+                } catch (error) {
+                    console.error(`❌ API: getNextAvailableURL error:`, error);
+                    return res.status(500).json({
+                        success: false,
+                        error: 'URL取得エラー',
+                        details: error.message,
+                        timestamp: new Date().toISOString()
+                    });
+                }
 
             case 'clearAllData':
                 // KVデータを全削除
