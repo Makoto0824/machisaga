@@ -540,12 +540,12 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
                         <div>
                             <label for="intervalSeconds">間隔（秒）:</label>
-                            <input type="number" id="intervalSeconds" value="7200" min="60" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
-                            <small style="color: #ccc;">例: 7200 = 2時間</small>
+                            <input type="number" id="intervalSeconds" value="7200" min="0" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                            <small style="color: #ccc;">例: 7200 = 2時間、86400 = 1日、0 = 無制限</small>
                         </div>
                         <div>
                             <label for="maxPerDay">1日の最大回数:</label>
-                            <input type="number" id="maxPerDay" value="1" min="1" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                            <input type="number" id="maxPerDay" value="1" min="0" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
                             <small style="color: #ccc;">0 = 制限なし</small>
                         </div>
                     </div>
@@ -1164,9 +1164,33 @@
             const intervalSeconds = parseInt(document.getElementById('intervalSeconds').value);
             const maxPerDay = parseInt(document.getElementById('maxPerDay').value);
             
-            if (!intervalSeconds || intervalSeconds < 60) {
-                showRulesResult('間隔は60秒以上で設定してください', 'error');
+            // バリデーション
+            if (isNaN(intervalSeconds) || intervalSeconds < 0) {
+                showRulesResult('間隔は0以上の数値で設定してください', 'error');
                 return;
+            }
+            
+            if (isNaN(maxPerDay) || maxPerDay < 0) {
+                showRulesResult('1日の最大回数は0以上の数値で設定してください', 'error');
+                return;
+            }
+            
+            // 論理的な矛盾チェック
+            if (intervalSeconds > 0 && maxPerDay > 0) {
+                const intervalHours = intervalSeconds / 3600;
+                const maxPossiblePerDay = Math.floor(24 / intervalHours);
+                
+                if (maxPerDay > maxPossiblePerDay) {
+                    showRulesResult(`設定に矛盾があります。${intervalHours}時間間隔では1日最大${maxPossiblePerDay}回までです。`, 'error');
+                    return;
+                }
+            }
+            
+            // 無制限の場合は警告
+            if (intervalSeconds === 0 && maxPerDay === 0) {
+                if (!confirm('完全無制限（間隔0秒、1日0回）に設定しますか？')) {
+                    return;
+                }
             }
             
             try {
