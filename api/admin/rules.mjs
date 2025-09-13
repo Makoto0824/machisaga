@@ -34,7 +34,17 @@ export default async function handler(req, res) {
             
         } else if (req.method === 'POST' || req.method === 'PUT') {
             // ルールを更新
-            const { shopId, intervalSeconds, maxPerDay } = req.body;
+            let body;
+            try {
+                body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+            } catch (error) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid JSON body'
+                });
+            }
+            
+            const { shopId, intervalSeconds, maxPerDay } = body;
             
             if (!shopId) {
                 return res.status(400).json({
