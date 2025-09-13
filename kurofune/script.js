@@ -589,6 +589,10 @@ function showAttackMessage() {
             
             // 「つぎへ」ボタンのクリックイベントを追加
             newKaishiBtn.addEventListener('click', () => {
+                // 即座にボタンを非表示にする
+                newKaishiBtn.style.display = 'none';
+                newKaishiBtn.style.visibility = 'hidden';
+                newKaishiBtn.style.opacity = '0';
                 // 選択された技に対応するリンク先に遷移（技名表示なし）
                 executeCommand();
             });
@@ -696,9 +700,17 @@ async function executeCommand() {
             // 「つぎへ」ボタンを非表示にして、リンク設定を削除
             const nextButton = document.getElementById('next-button');
             if (nextButton) {
+                // ボタンを完全に非表示にする
                 nextButton.style.display = 'none';
+                nextButton.style.visibility = 'hidden';
+                nextButton.style.opacity = '0';
                 // リンク設定を削除
                 nextButton.onclick = null;
+                // ボタンの親要素も非表示にする
+                const parentElement = nextButton.parentElement;
+                if (parentElement) {
+                    parentElement.style.display = 'none';
+                }
             }
         }
     }
@@ -738,14 +750,7 @@ async function executeCommand() {
         // ダイアログを表示
         modal.style.display = 'flex';
         
-        // 3秒後に自動で閉じる
-        setTimeout(() => {
-            modal.style.display = 'none';
-            // 元の内容に戻す
-            title.innerHTML = 'ポップアップが<br>ブロックされました';
-            description.textContent = 'ブラウザの設定でポップアップを許可するか、下記の「開く」からアクセスしてください。';
-            openBtn.style.display = 'block';
-        }, 3000);
+        // 自動で閉じる処理を削除（ユーザー要求により）
     }
 
     // クリップボードにコピーする関数
