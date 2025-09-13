@@ -55,7 +55,7 @@ export default async function handler(req, res) {
             
             const rule = {
                 intervalSeconds: intervalSeconds || 7200, // デフォルト2時間
-                maxPerDay: maxPerDay || 1 // デフォルト1日1回
+                maxPerDay: maxPerDay !== undefined ? maxPerDay : 1 // 0も有効な値として扱う
             };
             
             const ruleKey = `rule:${shopId}`;
