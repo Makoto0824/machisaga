@@ -584,6 +584,9 @@ function showAttackMessage() {
             newKaishiBtn.classList.remove('kaishi-btn'); // CSS疑似要素のクラスを削除
             newKaishiBtn.className = 'skill-determined-btn'; // 技確定後のスタイルクラスを追加
             
+            // 「つぎへ」ボタンにIDを追加
+            newKaishiBtn.id = 'next-button';
+            
             // 「つぎへ」ボタンのクリックイベントを追加
             newKaishiBtn.addEventListener('click', () => {
                 // 選択された技に対応するリンク先に遷移（技名表示なし）
@@ -686,10 +689,88 @@ async function executeCommand() {
                 await executeKancho();
                 break;
         }
-    } finally {
-        // ローディング終了（再有効化はしない）
-        hideLoading();
+        } finally {
+            // ローディング終了（再有効化はしない）
+            hideLoading();
+            
+            // 「つぎへ」ボタンを非表示にする
+            const nextButton = document.getElementById('next-button');
+            if (nextButton) {
+                nextButton.style.display = 'none';
+            }
+        }
     }
+
+    // ポップアップブロック通知ダイアログを表示
+    function showPopupBlockDialog(url) {
+        const modal = document.getElementById('popup-block-modal');
+        const urlInput = document.getElementById('blocked-url');
+        const copyBtn = document.getElementById('copy-url-btn');
+        const openBtn = document.getElementById('open-url-btn');
+        
+        // URLを設定
+        urlInput.value = url;
+        
+        // ダイアログを表示
+        modal.style.display = 'flex';
+        
+        // コピーボタンのイベント
+        copyBtn.onclick = async () => {
+            const success = await copyToClipboard(url);
+            if (success) {
+                copyBtn.textContent = '✅ コピー完了';
+                copyBtn.style.background = '#27ae60';
+                setTimeout(() => {
+                    copyBtn.textContent = '📋 コピー';
+                    copyBtn.style.background = '#3498db';
+                }, 2000);
+            } else {
+                copyBtn.textContent = '❌ コピー失敗';
+                copyBtn.style.background = '#e74c3c';
+                setTimeout(() => {
+                    copyBtn.textContent = '📋 コピー';
+                    copyBtn.style.background = '#3498db';
+                }, 2000);
+            }
+        };
+        
+        // URLを開くボタンのイベント
+        openBtn.onclick = () => {
+            window.open(url, '_blank');
+            modal.style.display = 'none';
+        };
+        
+        // モーダル外クリックで閉じる
+        modal.onclick = (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
+    }
+
+    // クリップボードにコピーする関数
+    async function copyToClipboard(text) {
+        try {
+            await navigator.clipboard.writeText(text);
+            console.log('✅ クリップボードにコピーしました:', text);
+            return true;
+        } catch (error) {
+            console.error('❌ クリップボードコピーエラー:', error);
+            // フォールバック: 古いブラウザ対応
+            try {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                console.log('✅ フォールバックでクリップボードにコピーしました:', text);
+                return true;
+            } catch (fallbackError) {
+                console.error('❌ フォールバックも失敗:', fallbackError);
+                return false;
+            }
+        }
 }
 
 // ネコパンチ実行
@@ -712,8 +793,8 @@ async function executeMera() {
                 console.log(`✅ ネコパンチ遷移完了: ${url}`);
             } else {
                 console.warn('⚠️ ポップアップがブロックされました');
-                // ユーザーに通知
-                alert('⚠️ ポップアップがブロックされました。\n\nブラウザの設定でポップアップを許可するか、以下のURLを手動で開いてください：\n\n' + url);
+                // カスタムダイアログで通知
+                showPopupBlockDialog(url);
             }
         } catch (error) {
             console.error('❌ ネコパンチ遷移エラー:', error);
@@ -743,8 +824,8 @@ async function executeMerami() {
                 console.log(`✅ メガローキック遷移完了: ${url}`);
             } else {
                 console.warn('⚠️ ポップアップがブロックされました');
-                // ユーザーに通知
-                alert('⚠️ ポップアップがブロックされました。\n\nブラウザの設定でポップアップを許可するか、以下のURLを手動で開いてください：\n\n' + url);
+                // カスタムダイアログで通知
+                showPopupBlockDialog(url);
             }
         } catch (error) {
             console.error('❌ メガローキック遷移エラー:', error);

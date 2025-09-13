@@ -67,6 +67,91 @@
             pointer-events: none;
             cursor: not-allowed;
         }
+
+        /* ポップアップブロック通知ダイアログ */
+        .popup-block-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .popup-block-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .popup-block-content h3 {
+            color: #e74c3c;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .popup-block-content p {
+            color: #333;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .url-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .url-container input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            background: #f9f9f9;
+        }
+
+        .copy-btn, .open-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn {
+            background: #3498db;
+            color: white;
+        }
+
+        .copy-btn:hover {
+            background: #2980b9;
+        }
+
+        .open-btn {
+            background: #27ae60;
+            color: white;
+        }
+
+        .open-btn:hover {
+            background: #229954;
+        }
+
+        .popup-block-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
     </style>
     
     <!-- BGM -->
@@ -158,6 +243,21 @@
             <div class="loading-content">
                 <div class="loading-spinner"></div>
                 <div class="loading-text">よみこみ中…</div>
+            </div>
+        </div>
+
+        <!-- ポップアップブロック通知ダイアログ -->
+        <div class="popup-block-modal" id="popup-block-modal" style="display: none;">
+            <div class="popup-block-content">
+                <h3>⚠️ ポップアップがブロックされました</h3>
+                <p>ブラウザの設定でポップアップを許可するか、以下のURLを手動で開いてください：</p>
+                <div class="url-container">
+                    <input type="text" id="blocked-url" readonly>
+                    <button class="copy-btn" id="copy-url-btn">📋 コピー</button>
+                </div>
+                <div class="popup-block-buttons">
+                    <button class="open-btn" id="open-url-btn">🔗 URLを開く</button>
+                </div>
             </div>
         </div>
 
