@@ -104,20 +104,6 @@
             line-height: 1.5;
         }
 
-        .url-container {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 1.5rem;
-        }
-
-        .url-container input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 0.9rem;
-            background: #f9f9f9;
-        }
 
         .open-btn {
             padding: 10px 20px;
@@ -241,12 +227,9 @@
         <div class="popup-block-modal" id="popup-block-modal" style="display: none;">
             <div class="popup-block-content">
                 <h3>⚠️ ポップアップが<br>ブロックされました</h3>
-                <p>ブラウザの設定でポップアップを許可するか、下記の「URLを開く」ボタンからアクセスしてください。</p>
-                <div class="url-container">
-                    <input type="text" id="blocked-url" readonly>
-                </div>
+                <p>ブラウザの設定でポップアップを許可するか、下記の「開く」ボタンからアクセスしてください。</p>
                 <div class="popup-block-buttons">
-                    <button class="open-btn" id="open-url-btn">🔗 URLを開く</button>
+                    <button class="open-btn" id="open-url-btn">開く</button>
                 </div>
             </div>
         </div>

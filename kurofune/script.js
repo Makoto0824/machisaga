@@ -704,11 +704,7 @@ async function executeCommand() {
     // ポップアップブロック通知ダイアログを表示
     function showPopupBlockDialog(url) {
         const modal = document.getElementById('popup-block-modal');
-        const urlInput = document.getElementById('blocked-url');
         const openBtn = document.getElementById('open-url-btn');
-        
-        // URLを設定
-        urlInput.value = url;
         
         // ダイアログを表示
         modal.style.display = 'flex';
