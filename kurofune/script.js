@@ -725,6 +725,34 @@ async function executeCommand() {
         // モーダル外クリックで閉じる処理を削除（ユーザー要求により）
     }
 
+    // URL取得エラーダイアログを表示
+    function showURLErrorDialog(errorMessage) {
+        const modal = document.getElementById('popup-block-modal');
+        const modalContent = modal.querySelector('.popup-block-content');
+        const title = modalContent.querySelector('h3');
+        const description = modalContent.querySelector('p');
+        const openBtn = document.getElementById('open-url-btn');
+        
+        // タイトルと説明文を変更
+        title.innerHTML = 'URL取得エラー';
+        description.textContent = errorMessage;
+        
+        // ボタンを非表示にする（URLがないため）
+        openBtn.style.display = 'none';
+        
+        // ダイアログを表示
+        modal.style.display = 'flex';
+        
+        // 3秒後に自動で閉じる
+        setTimeout(() => {
+            modal.style.display = 'none';
+            // 元の内容に戻す
+            title.innerHTML = 'ポップアップが<br>ブロックされました';
+            description.textContent = 'ブラウザの設定でポップアップを許可するか、下記の「開く」からアクセスしてください。';
+            openBtn.style.display = 'block';
+        }, 3000);
+    }
+
     // クリップボードにコピーする関数
     async function copyToClipboard(text) {
         try {
@@ -778,6 +806,7 @@ async function executeMera() {
         }
     } else {
         console.error('ネコパンチのURL取得に失敗しました');
+        showURLErrorDialog('ネコパンチのURL取得に失敗しました。しばらく時間をおいてから再度お試しください。');
     }
 }
 
@@ -809,6 +838,7 @@ async function executeMerami() {
         }
     } else {
         console.error('メガローキックのURL取得に失敗しました');
+        showURLErrorDialog('メガローキックのURL取得に失敗しました。しばらく時間をおいてから再度お試しください。');
     }
 }
 
@@ -835,6 +865,7 @@ async function executeMerazoma() {
         }
     } else {
         console.error('ギガドヤストライクのURL取得に失敗しました');
+        showURLErrorDialog('ギガドヤストライクのURL取得に失敗しました。しばらく時間をおいてから再度お試しください。');
     }
 }
 
@@ -861,6 +892,7 @@ async function executeSeiken() {
         }
     } else {
         console.error('テラオーバーキルのURL取得に失敗しました');
+        showURLErrorDialog('テラオーバーキルのURL取得に失敗しました。しばらく時間をおいてから再度お試しください。');
     }
 }
 
@@ -887,6 +919,7 @@ async function executeKancho() {
         }
     } else {
         console.error('ペタインパクト　MUGENのURL取得に失敗しました');
+        showURLErrorDialog('ペタインパクト　MUGENのURL取得に失敗しました。しばらく時間をおいてから再度お試しください。');
     }
 }
 
