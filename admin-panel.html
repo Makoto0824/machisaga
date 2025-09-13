@@ -523,14 +523,30 @@
                 <button class="button success" onclick="reloadFromCSV()">📥 CSVから再読み込み</button>
                 <button class="button" onclick="exportReport()">📊 使用状況レポート出力</button>
                 
-                <div class="form-group" style="margin-top: 1rem;">
-                    <h4>📄 CSV読み込み情報</h4>
-                    <div id="csvLoadInfo" style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 0.9em; color: #333;">
-                        <p style="color: #333; margin: 5px 0;">ファイル名: <span id="csvFileName" style="color: #000; font-weight: bold;">--</span></p>
-                        <p style="color: #333; margin: 5px 0;">読み込み日時: <span id="csvLoadTime" style="color: #000; font-weight: bold;">--</span></p>
-                        <p style="color: #333; margin: 5px 0;">URL総数: <span id="csvUrlCount" style="color: #000; font-weight: bold;">--</span></p>
-                    </div>
+            <div class="form-group" style="margin-top: 1rem;">
+                <h4>📄 CSV読み込み情報</h4>
+                <div id="csvLoadInfo" style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-size: 0.9em; color: #333;">
+                    <p style="color: #333; margin: 5px 0;">ファイル名: <span id="csvFileName" style="color: #000; font-weight: bold;">--</span></p>
+                    <p style="color: #333; margin: 5px 0;">読み込み日時: <span id="csvLoadTime" style="color: #000; font-weight: bold;">--</span></p>
+                    <p style="color: #333; margin: 5px 0;">URL総数: <span id="csvUrlCount" style="color: #000; font-weight: bold;">--</span></p>
                 </div>
+            </div>
+
+            <!-- テスト機能セクション -->
+            <div class="form-group" style="margin-top: 2rem;">
+                <h4>🧪 テスト機能</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                    <button class="button" onclick="testEventURL('242')">イベント242 (ネコパンチ)</button>
+                    <button class="button" onclick="testEventURL('243')">イベント243 (メガローキック)</button>
+                    <button class="button" onclick="testEventURL('244')">イベント244 (ギガドヤストライク)</button>
+                    <button class="button" onclick="testEventURL('245')">イベント245 (テラオーバーキル)</button>
+                    <button class="button" onclick="testEventURL('246')">イベント246 (ペタインパクト)</button>
+                </div>
+                <div id="testResult" style="margin-top: 1rem; padding: 1rem; background: rgba(255, 255, 255, 0.1); border-radius: 5px; display: none;">
+                    <h5>テスト結果:</h5>
+                    <div id="testResultContent"></div>
+                </div>
+            </div>
                     
                     
                     <div class="form-group" style="margin-top: 2rem;">
@@ -978,6 +994,85 @@
             } else {
                 button.classList.remove('loading');
                 button.disabled = false;
+            }
+        }
+
+        // test-kv.htmlの機能を統合
+        async function callKVTestAPI(action) {
+            try {
+                const response = await fetch(`${window.location.origin}/api/test-kv?action=${action}`);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                return {
+                    success: false,
+                    error: error.message
+                };
+            }
+        }
+
+        // イベントURLテスト機能
+        async function testEventURL(eventId) {
+            const eventNames = {
+                '242': 'ネコパンチ',
+                '243': 'メガローキック',
+                '244': 'ギガドヤストライク',
+                '245': 'テラオーバーキル',
+                '246': 'ペタインパクト MUGEN'
+            };
+            const eventName = eventNames[eventId] || `イベント${eventId}`;
+            
+            showLoading(`${eventName}のURL取得テスト中...`);
+            try {
+                const result = await callKVTestAPI(`getNextURL&event=${eventId}`);
+                
+                // 結果を表示
+                const testResult = document.getElementById('testResult');
+                const testResultContent = document.getElementById('testResultContent');
+                
+                if (result.success && result.result && result.result.nextURL && result.result.nextURL.url) {
+                    // URLが取得できた場合
+                    const url = result.result.nextURL.url;
+                    testResultContent.innerHTML = `
+                        <div style="color: #27ae60;">
+                            <strong>✅ ${eventName}のURL取得成功</strong><br>
+                            <strong>URL ID:</strong> ${result.result.nextURL.id}<br>
+                            <strong>URL:</strong> <a href="${url}" target="_blank" style="color: #3498db;">${url}</a><br>
+                            <button class="button" onclick="window.open('${url}', '_blank')" style="margin-top: 10px;">URLを開く</button>
+                        </div>
+                    `;
+                } else if (result.success && result.result && result.result.nextURL === null) {
+                    // 利用可能なURLがない場合
+                    testResultContent.innerHTML = `
+                        <div style="color: #e74c3c;">
+                            <strong>❌ 利用可能なURLがありません</strong><br>
+                            ${eventName}の利用可能なURLがありません。すべて使用済みの可能性があります。
+                        </div>
+                    `;
+                } else {
+                    // その他のエラー
+                    testResultContent.innerHTML = `
+                        <div style="color: #e74c3c;">
+                            <strong>❌ エラーが発生しました</strong><br>
+                            ${JSON.stringify(result, null, 2)}
+                        </div>
+                    `;
+                }
+                
+                testResult.style.display = 'block';
+                
+            } catch (error) {
+                const testResult = document.getElementById('testResult');
+                const testResultContent = document.getElementById('testResultContent');
+                testResultContent.innerHTML = `
+                    <div style="color: #e74c3c;">
+                        <strong>❌ テストエラー</strong><br>
+                        ${error.message}
+                    </div>
+                `;
+                testResult.style.display = 'block';
+            } finally {
+                hideLoading();
             }
         }
 
