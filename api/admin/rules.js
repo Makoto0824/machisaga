@@ -1,6 +1,25 @@
 import { kv } from '@vercel/kv';
 
 /**
+ * 指定店舗の全アクセス履歴をクリア
+ */
+async function clearAllAccessHistory(shopId) {
+    try {
+        // アクセス履歴のキーパターンを検索
+        const pattern = `access:*:${shopId}`;
+        const keys = await kv.keys(pattern);
+        
+        if (keys.length > 0) {
+            // 複数のキーを一括削除
+            await kv.del(...keys);
+            console.log(`Cleared ${keys.length} access history entries for shop: ${shopId}`);
+        }
+    } catch (error) {
+        console.error('Error clearing access history:', error);
+    }
+}
+
+/**
  * 店舗ルール管理API (Pages Router)
  * パス: /api/admin/rules
  */
@@ -60,6 +79,9 @@ export default async function handler(req, res) {
             
             const ruleKey = `rule:${shopId}`;
             await kv.set(ruleKey, JSON.stringify(rule));
+            
+            // ルール変更時に既存のアクセス履歴をクリア
+            await clearAllAccessHistory(shopId);
             
             return res.status(200).json({
                 success: true,
