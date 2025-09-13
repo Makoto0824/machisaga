@@ -168,10 +168,10 @@ async function getShopRule(shopId) {
         return JSON.parse(rule);
     }
     
-    // デフォルトルール（2時間に1回、1日1回）
+    // デフォルトルール（1時間に1回、1日2回）
     const defaultRule = {
-        intervalSeconds: 7200, // 2時間
-        maxPerDay: 1
+        intervalSeconds: 3600, // 1時間
+        maxPerDay: 2
     };
     
     // デフォルトルールを保存
