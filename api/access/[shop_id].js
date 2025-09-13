@@ -151,26 +151,20 @@ async function getUserUuid(req, res) {
  */
 async function getShopRule(shopId) {
     const ruleKey = `rule:${shopId}`;
-    const rule = await kv.get(ruleKey);
+    const raw = await kv.get(ruleKey);
     
-    if (rule) {
+    if (raw) {
         try {
-            return typeof rule === 'string' ? JSON.parse(rule) : rule;
-        } catch (parseError) {
-            console.error('Rule JSON parse error:', parseError, 'rule:', rule);
-            // パースエラーの場合はデフォルトルールを使用
+            const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+            return parsed;
+        } catch (e) {
+            console.error('Rule parse error:', e, raw);
         }
     }
     
     // デフォルトルール（30分に1回）
-    const defaultRule = {
-        intervalSeconds: 1800, // 30分
-        maxPerDay: 1
-    };
-    
-    // デフォルトルールを保存
-    await kv.set(ruleKey, JSON.stringify(defaultRule));
-    
+    const defaultRule = { intervalSeconds: 1800, maxPerDay: 1 };
+    await kv.set(ruleKey, JSON.stringify(defaultRule)); // 文字列で保存に統一
     return defaultRule;
 }
 

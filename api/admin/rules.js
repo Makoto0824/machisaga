@@ -59,7 +59,7 @@ export default async function handler(req, res) {
             };
             
             const ruleKey = `rule:${shopId}`;
-            await kv.set(ruleKey, rule);
+            await kv.set(ruleKey, JSON.stringify(rule));
             
             return res.status(200).json({
                 success: true,
