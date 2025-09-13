@@ -705,7 +705,6 @@ async function executeCommand() {
     function showPopupBlockDialog(url) {
         const modal = document.getElementById('popup-block-modal');
         const urlInput = document.getElementById('blocked-url');
-        const copyBtn = document.getElementById('copy-url-btn');
         const openBtn = document.getElementById('open-url-btn');
         
         // URLを設定
@@ -713,26 +712,6 @@ async function executeCommand() {
         
         // ダイアログを表示
         modal.style.display = 'flex';
-        
-        // コピーボタンのイベント
-        copyBtn.onclick = async () => {
-            const success = await copyToClipboard(url);
-            if (success) {
-                copyBtn.textContent = '✅ コピー完了';
-                copyBtn.style.background = '#27ae60';
-                setTimeout(() => {
-                    copyBtn.textContent = '📋 コピー';
-                    copyBtn.style.background = '#3498db';
-                }, 2000);
-            } else {
-                copyBtn.textContent = '❌ コピー失敗';
-                copyBtn.style.background = '#e74c3c';
-                setTimeout(() => {
-                    copyBtn.textContent = '📋 コピー';
-                    copyBtn.style.background = '#3498db';
-                }, 2000);
-            }
-        };
         
         // URLを開くボタンのイベント
         openBtn.onclick = () => {
