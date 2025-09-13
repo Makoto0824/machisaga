@@ -54,7 +54,7 @@ export default async function handler(req, res) {
             }
             
             const rule = {
-                intervalSeconds: intervalSeconds || 7200, // デフォルト2時間
+                intervalSeconds: intervalSeconds !== undefined ? intervalSeconds : 7200, // デフォルト2時間
                 maxPerDay: maxPerDay !== undefined ? maxPerDay : 1 // 0も有効な値として扱う
             };
             
