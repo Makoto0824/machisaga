@@ -1145,13 +1145,14 @@
                 const response = await fetch(`${window.location.origin}/api/admin/rules`);
                 const data = await response.json();
                 
-                if (data.success && data.rules.kurofune) {
+                if (data.success && data.rules && data.rules.kurofune) {
                     const rule = data.rules.kurofune;
                     document.getElementById('intervalSeconds').value = rule.intervalSeconds;
                     document.getElementById('maxPerDay').value = rule.maxPerDay;
                     
                     showRulesResult('現在のルールを読み込みました', 'success');
                 } else {
+                    console.error('ルール読み込み失敗:', data);
                     showRulesResult('ルールが見つかりません', 'error');
                 }
             } catch (error) {
