@@ -1134,6 +1134,11 @@
         //     refreshStats();
         // }, 60000);
 
+        // ページ読み込み時にルールを自動読み込み
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCurrentRules();
+        });
+
         // アクセス制御ルール管理関数
         async function loadCurrentRules() {
             try {
