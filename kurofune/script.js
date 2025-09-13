@@ -37,14 +37,14 @@ async function checkAccessControl() {
         } else if (data.status === 'ok') {
             return true;
         } else {
-            showAccessErrorDialog(data.message);
+            showAccessErrorDialog(data.message, data.retryAt);
             return false;
         }
     } catch (error) {
         console.error('アクセス制御チェックエラー:', error);
         game.accessControl.status = 'error';
         game.accessControl.isChecked = true;
-        showAccessErrorDialog('サーバーエラーが発生しました');
+        showAccessErrorDialog('サーバーエラーが発生しました', game.accessControl.retryAt);
         return false;
     }
 }
@@ -72,7 +72,7 @@ function showAccessLockedDialog(retryAt) {
 }
 
 // アクセスエラーダイアログを表示
-function showAccessErrorDialog(message) {
+function showAccessErrorDialog(message, retryAt = null) {
     const modal = document.getElementById('popup-block-modal');
     const modalContent = modal.querySelector('.popup-block-content');
     const title = modalContent.querySelector('h3');
@@ -81,7 +81,15 @@ function showAccessErrorDialog(message) {
     
     // タイトルと説明文を変更
     title.innerHTML = 'アクセスエラー';
-    description.textContent = message;
+    
+    // リセット日時を含む説明文を作成
+    let descriptionText = message;
+    if (retryAt) {
+        const resetTime = formatRetryTime(retryAt);
+        descriptionText += `<br><br>リセット日時: <strong>${resetTime}</strong>`;
+    }
+    
+    description.innerHTML = descriptionText;
     
     // ボタンを非表示にする
     openBtn.style.display = 'none';
