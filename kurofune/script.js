@@ -704,9 +704,17 @@ async function executeMera() {
     if (url) {
         console.log(`🎯 ネコパンチ遷移開始: ${url}`);
         try {
-            // 即座にポップアップを開く（setTimeoutを削除）
-            window.open(url, '_blank');
-            console.log(`✅ ネコパンチ遷移完了: ${url}`);
+            // ポップアップを開く
+            const popup = window.open(url, '_blank');
+            
+            // ポップアップブロックを検出
+            if (popup) {
+                console.log(`✅ ネコパンチ遷移完了: ${url}`);
+            } else {
+                console.warn('⚠️ ポップアップがブロックされました');
+                // ユーザーに通知
+                alert('⚠️ ポップアップがブロックされました。\n\nブラウザの設定でポップアップを許可するか、以下のURLを手動で開いてください：\n\n' + url);
+            }
         } catch (error) {
             console.error('❌ ネコパンチ遷移エラー:', error);
         }
@@ -727,9 +735,17 @@ async function executeMerami() {
     if (url) {
         console.log(`🎯 メガローキック遷移開始: ${url}`);
         try {
-            // 即座にポップアップを開く（setTimeoutを削除）
-            window.open(url, '_blank');
-            console.log(`✅ メガローキック遷移完了: ${url}`);
+            // ポップアップを開く
+            const popup = window.open(url, '_blank');
+            
+            // ポップアップブロックを検出
+            if (popup) {
+                console.log(`✅ メガローキック遷移完了: ${url}`);
+            } else {
+                console.warn('⚠️ ポップアップがブロックされました');
+                // ユーザーに通知
+                alert('⚠️ ポップアップがブロックされました。\n\nブラウザの設定でポップアップを許可するか、以下のURLを手動で開いてください：\n\n' + url);
+            }
         } catch (error) {
             console.error('❌ メガローキック遷移エラー:', error);
         }
@@ -748,8 +764,17 @@ async function executeMerazoma() {
     const url = await getSingleUseURL(eventId);
     
     if (url) {
-        // 即座にポップアップを開く（setTimeoutを削除）
-        window.open(url, '_blank');
+        // ポップアップを開く
+        const popup = window.open(url, '_blank');
+        
+        // ポップアップブロックを検出
+        if (popup) {
+            console.log(`✅ ギガドヤストライク遷移完了: ${url}`);
+        } else {
+            console.warn('⚠️ ポップアップがブロックされました');
+            // ユーザーに通知
+            alert('⚠️ ポップアップがブロックされました。\n\nブラウザの設定でポップアップを許可するか、以下のURLを手動で開いてください：\n\n' + url);
+        }
     } else {
         console.error('ギガドヤストライクのURL取得に失敗しました');
     }
@@ -765,8 +790,17 @@ async function executeSeiken() {
     const url = await getSingleUseURL(eventId);
     
     if (url) {
-        // 即座にポップアップを開く（setTimeoutを削除）
-        window.open(url, '_blank');
+        // ポップアップを開く
+        const popup = window.open(url, '_blank');
+        
+        // ポップアップブロックを検出
+        if (popup) {
+            console.log(`✅ テラオーバーキル遷移完了: ${url}`);
+        } else {
+            console.warn('⚠️ ポップアップがブロックされました');
+            // ユーザーに通知
+            alert('⚠️ ポップアップがブロックされました。\n\nブラウザの設定でポップアップを許可するか、以下のURLを手動で開いてください：\n\n' + url);
+        }
     } else {
         console.error('テラオーバーキルのURL取得に失敗しました');
     }
@@ -782,8 +816,17 @@ async function executeKancho() {
     const url = await getSingleUseURL(eventId);
     
     if (url) {
-        // 即座にポップアップを開く（setTimeoutを削除）
-        window.open(url, '_blank');
+        // ポップアップを開く
+        const popup = window.open(url, '_blank');
+        
+        // ポップアップブロックを検出
+        if (popup) {
+            console.log(`✅ ペタインパクト　MUGEN遷移完了: ${url}`);
+        } else {
+            console.warn('⚠️ ポップアップがブロックされました');
+            // ユーザーに通知
+            alert('⚠️ ポップアップがブロックされました。\n\nブラウザの設定でポップアップを許可するか、以下のURLを手動で開いてください：\n\n' + url);
+        }
     } else {
         console.error('ペタインパクト　MUGENのURL取得に失敗しました');
     }
