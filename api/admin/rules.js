@@ -24,15 +24,7 @@ export default async function handler(req, res) {
             for (const shopId of shopIds) {
                 const ruleKey = `rule:${shopId}`;
                 const rule = await kv.get(ruleKey);
-                if (rule) {
-                    rules[shopId] = typeof rule === 'string' ? JSON.parse(rule) : rule;
-                } else {
-                    // デフォルトルールを返す
-                    rules[shopId] = {
-                        intervalSeconds: 7200, // 2時間
-                        maxPerDay: 1
-                    };
-                }
+                rules[shopId] = rule || { intervalSeconds: 7200, maxPerDay: 1 };
             }
             
             return res.status(200).json({
@@ -67,7 +59,7 @@ export default async function handler(req, res) {
             };
             
             const ruleKey = `rule:${shopId}`;
-            await kv.set(ruleKey, JSON.stringify(rule));
+            await kv.set(ruleKey, rule);
             
             return res.status(200).json({
                 success: true,
