@@ -399,7 +399,7 @@ const commandEventIds = {
 async function getSingleUseURL(eventId) {
     try {
         console.log(`🔍 URL取得開始: イベント${eventId}`);
-        const response = await fetch(`/api/test-kv?action=getNextURL&event=${eventId}`);
+        const response = await fetch(`${window.location.origin}/api/test-kv?action=getNextURL&event=${eventId}`);
         console.log(`📡 API応答:`, response.status, response.statusText);
         
         const data = await response.json();
