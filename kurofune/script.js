@@ -693,14 +693,12 @@ async function executeCommand() {
             // ローディング終了（再有効化はしない）
             hideLoading();
             
-            // 「つぎへ」ボタンを非表示にして、リンク設定と▶︎を削除
+            // 「つぎへ」ボタンを非表示にして、リンク設定を削除
             const nextButton = document.getElementById('next-button');
             if (nextButton) {
                 nextButton.style.display = 'none';
                 // リンク設定を削除
                 nextButton.onclick = null;
-                // ▶︎を削除（テキストを「開く」のみに）
-                nextButton.innerHTML = '開く';
             }
         }
     }
