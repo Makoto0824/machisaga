@@ -114,15 +114,22 @@
             font-size: 1rem;
             font-weight: bold;
             transition: all 0.3s ease;
-        }
-
-        .open-btn {
-            background: #27ae60;
+            background: transparent;
             color: white;
         }
 
         .open-btn:hover {
-            background: #229954;
+            background: transparent;
+        }
+
+        /* ▶︎の点滅アニメーション */
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        .blink-arrow {
+            animation: blink 1s infinite;
         }
 
         .popup-block-buttons {
@@ -230,7 +237,7 @@
                 <h3>⚠️ ポップアップが<br>ブロックされました</h3>
                 <p>ブラウザの設定でポップアップを許可するか、下記の「開く」ボタンからアクセスしてください。</p>
                 <div class="popup-block-buttons">
-                    <button class="open-btn" id="open-url-btn">▶︎開く</button>
+                    <button class="open-btn" id="open-url-btn"><span class="blink-arrow">▶︎</span>開く</button>
                 </div>
             </div>
         </div>
