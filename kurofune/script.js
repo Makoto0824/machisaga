@@ -695,10 +695,15 @@ async function executeCommand() {
             
             // 「つぎへ」ボタンを非表示にして、リンク設定を削除
             const nextButton = document.getElementById('next-button');
+            console.log('🔍 ボタン取得結果:', nextButton);
             if (nextButton) {
+                console.log('✅ ボタンを非表示にします');
                 nextButton.style.display = 'none';
                 // リンク設定を削除
                 nextButton.onclick = null;
+                console.log('✅ ボタン非表示完了');
+            } else {
+                console.log('❌ next-buttonが見つかりません');
             }
         }
     }
@@ -717,12 +722,7 @@ async function executeCommand() {
             modal.style.display = 'none';
         };
         
-        // モーダル外クリックで閉じる
-        modal.onclick = (e) => {
-            if (e.target === modal) {
-                modal.style.display = 'none';
-            }
-        };
+        // モーダル外クリックで閉じる処理を削除（ユーザー要求により）
     }
 
     // クリップボードにコピーする関数
