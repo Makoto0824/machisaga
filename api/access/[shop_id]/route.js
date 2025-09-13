@@ -1,48 +1,32 @@
+import { NextResponse } from 'next/server';
 import { kv } from '@vercel/kv';
 
 /**
- * 店舗ごとのアクセス制御API
+ * 店舗ごとのアクセス制御API (App Router)
  * パス: /api/access/[shop_id]
  * 例: /api/access/kurofune
  */
 
-export default async function handler(req, res) {
-    // CORS設定
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
-
-    if (req.method !== 'GET') {
-        return res.status(405).json({
-            status: 'error',
-            message: 'Method not allowed',
-            retryAt: null
-        });
-    }
-
+export async function GET(req, { params }) {
     try {
-        const { shop_id } = req.query;
+        const { shop_id } = params;
         
         if (!shop_id) {
-            return res.status(400).json({
+            return NextResponse.json({
                 status: 'error',
                 message: 'shop_id is required',
                 retryAt: null
-            });
+            }, { status: 400 });
         }
 
         // 1. ユーザーUUIDを取得または生成
-        const userUuid = await getUserUuid(req, res);
+        const userUuid = await getUserUuid(req);
         if (!userUuid) {
-            return res.status(500).json({
+            return NextResponse.json({
                 status: 'error',
                 message: 'Failed to get user UUID',
                 retryAt: null
-            });
+            }, { status: 500 });
         }
 
         // 2. 店舗ルールを取得
@@ -66,18 +50,36 @@ export default async function handler(req, res) {
             // アクセス履歴を保存（TTL設定）
             await kv.setex(accessKey, rule.intervalSeconds, JSON.stringify(newAccessHistory));
             
-            return res.status(200).json({
+            return NextResponse.json({
                 status: 'ok',
                 retryAt: new Date(nextAvailableAt * 1000).toISOString()
             });
             
         } else {
             // 既存アクセス - 制限チェック
-            const history = JSON.parse(accessHistory);
+            let history;
+            try {
+                history = typeof accessHistory === 'string' ? JSON.parse(accessHistory) : accessHistory;
+            } catch (parseError) {
+                console.error('JSON parse error:', parseError, 'accessHistory:', accessHistory);
+                // パースエラーの場合は初回アクセスとして扱う
+                const nextAvailableAt = now + rule.intervalSeconds;
+                const newAccessHistory = {
+                    nextAvailableAt: nextAvailableAt,
+                    lastAccessAt: now
+                };
+                
+                await kv.setex(accessKey, rule.intervalSeconds, JSON.stringify(newAccessHistory));
+                
+                return NextResponse.json({
+                    status: 'ok',
+                    retryAt: new Date(nextAvailableAt * 1000).toISOString()
+                });
+            }
             
             if (now < history.nextAvailableAt) {
                 // 制限中
-                return res.status(200).json({
+                return NextResponse.json({
                     status: 'locked',
                     retryAt: new Date(history.nextAvailableAt * 1000).toISOString()
                 });
@@ -92,7 +94,7 @@ export default async function handler(req, res) {
                 // アクセス履歴を更新（TTL更新）
                 await kv.setex(accessKey, rule.intervalSeconds, JSON.stringify(updatedHistory));
                 
-                return res.status(200).json({
+                return NextResponse.json({
                     status: 'ok',
                     retryAt: new Date(nextAvailableAt * 1000).toISOString()
                 });
@@ -101,20 +103,33 @@ export default async function handler(req, res) {
         
     } catch (error) {
         console.error('Access control error:', error);
-        return res.status(500).json({
+        return NextResponse.json({
             status: 'error',
-            message: 'Server error: ' + error.message,
+            message: error.message || 'Server error',
             retryAt: null
-        });
+        }, { status: 500 });
     }
+}
+
+export async function OPTIONS(req) {
+    return new NextResponse(null, {
+        status: 200,
+        headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type',
+        },
+    });
 }
 
 /**
  * ユーザーUUIDを取得または生成
  */
-async function getUserUuid(req, res) {
+async function getUserUuid(req) {
     // Cookieから取得を試行
-    const cookieUuid = req.cookies?.ms_uuid;
+    const cookies = req.cookies;
+    const cookieUuid = cookies?.get('ms_uuid')?.value;
+    
     if (cookieUuid) {
         return cookieUuid;
     }
@@ -122,10 +137,7 @@ async function getUserUuid(req, res) {
     // UUIDを生成
     const uuid = generateUUID();
     
-    // Cookieに設定
-    res.setHeader('Set-Cookie', `ms_uuid=${uuid}; Path=/; Max-Age=31536000; SameSite=Lax`);
-    
-    return uuid;
+    return uuid; // Cookie設定はNextResponseで行う
 }
 
 /**
@@ -136,7 +148,12 @@ async function getShopRule(shopId) {
     const rule = await kv.get(ruleKey);
     
     if (rule) {
-        return JSON.parse(rule);
+        try {
+            return typeof rule === 'string' ? JSON.parse(rule) : rule;
+        } catch (parseError) {
+            console.error('Rule JSON parse error:', parseError, 'rule:', rule);
+            // パースエラーの場合はデフォルトルールを使用
+        }
     }
     
     // デフォルトルール（30分に1回）
@@ -161,4 +178,3 @@ function generateUUID() {
         return v.toString(16);
     });
 }
-
