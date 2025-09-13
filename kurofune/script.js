@@ -24,19 +24,25 @@ let game = new GameState();
 // アクセス制御関連の関数
 async function checkAccessControl() {
     try {
+        console.log('🔍 アクセス制御チェック開始');
         const response = await fetch(`${window.location.origin}/api/access/kurofune`);
         const data = await response.json();
+        
+        console.log('📡 API応答:', data);
         
         game.accessControl.status = data.status;
         game.accessControl.retryAt = data.retryAt;
         game.accessControl.isChecked = true;
         
         if (data.status === 'locked') {
+            console.log('🔒 アクセス制限中:', data.retryAt);
             showAccessLockedDialog(data.retryAt);
             return false;
         } else if (data.status === 'ok') {
+            console.log('✅ アクセス許可');
             return true;
         } else {
+            console.log('❌ アクセスエラー:', data.message);
             showAccessErrorDialog(data.message, data.retryAt);
             return false;
         }
