@@ -1252,10 +1252,24 @@
             const resultDiv = document.getElementById('rulesResult');
             const contentDiv = document.getElementById('rulesResultContent');
             
-            contentDiv.innerHTML = `<div style="color: ${type === 'success' ? '#27ae60' : '#e74c3c'};">${message}</div>`;
+            if (type === 'error') {
+                contentDiv.innerHTML = `
+                    <div style="color: #e74c3c; display: flex; justify-content: space-between; align-items: center;">
+                        <span>${message}</span>
+                        <button onclick="document.getElementById('rulesResult').style.display='none'" style="background: #e74c3c; color: white; border: none; padding: 2px 8px; border-radius: 3px; cursor: pointer; font-size: 12px;">×</button>
+                    </div>
+                `;
+            } else {
+                contentDiv.innerHTML = `<div style="color: #27ae60;">${message}</div>`;
+            }
             resultDiv.style.display = 'block';
             
-            // 3秒後に非表示
+            // エラーの場合は自動非表示しない
+            if (type === 'error') {
+                return;
+            }
+            
+            // 成功メッセージのみ3秒後に非表示
             setTimeout(() => {
                 resultDiv.style.display = 'none';
             }, 3000);
