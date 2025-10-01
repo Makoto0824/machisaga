@@ -24,17 +24,30 @@ export default async function handler(req, res) {
     }
 
     try {
-        // GET: 未使用URLを取得してリダイレクト（一時的に無効化）
+        // GET: 統計情報や管理機能の取得
         if (req.method === 'GET') {
-            // GETリクエストを完全に無効化（デバッグ用）
-            return res.status(200).json({
-                success: false,
-                message: 'GETリクエストは一時的に無効化されています。POSTリクエストを使用してください。',
-                debug: {
-                    query: req.query,
-                    userAgent: req.headers['user-agent']
-                }
-            });
+            const { action } = req.query;
+            
+            switch (action) {
+                case 'stats':
+                    const stats = await kvURLManager.getStats();
+                    const recentUsage = await kvURLManager.getUsageHistory(10);
+                    const loadInfo = await kvURLManager.getCSVLoadInfo();
+                    
+                    return res.status(200).json({
+                        success: true,
+                        stats,
+                        recentUsage,
+                        loadInfo
+                    });
+                    
+                default:
+                    return res.status(400).json({
+                        success: false,
+                        error: '無効なアクション',
+                        availableActions: ['stats']
+                    });
+            }
             
             // 以下のコードは一時的にコメントアウト
             /*
