@@ -21,13 +21,26 @@ class GameState {
 // ゲームインスタンス
 let game = new GameState();
 
-// アクセス制御関連の関数
+// アクセス制御関連の関数（最適化版）
 async function checkAccessControl() {
     try {
         console.log('🔍 アクセス制御チェック開始');
-        const response = await fetch(`${window.location.origin}/api/access/kurofune`);
-        const data = await response.json();
         
+        // タイムアウト設定（5秒）
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        
+        const response = await fetch(`${window.location.origin}/api/access/kurofune`, {
+            signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
         console.log('📡 API応答:', data);
         
         game.accessControl.status = data.status;
@@ -50,6 +63,13 @@ async function checkAccessControl() {
         console.error('アクセス制御チェックエラー:', error);
         game.accessControl.status = 'error';
         game.accessControl.isChecked = true;
+        
+        // タイムアウトの場合は自動的にゲーム開始
+        if (error.name === 'AbortError') {
+            console.log('⏰ アクセス制御タイムアウト、ゲームを開始します');
+            return true;
+        }
+        
         showAccessErrorDialog('サーバーエラーが発生しました', game.accessControl.retryAt);
         return false;
     }
@@ -540,13 +560,23 @@ const commandEventIds = {
 async function getSingleUseURL(eventId) {
     try {
         console.log(`🔍 URL取得開始: イベント${eventId}`);
-        const response = await fetch(`${window.location.origin}/api/test-kv?action=getNextURL&event=${eventId}`);
-        console.log(`📡 API応答:`, response.status, response.statusText);
+        
+        // タイムアウト設定（10秒）
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        
+        const response = await fetch(`${window.location.origin}/api/test-kv?action=getNextURL&event=${eventId}`, {
+            signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
         
         const data = await response.json();
         console.log(`📊 APIデータ:`, data);
-        console.log(`📊 result:`, data.result);
-        console.log(`📊 nextURL:`, data.result?.nextURL);
         
         if (data.success && data.result && data.result.nextURL && data.result.nextURL.url) {
             const url = data.result.nextURL.url;
@@ -554,11 +584,16 @@ async function getSingleUseURL(eventId) {
             return url;
         } else {
             console.error('❌ URL取得エラー:', data);
-            console.error('❌ nextURL詳細:', data.result?.nextURL);
             return null;
         }
     } catch (error) {
         console.error('❌ URL取得エラー:', error);
+        
+        // タイムアウトの場合はエラーダイアログを表示
+        if (error.name === 'AbortError') {
+            showURLErrorDialog('URL取得がタイムアウトしました。しばらく待ってから再試行してください。');
+        }
+        
         return null;
     }
 }
@@ -1183,13 +1218,40 @@ function navigateCommands(key) {
     }
 }
 
-// ゲーム初期化
+// ローディング表示関数
+function showLoadingOverlay() {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+        overlay.style.display = 'flex';
+    }
+}
+
+function hideLoadingOverlay() {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+        overlay.style.display = 'none';
+    }
+}
+
+// ゲーム初期化（最適化版）
 document.addEventListener('DOMContentLoaded', async () => {
-    // アクセス制御をチェック
-    const hasAccess = await checkAccessControl();
+    // ローディング表示を開始
+    showLoadingOverlay();
     
-    if (hasAccess) {
-        // アクセス許可された場合のみゲームを初期化
-        initGame();
+    try {
+        // アクセス制御をチェック（タイムアウト付き）
+        const hasAccess = await checkAccessControl();
+        
+        if (hasAccess) {
+            // アクセス許可された場合のみゲームを初期化
+            await initGame();
+        }
+    } catch (error) {
+        console.error('ゲーム初期化エラー:', error);
+        // エラーが発生してもゲームを開始
+        await initGame();
+    } finally {
+        // ローディング表示を終了
+        hideLoadingOverlay();
     }
 });
