@@ -627,11 +627,11 @@
         let isAuthenticated = true; // 認証を無効化
         let currentPassword = 'admin'; // ダミーパスワード
 
-        // ページ読み込み時に自動でデータを取得
-        window.onload = function() {
-            showLoading('初期データを読み込み中...');
-            refreshStats();
-        };
+        // ページ読み込み時の自動統計更新を停止
+        // window.onload = function() {
+        //     showLoading('初期データを読み込み中...');
+        //     refreshStats();
+        // };
 
         // 統計データ更新
         function updateStats(stats, recentUsage = [], loadInfo = null) {
@@ -1237,10 +1237,10 @@
         //     refreshStats();
         // }, 60000);
 
-        // ページ読み込み時にルールを自動読み込み
-        document.addEventListener('DOMContentLoaded', () => {
-            loadCurrentRules();
-        });
+        // ページ読み込み時の自動ルール読み込みを停止
+        // document.addEventListener('DOMContentLoaded', () => {
+        //     loadCurrentRules();
+        // });
 
         // アクセス制御ルール管理関数
         async function loadCurrentRules() {
