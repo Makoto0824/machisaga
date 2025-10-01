@@ -49,8 +49,7 @@ export default async function handler(req, res) {
                     });
             }
             
-            // 以下のコードは一時的にコメントアウト
-            /*
+            // URL取得機能を復活
             const userId = req.query.userId || generateGuestId(req);
             const eventName = req.query.event || null;
             const availableURL = await kvURLManager.getNextAvailableURL(userId, eventName);
@@ -83,7 +82,6 @@ export default async function handler(req, res) {
                 message: `${availableURL.event}のイベントページにリダイレクトします`,
                 stats: await kvURLManager.getStats()
             });
-            */
         }
 
         // POST: 管理者機能（リセット、統計など）
