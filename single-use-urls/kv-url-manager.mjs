@@ -195,46 +195,66 @@ class KVURLManager {
                 // };
             }
 
-            // 全URLキーを取得
-            const urlKeys = await kv.keys('url:*');
-            console.log(`🔍 デバッグ: 全URLキー数 = ${urlKeys.length}`);
-            console.log(`🔍 デバッグ: 検索対象イベント = ${eventId}`);
-            console.log(`🔍 デバッグ: 最初の5個のキー = ${urlKeys.slice(0, 5)}`);
+            // イベント別キー取得（最適化）
+            let urlKeys;
+            if (eventId) {
+                // イベント別のキーパターンを試す
+                const eventPatterns = [
+                    `url:event_${eventId}_*`,
+                    `url:*_${eventId}_*`,
+                    `url:*_${eventId}*`
+                ];
+                
+                for (const pattern of eventPatterns) {
+                    urlKeys = await kv.keys(pattern);
+                    if (urlKeys.length > 0) {
+                        console.log(`🔍 最適化: パターン ${pattern} で ${urlKeys.length}個のキーを発見`);
+                        break;
+                    }
+                }
+                
+                // パターンマッチが失敗した場合は全キーから検索
+                if (!urlKeys || urlKeys.length === 0) {
+                    urlKeys = await kv.keys('url:*');
+                    console.log(`🔍 最適化: パターンマッチ失敗、全キー検索 (${urlKeys.length}個)`);
+                }
+            } else {
+                urlKeys = await kv.keys('url:*');
+                console.log(`🔍 最適化: 全イベント検索 (${urlKeys.length}個)`);
+            }
             
             let availableURL = null;
             let debugCount = 0;
             
-            // イベント別または全イベントから未使用URLを検索
-            for (const key of urlKeys) {
-                const urlData = await kv.get(key);
-                debugCount++;
+            // 並列処理でURLデータを取得（最適化）
+            const batchSize = 10; // バッチサイズを制限
+            for (let i = 0; i < urlKeys.length; i += batchSize) {
+                const batch = urlKeys.slice(i, i + batchSize);
+                const promises = batch.map(key => kv.get(key));
+                const results = await Promise.all(promises);
                 
-                if (!urlData) {
-                    console.log(`🔍 デバッグ: ${key} - データなし`);
-                    continue;
+                for (let j = 0; j < results.length; j++) {
+                    const urlData = results[j];
+                    debugCount++;
+                    
+                    if (!urlData) continue;
+                    
+                    if (urlData.used) continue;
+                    
+                    // eventIdが指定されている場合、文字列として比較
+                    if (eventId && String(urlData.event) !== String(eventId)) {
+                        continue;
+                    }
+                    
+                    availableURL = urlData;
+                    console.log(`✅ 最適化: 利用可能URL発見 = ${batch[j]} (${debugCount}個目)`);
+                    break;
                 }
                 
-                console.log(`🔍 デバッグ: ${key} - データ取得成功: event=${urlData.event}, used=${urlData.used}`);
-                
-                if (urlData.used) {
-                    console.log(`🔍 デバッグ: ${key} - 使用済み (${urlData.event})`);
-                    continue;
-                }
-                
-                console.log(`🔍 デバッグ: ${key} - 未使用 (${urlData.event})`);
-                
-                // eventIdが指定されている場合、文字列として比較
-                if (eventId && String(urlData.event) !== String(eventId)) {
-                    console.log(`🔍 デバッグ: ${key} - イベント不一致 (${urlData.event} !== ${eventId})`);
-                    continue;
-                }
-                
-                availableURL = urlData;
-                console.log(`✅ デバッグ: 利用可能URL発見 = ${key}`);
-                break;
+                if (availableURL) break;
             }
             
-            console.log(`🔍 デバッグ: 検索完了 - 処理したキー数 = ${debugCount}`);
+            console.log(`🔍 最適化: 検索完了 - 処理したキー数 = ${debugCount}`);
 
             if (!availableURL) {
                 console.log(`❌ 利用可能なURLがありません (イベント: ${eventId || '全イベント'})`);
