@@ -265,20 +265,87 @@ class KVURLManager {
                 return null;
             }
 
-            // 使用済みにマーク
+            // 使用済みにマーク（KVベース、確実）
             availableURL.used = true;
             availableURL.usedAt = new Date().toISOString();
             availableURL.usedBy = userId || 'anonymous';
 
-            // KVに保存
+            // KVに保存（確実な状態管理）
             await kv.set(`url:${availableURL.id}`, availableURL);
 
             console.log(`🎯 URL配布: ${availableURL.id} (${availableURL.event}) → ${userId || 'anonymous'}`);
+            console.log(`✅ KVベースの管理: 使用状態を確実に保存しました`);
             return availableURL;
 
         } catch (error) {
             console.error('❌ URL取得エラー:', error);
             return null;
+        }
+    }
+
+    /**
+     * 管理者機能: 特定のURL状態をリセット
+     */
+    async resetURLStatus(urlId) {
+        if (!this.isKVAvailable) {
+            console.log('❌ KVが利用できません');
+            return { error: 'KVが利用できません' };
+        }
+
+        try {
+            const urlData = await kv.get(`url:${urlId}`);
+            if (!urlData) {
+                return { error: 'URLが見つかりません' };
+            }
+            
+            // 使用状態をリセット
+            urlData.used = false;
+            urlData.usedAt = null;
+            urlData.usedBy = null;
+            
+            // KVに保存
+            await kv.set(`url:${urlId}`, urlData);
+            
+            console.log(`✅ URL状態をリセット: ${urlId}`);
+            return { success: true, message: 'URL状態をリセットしました' };
+            
+        } catch (error) {
+            console.error('❌ URL状態リセットエラー:', error);
+            return { error: error.message };
+        }
+    }
+
+    /**
+     * 管理者機能: 全URL状態をリセット
+     */
+    async resetAllURLs() {
+        if (!this.isKVAvailable) {
+            console.log('❌ KVが利用できません');
+            return { error: 'KVが利用できません' };
+        }
+
+        try {
+            const urlKeys = await kv.keys('url:*');
+            let resetCount = 0;
+            
+            for (const key of urlKeys) {
+                const urlData = await kv.get(key);
+                if (urlData && urlData.used) {
+                    urlData.used = false;
+                    urlData.usedAt = null;
+                    urlData.usedBy = null;
+                    
+                    await kv.set(key, urlData);
+                    resetCount++;
+                }
+            }
+            
+            console.log(`✅ 全URL状態をリセット: ${resetCount}個`);
+            return { success: true, resetCount, message: `${resetCount}個のURL状態をリセットしました` };
+            
+        } catch (error) {
+            console.error('❌ 全URL状態リセットエラー:', error);
+            return { error: error.message };
         }
     }
 

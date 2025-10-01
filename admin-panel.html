@@ -575,6 +575,19 @@
                     <div id="testResultContent"></div>
                 </div>
             </div>
+
+            <!-- KVベース管理機能セクション -->
+            <div class="form-group" style="margin-top: 2rem;">
+                <h4>🔧 KVベース管理機能</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                    <button class="button" onclick="resetAllURLs()" style="background: #e74c3c; color: white;">全URL状態をリセット</button>
+                    <button class="button" onclick="showKVStatus()" style="background: #3498db; color: white;">KV状態を確認</button>
+                </div>
+                <div id="kvStatusResult" style="margin-top: 1rem; padding: 1rem; background: rgba(255, 255, 255, 0.1); border-radius: 5px; display: none;">
+                    <h5>KV状態:</h5>
+                    <div id="kvStatusContent"></div>
+                </div>
+            </div>
                     
                     
                     <div class="form-group" style="margin-top: 2rem;">
@@ -1036,6 +1049,96 @@
                     success: false,
                     error: error.message
                 };
+            }
+        }
+
+        // KVベース管理機能
+        async function resetAllURLs() {
+            const resultDiv = document.getElementById('kvStatusResult');
+            const contentDiv = document.getElementById('kvStatusContent');
+            
+            contentDiv.innerHTML = '<div style="color: #f39c12;">全URL状態をリセット中...</div>';
+            resultDiv.style.display = 'block';
+            
+            try {
+                const response = await fetch('/api/single-use-redirect?action=resetAllURLs', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    contentDiv.innerHTML = `
+                        <div style="color: #27ae60;">
+                            <strong>✅ リセット完了</strong><br>
+                            リセット数: ${data.resetCount}個<br>
+                            メッセージ: ${data.message}
+                        </div>
+                    `;
+                    // 統計を更新
+                    refreshStats();
+                } else {
+                    contentDiv.innerHTML = `
+                        <div style="color: #e74c3c;">
+                            <strong>❌ リセット失敗</strong><br>
+                            エラー: ${data.error}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                contentDiv.innerHTML = `
+                    <div style="color: #e74c3c;">
+                        <strong>❌ エラー</strong><br>
+                        エラー: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        async function showKVStatus() {
+            const resultDiv = document.getElementById('kvStatusResult');
+            const contentDiv = document.getElementById('kvStatusContent');
+            
+            contentDiv.innerHTML = '<div style="color: #f39c12;">KV状態を確認中...</div>';
+            resultDiv.style.display = 'block';
+            
+            try {
+                const response = await fetch('/api/single-use-redirect?action=stats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const stats = data.stats;
+                    contentDiv.innerHTML = `
+                        <div style="color: #27ae60;">
+                            <strong>✅ KV状態確認完了</strong><br>
+                            総URL数: ${stats.total}個<br>
+                            使用済み: ${stats.used}個<br>
+                            利用可能: ${stats.available}個<br>
+                            使用率: ${stats.usedRate}%<br><br>
+                            <strong>イベント別統計:</strong><br>
+                            ${Object.entries(stats.eventStats).map(([event, eventStats]) => 
+                                `イベント${event}: ${eventStats.used}/${eventStats.total}個 (${((eventStats.used / eventStats.total) * 100).toFixed(1)}%)`
+                            ).join('<br>')}
+                        </div>
+                    `;
+                } else {
+                    contentDiv.innerHTML = `
+                        <div style="color: #e74c3c;">
+                            <strong>❌ 確認失敗</strong><br>
+                            エラー: ${data.error}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                contentDiv.innerHTML = `
+                    <div style="color: #e74c3c;">
+                        <strong>❌ エラー</strong><br>
+                        エラー: ${error.message}
+                    </div>
+                `;
             }
         }
 

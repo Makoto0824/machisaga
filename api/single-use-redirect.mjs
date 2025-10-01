@@ -94,6 +94,17 @@ export default async function handler(req, res) {
                     });
                     break;
 
+                case 'resetAllURLs':
+                    // 全URL状態をリセット
+                    const resetResult = await kvURLManager.resetAllURLs();
+                    res.status(200).json({
+                        success: resetResult.success || false,
+                        resetCount: resetResult.resetCount || 0,
+                        message: resetResult.message || 'リセット完了',
+                        timestamp: new Date().toISOString()
+                    });
+                    break;
+
                 case 'reset':
                     if (urlId) {
                         const result = await kvURLManager.resetURL(urlId);
