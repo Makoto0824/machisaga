@@ -15,6 +15,8 @@ class KVURLManager {
     constructor() {
         this.csvFile = path.join(__dirname, 'tnt-urls.csv');
         this.isKVAvailable = false;
+        this.urlCache = new Map(); // URLキャッシュ
+        this.cacheExpiry = 30000; // 30秒でキャッシュ期限切れ
         this.initializeKV();
     }
 
@@ -226,32 +228,54 @@ class KVURLManager {
             let availableURL = null;
             let debugCount = 0;
             
-            // 並列処理でURLデータを取得（最適化）
-            const batchSize = 10; // バッチサイズを制限
-            for (let i = 0; i < urlKeys.length; i += batchSize) {
-                const batch = urlKeys.slice(i, i + batchSize);
-                const promises = batch.map(key => kv.get(key));
-                const results = await Promise.all(promises);
+            // キャッシュから利用可能URLを検索
+            const cacheKey = `available_${eventId || 'all'}`;
+            const cached = this.urlCache.get(cacheKey);
+            if (cached && Date.now() - cached.timestamp < this.cacheExpiry) {
+                console.log(`🚀 キャッシュヒット: ${cached.urls.length}個の利用可能URL`);
+                if (cached.urls.length > 0) {
+                    availableURL = cached.urls[0];
+                    console.log(`✅ キャッシュ: 利用可能URL発見 = ${availableURL.id}`);
+                }
+            } else {
+                // 並列処理でURLデータを取得（最適化）
+                const batchSize = 20; // バッチサイズを増加
+                const availableURLs = [];
                 
-                for (let j = 0; j < results.length; j++) {
-                    const urlData = results[j];
-                    debugCount++;
+                for (let i = 0; i < urlKeys.length; i += batchSize) {
+                    const batch = urlKeys.slice(i, i + batchSize);
+                    const promises = batch.map(key => kv.get(key));
+                    const results = await Promise.all(promises);
                     
-                    if (!urlData) continue;
-                    
-                    if (urlData.used) continue;
-                    
-                    // eventIdが指定されている場合、文字列として比較
-                    if (eventId && String(urlData.event) !== String(eventId)) {
-                        continue;
+                    for (let j = 0; j < results.length; j++) {
+                        const urlData = results[j];
+                        debugCount++;
+                        
+                        if (!urlData) continue;
+                        
+                        if (urlData.used) continue;
+                        
+                        // eventIdが指定されている場合、文字列として比較
+                        if (eventId && String(urlData.event) !== String(eventId)) {
+                            continue;
+                        }
+                        
+                        availableURLs.push(urlData);
                     }
                     
-                    availableURL = urlData;
-                    console.log(`✅ 最適化: 利用可能URL発見 = ${batch[j]} (${debugCount}個目)`);
-                    break;
+                    if (availableURLs.length > 0) break;
                 }
                 
-                if (availableURL) break;
+                // キャッシュに保存
+                this.urlCache.set(cacheKey, {
+                    urls: availableURLs,
+                    timestamp: Date.now()
+                });
+                
+                if (availableURLs.length > 0) {
+                    availableURL = availableURLs[0];
+                    console.log(`✅ 最適化: 利用可能URL発見 = ${availableURL.id} (${availableURLs.length}個中)`);
+                }
             }
             
             console.log(`🔍 最適化: 検索完了 - 処理したキー数 = ${debugCount}`);
