@@ -79,7 +79,10 @@ class KVURLManager {
             for (const line of urlLines) {
                 const [id, event, url, description] = line.split(',').map(item => item.trim().replace(/"/g, ''));
                 
-                if (!url || !url.startsWith('http')) continue;
+                if (!url || !url.startsWith('http')) {
+                    console.log(`⚠️ スキップ: ${line.substring(0, 50)}...`);
+                    continue;
+                }
 
                 const urlData = {
                     id: id || `url_${loadedCount + 1}`,
@@ -111,6 +114,7 @@ class KVURLManager {
                 }
 
                 loadedCount++;
+                console.log(`📝 読み込み中: ${loadedCount}/${urlLines.length} - ${urlData.id}`);
             }
 
             // 重複チェック結果をログ出力
