@@ -444,7 +444,6 @@ function showLoadingIndicator(message) {
         text-align: center;
     `;
     loadingDiv.innerHTML = `
-        <div style="margin-bottom: 10px;">⏳</div>
         <div>${message}</div>
     `;
     document.body.appendChild(loadingDiv);
@@ -605,7 +604,7 @@ async function getSingleUseURL(eventId, showLoading = true) {
     
     // ローディング表示
     if (showLoading) {
-        showLoadingIndicator('URL取得中...');
+        showLoadingIndicator('よみこみ中...');
     }
     
     try {
