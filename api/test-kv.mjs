@@ -89,6 +89,10 @@ export default async function handler(req, res) {
                 console.log(`🔍 API: getNextURL called with eventId=${eventId}`);
                 
                 try {
+                    // まず統計を確認
+                    const stats = await kvURLManager.getStats();
+                    console.log(`🔍 API: Current stats:`, stats);
+                    
                     const nextURL = await kvURLManager.getNextAvailableURL(null, eventId);
                     console.log(`🔍 API: getNextAvailableURL result:`, nextURL);
                     
@@ -97,7 +101,8 @@ export default async function handler(req, res) {
                         action: 'getNextURL',
                         result: { 
                             nextURL,
-                            eventId: eventId || 'all'
+                            eventId: eventId || 'all',
+                            stats: stats
                         },
                         timestamp: new Date().toISOString()
                     });
