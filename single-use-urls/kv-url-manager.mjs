@@ -80,6 +80,12 @@ class KVURLManager {
             };
 
             for (const line of urlLines) {
+                // ヘッダー行をスキップ
+                if (line.startsWith('ID,Event,URL,Description')) {
+                    console.log(`📝 ヘッダー行をスキップ: ${line}`);
+                    continue;
+                }
+                
                 const [id, event, url, description] = line.split(',').map(item => item.trim().replace(/"/g, ''));
                 
                 if (!url || !url.startsWith('http')) {
