@@ -197,85 +197,44 @@ class KVURLManager {
                 // };
             }
 
-            // イベント別キー取得（最適化）
-            let urlKeys;
-            if (eventId) {
-                // イベント別のキーパターンを試す
-                const eventPatterns = [
-                    `url:event_${eventId}_*`,
-                    `url:*_${eventId}_*`,
-                    `url:*_${eventId}*`
-                ];
-                
-                for (const pattern of eventPatterns) {
-                    urlKeys = await kv.keys(pattern);
-                    if (urlKeys.length > 0) {
-                        console.log(`🔍 最適化: パターン ${pattern} で ${urlKeys.length}個のキーを発見`);
-                        break;
-                    }
-                }
-                
-                // パターンマッチが失敗した場合は全キーから検索
-                if (!urlKeys || urlKeys.length === 0) {
-                    urlKeys = await kv.keys('url:*');
-                    console.log(`🔍 最適化: パターンマッチ失敗、全キー検索 (${urlKeys.length}個)`);
-                }
-            } else {
-                urlKeys = await kv.keys('url:*');
-                console.log(`🔍 最適化: 全イベント検索 (${urlKeys.length}個)`);
-            }
+            // 全URLキーを取得（安全な方法に戻す）
+            const urlKeys = await kv.keys('url:*');
+            console.log(`🔍 修正: 全URLキー数 = ${urlKeys.length}`);
             
             let availableURL = null;
             let debugCount = 0;
             
-            // キャッシュから利用可能URLを検索
-            const cacheKey = `available_${eventId || 'all'}`;
-            const cached = this.urlCache.get(cacheKey);
-            if (cached && Date.now() - cached.timestamp < this.cacheExpiry) {
-                console.log(`🚀 キャッシュヒット: ${cached.urls.length}個の利用可能URL`);
-                if (cached.urls.length > 0) {
-                    availableURL = cached.urls[0];
-                    console.log(`✅ キャッシュ: 利用可能URL発見 = ${availableURL.id}`);
-                }
-            } else {
-                // 並列処理でURLデータを取得（最適化）
-                const batchSize = 20; // バッチサイズを増加
-                const availableURLs = [];
+            // 並列処理でURLデータを取得（修正版）
+            const batchSize = 20;
+            const availableURLs = [];
+            
+            for (let i = 0; i < urlKeys.length; i += batchSize) {
+                const batch = urlKeys.slice(i, i + batchSize);
+                const promises = batch.map(key => kv.get(key));
+                const results = await Promise.all(promises);
                 
-                for (let i = 0; i < urlKeys.length; i += batchSize) {
-                    const batch = urlKeys.slice(i, i + batchSize);
-                    const promises = batch.map(key => kv.get(key));
-                    const results = await Promise.all(promises);
+                for (let j = 0; j < results.length; j++) {
+                    const urlData = results[j];
+                    debugCount++;
                     
-                    for (let j = 0; j < results.length; j++) {
-                        const urlData = results[j];
-                        debugCount++;
-                        
-                        if (!urlData) continue;
-                        
-                        if (urlData.used) continue;
-                        
-                        // eventIdが指定されている場合、文字列として比較
-                        if (eventId && String(urlData.event) !== String(eventId)) {
-                            continue;
-                        }
-                        
-                        availableURLs.push(urlData);
+                    if (!urlData) continue;
+                    
+                    if (urlData.used) continue;
+                    
+                    // eventIdが指定されている場合、文字列として比較
+                    if (eventId && String(urlData.event) !== String(eventId)) {
+                        continue;
                     }
                     
-                    if (availableURLs.length > 0) break;
+                    availableURLs.push(urlData);
                 }
                 
-                // キャッシュに保存
-                this.urlCache.set(cacheKey, {
-                    urls: availableURLs,
-                    timestamp: Date.now()
-                });
-                
-                if (availableURLs.length > 0) {
-                    availableURL = availableURLs[0];
-                    console.log(`✅ 最適化: 利用可能URL発見 = ${availableURL.id} (${availableURLs.length}個中)`);
-                }
+                if (availableURLs.length > 0) break;
+            }
+            
+            if (availableURLs.length > 0) {
+                availableURL = availableURLs[0];
+                console.log(`✅ 修正: 利用可能URL発見 = ${availableURL.id} (${availableURLs.length}個中)`);
             }
             
             console.log(`🔍 最適化: 検索完了 - 処理したキー数 = ${debugCount}`);
