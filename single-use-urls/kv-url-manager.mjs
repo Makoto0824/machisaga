@@ -195,6 +195,7 @@ class KVURLManager {
             const urlKeys = await kv.keys('url:*');
             console.log(`🔍 デバッグ: 全URLキー数 = ${urlKeys.length}`);
             console.log(`🔍 デバッグ: 検索対象イベント = ${eventId}`);
+            console.log(`🔍 デバッグ: 最初の5個のキー = ${urlKeys.slice(0, 5)}`);
             
             let availableURL = null;
             let debugCount = 0;
@@ -208,6 +209,8 @@ class KVURLManager {
                     console.log(`🔍 デバッグ: ${key} - データなし`);
                     continue;
                 }
+                
+                console.log(`🔍 デバッグ: ${key} - データ取得成功: event=${urlData.event}, used=${urlData.used}`);
                 
                 if (urlData.used) {
                     console.log(`🔍 デバッグ: ${key} - 使用済み (${urlData.event})`);
