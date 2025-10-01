@@ -30,8 +30,14 @@ class KVURLManager {
             this.isKVAvailable = true;
             console.log('✅ Vercel KV接続成功');
             
-            // 初期データの読み込み
-            await this.loadFromCSV();
+            // 初期データの読み込み（KVが空の場合のみ）
+            const existingKeys = await kv.keys('url:*');
+            if (existingKeys.length === 0) {
+                console.log('🔄 KVが空のため、CSVから自動読み込みを開始...');
+                await this.loadFromCSV();
+            } else {
+                console.log(`📊 KVに${existingKeys.length}個のURLが保存済み`);
+            }
         } catch (error) {
             console.warn('⚠️ Vercel KV接続失敗:', error.message);
             this.isKVAvailable = false;
