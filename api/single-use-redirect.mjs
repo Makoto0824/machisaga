@@ -26,61 +26,72 @@ export default async function handler(req, res) {
     try {
         // GET: 統計情報や管理機能の取得
         if (req.method === 'GET') {
-            const { action } = req.query;
+            const { action, event } = req.query;
             
-            switch (action) {
-                case 'stats':
-                    const stats = await kvURLManager.getStats();
-                    const recentUsage = await kvURLManager.getUsageHistory(10);
-                    const loadInfo = await kvURLManager.getCSVLoadInfo();
-                    
-                    return res.status(200).json({
-                        success: true,
-                        stats,
-                        recentUsage,
-                        loadInfo
-                    });
-                    
-                default:
-                    return res.status(400).json({
+            // eventパラメータがある場合はURL取得
+            if (event) {
+                const userId = req.query.userId || generateGuestId(req);
+                const availableURL = await kvURLManager.getNextAvailableURL(userId, event);
+                
+                if (!availableURL) {
+                    const eventMessage = `イベント${event}の`;
+                    return res.status(410).json({
                         success: false,
-                        error: '無効なアクション',
-                        availableActions: ['stats']
+                        error: `${eventMessage}すべてのURLが使用済みです`,
+                        message: 'イベントの募集は終了しました。次回の開催をお待ちください。',
+                        stats: await kvURLManager.getStats()
                     });
-            }
-            
-            // URL取得機能を復活
-            const userId = req.query.userId || generateGuestId(req);
-            const eventName = req.query.event || null;
-            const availableURL = await kvURLManager.getNextAvailableURL(userId, eventName);
+                }
 
-            if (!availableURL) {
-                const eventMessage = eventName ? `イベント${eventName}の` : '';
-                return res.status(410).json({
-                    success: false,
-                    error: `${eventMessage}すべてのURLが使用済みです`,
-                    message: 'イベントの募集は終了しました。次回の開催をお待ちください。',
+                // 直接リダイレクト
+                if (req.query.redirect === 'true') {
+                    console.log(`🎯 直接リダイレクト: ${availableURL.url} (${availableURL.event})`);
+                    res.writeHead(302, { 'Location': availableURL.url });
+                    res.end();
+                    return;
+                }
+
+                // URL情報を返す
+                return res.status(200).json({
+                    success: true,
+                    url: availableURL.url,
+                    urlId: availableURL.id,
+                    event: availableURL.event,
+                    description: availableURL.description,
+                    message: `${availableURL.event}のイベントページにリダイレクトします`,
                     stats: await kvURLManager.getStats()
                 });
             }
-
-            // 直接リダイレクト
-            if (req.query.redirect === 'true') {
-                console.log(`🎯 直接リダイレクト: ${availableURL.url} (${availableURL.event})`);
-                res.writeHead(302, { 'Location': availableURL.url });
-                res.end();
-                return;
+            
+            // actionパラメータがある場合は統計情報取得
+            if (action) {
+                switch (action) {
+                    case 'stats':
+                        const stats = await kvURLManager.getStats();
+                        const recentUsage = await kvURLManager.getUsageHistory(10);
+                        const loadInfo = await kvURLManager.getCSVLoadInfo();
+                        
+                        return res.status(200).json({
+                            success: true,
+                            stats,
+                            recentUsage,
+                            loadInfo
+                        });
+                        
+                    default:
+                        return res.status(400).json({
+                            success: false,
+                            error: '無効なアクション',
+                            availableActions: ['stats']
+                        });
+                }
             }
-
-            // URL情報を返す
-            res.status(200).json({
-                success: true,
-                url: availableURL.url,
-                urlId: availableURL.id,
-                event: availableURL.event,
-                description: availableURL.description,
-                message: `${availableURL.event}のイベントページにリダイレクトします`,
-                stats: await kvURLManager.getStats()
+            
+            // パラメータがない場合はエラー
+            return res.status(400).json({
+                success: false,
+                error: 'パラメータが必要です',
+                availableParams: ['event', 'action']
             });
         }
 
