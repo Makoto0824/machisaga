@@ -21,26 +21,13 @@ class GameState {
 // ゲームインスタンス
 let game = new GameState();
 
-// アクセス制御関連の関数（最適化版）
+// アクセス制御関連の関数
 async function checkAccessControl() {
     try {
         console.log('🔍 アクセス制御チェック開始');
-        
-        // タイムアウト設定（5秒）
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
-        
-        const response = await fetch(`${window.location.origin}/api/access/kurofune`, {
-            signal: controller.signal
-        });
-        
-        clearTimeout(timeoutId);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        
+        const response = await fetch(`${window.location.origin}/api/access/kurofune`);
         const data = await response.json();
+        
         console.log('📡 API応答:', data);
         
         game.accessControl.status = data.status;
@@ -63,13 +50,6 @@ async function checkAccessControl() {
         console.error('アクセス制御チェックエラー:', error);
         game.accessControl.status = 'error';
         game.accessControl.isChecked = true;
-        
-        // タイムアウトの場合は自動的にゲーム開始
-        if (error.name === 'AbortError') {
-            console.log('⏰ アクセス制御タイムアウト、ゲームを開始します');
-            return true;
-        }
-        
         showAccessErrorDialog('サーバーエラーが発生しました', game.accessControl.retryAt);
         return false;
     }
@@ -442,6 +422,59 @@ function preloadDamageVideo() {
     }, { once: true });
 }
 
+// ローディング表示関数
+function showLoadingIndicator(message) {
+    // 既存のローディングを削除
+    hideLoadingIndicator();
+    
+    const loadingDiv = document.createElement('div');
+    loadingDiv.id = 'url-loading';
+    loadingDiv.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        z-index: 10000;
+        font-family: 'DotGothic16', monospace;
+        font-size: 16px;
+        text-align: center;
+    `;
+    loadingDiv.innerHTML = `
+        <div style="margin-bottom: 10px;">⏳</div>
+        <div>${message}</div>
+    `;
+    document.body.appendChild(loadingDiv);
+}
+
+function hideLoadingIndicator() {
+    const loadingDiv = document.getElementById('url-loading');
+    if (loadingDiv) {
+        loadingDiv.remove();
+    }
+}
+
+// URLプリロード機能
+async function preloadURLs() {
+    console.log('🚀 URLプリロード開始');
+    const eventIds = ['242', '243', '244', '245', '246'];
+    
+    // 並列でURLを取得（ローディング表示なし）
+    const promises = eventIds.map(eventId => getSingleUseURL(eventId, false));
+    const results = await Promise.all(promises);
+    
+    console.log('✅ URLプリロード完了:', results.filter(url => url !== null).length, '個のURLを取得');
+}
+
+// ページ読み込み時にURLをプリロード
+document.addEventListener('DOMContentLoaded', () => {
+    // 少し遅延してからプリロード（ページ読み込みを優先）
+    setTimeout(preloadURLs, 2000);
+});
+
 // 戦闘開始（ユーザークリック時）
 function startBattle() {
     // 最初のクリックでエンカウンター演出開始
@@ -556,44 +589,68 @@ const commandEventIds = {
     'kancho': '246'     // ペタインパクト　MUGEN
 };
 
-// 使い切りURL取得関数
-async function getSingleUseURL(eventId) {
+// URLキャッシュ管理
+const urlCache = new Map();
+const CACHE_DURATION = 30000; // 30秒
+
+// 使い切りURL取得関数（最適化版）
+async function getSingleUseURL(eventId, showLoading = true) {
+    // キャッシュチェック
+    const cacheKey = `url_${eventId}`;
+    const cached = urlCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+        console.log(`🚀 キャッシュヒット: イベント${eventId}`);
+        return cached.url;
+    }
+    
+    // ローディング表示
+    if (showLoading) {
+        showLoadingIndicator('URL取得中...');
+    }
+    
     try {
         console.log(`🔍 URL取得開始: イベント${eventId}`);
+        const startTime = Date.now();
         
-        // タイムアウト設定（10秒）
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
-        
-        const response = await fetch(`${window.location.origin}/api/test-kv?action=getNextURL&event=${eventId}`, {
-            signal: controller.signal
-        });
-        
-        clearTimeout(timeoutId);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
+        const response = await fetch(`${window.location.origin}/api/test-kv?action=getNextURL&event=${eventId}`);
+        console.log(`📡 API応答:`, response.status, response.statusText);
         
         const data = await response.json();
         console.log(`📊 APIデータ:`, data);
+        console.log(`📊 result:`, data.result);
+        console.log(`📊 nextURL:`, data.result?.nextURL);
+        
+        const duration = Date.now() - startTime;
+        console.log(`⏱️ URL取得時間: ${duration}ms`);
         
         if (data.success && data.result && data.result.nextURL && data.result.nextURL.url) {
             const url = data.result.nextURL.url;
             console.log(`✅ URL取得成功:`, url);
+            
+            // キャッシュに保存
+            urlCache.set(cacheKey, {
+                url: url,
+                timestamp: Date.now()
+            });
+            
+            if (showLoading) {
+                hideLoadingIndicator();
+            }
+            
             return url;
         } else {
             console.error('❌ URL取得エラー:', data);
+            console.error('❌ nextURL詳細:', data.result?.nextURL);
+            if (showLoading) {
+                hideLoadingIndicator();
+            }
             return null;
         }
     } catch (error) {
         console.error('❌ URL取得エラー:', error);
-        
-        // タイムアウトの場合はエラーダイアログを表示
-        if (error.name === 'AbortError') {
-            showURLErrorDialog('URL取得がタイムアウトしました。しばらく待ってから再試行してください。');
+        if (showLoading) {
+            hideLoadingIndicator();
         }
-        
         return null;
     }
 }
@@ -1218,40 +1275,13 @@ function navigateCommands(key) {
     }
 }
 
-// ローディング表示関数
-function showLoadingOverlay() {
-    const overlay = document.getElementById('loading-overlay');
-    if (overlay) {
-        overlay.style.display = 'flex';
-    }
-}
-
-function hideLoadingOverlay() {
-    const overlay = document.getElementById('loading-overlay');
-    if (overlay) {
-        overlay.style.display = 'none';
-    }
-}
-
-// ゲーム初期化（最適化版）
+// ゲーム初期化
 document.addEventListener('DOMContentLoaded', async () => {
-    // ローディング表示を開始
-    showLoadingOverlay();
+    // アクセス制御をチェック
+    const hasAccess = await checkAccessControl();
     
-    try {
-        // アクセス制御をチェック（タイムアウト付き）
-        const hasAccess = await checkAccessControl();
-        
-        if (hasAccess) {
-            // アクセス許可された場合のみゲームを初期化
-            await initGame();
-        }
-    } catch (error) {
-        console.error('ゲーム初期化エラー:', error);
-        // エラーが発生してもゲームを開始
-        await initGame();
-    } finally {
-        // ローディング表示を終了
-        hideLoadingOverlay();
+    if (hasAccess) {
+        // アクセス許可された場合のみゲームを初期化
+        initGame();
     }
 });
