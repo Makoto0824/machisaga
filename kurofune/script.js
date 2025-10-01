@@ -612,19 +612,19 @@ async function getSingleUseURL(eventId, showLoading = true) {
         console.log(`🔍 URL取得開始: イベント${eventId}`);
         const startTime = Date.now();
         
-        const response = await fetch(`${window.location.origin}/api/test-kv?action=getNextURL&event=${eventId}`);
+        const response = await fetch(`${window.location.origin}/api/single-use-redirect?event=${eventId}`);
         console.log(`📡 API応答:`, response.status, response.statusText);
         
         const data = await response.json();
         console.log(`📊 APIデータ:`, data);
-        console.log(`📊 result:`, data.result);
-        console.log(`📊 nextURL:`, data.result?.nextURL);
+        console.log(`📊 URL:`, data.url);
+        console.log(`📊 event:`, data.event);
         
         const duration = Date.now() - startTime;
         console.log(`⏱️ URL取得時間: ${duration}ms`);
         
-        if (data.success && data.result && data.result.nextURL && data.result.nextURL.url) {
-            const url = data.result.nextURL.url;
+        if (data.success && data.url) {
+            const url = data.url;
             console.log(`✅ URL取得成功:`, url);
             
             // キャッシュに保存（一時的に無効化）
