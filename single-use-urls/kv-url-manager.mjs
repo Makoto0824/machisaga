@@ -52,6 +52,7 @@ class KVURLManager {
 
             console.log(`📄 CSVから${urlLines.length}個のURLを読み込み中...`);
             console.log(`📄 CSV内容: ${csvContent.substring(0, 200)}...`);
+            console.log(`🔍 KV接続状況: ${this.isKVAvailable ? '利用可能' : '利用不可'}`);
 
             // 既存のURLデータをクリア
             if (this.isKVAvailable) {
@@ -111,6 +112,9 @@ class KVURLManager {
                 // KVに保存（既存データを上書き）
                 if (this.isKVAvailable) {
                     await kv.set(`url:${urlData.id}`, urlData);
+                    console.log(`💾 KV保存成功: ${urlData.id} (${urlData.event})`);
+                } else {
+                    console.warn(`⚠️ KV利用不可のため保存スキップ: ${urlData.id}`);
                 }
 
                 loadedCount++;
