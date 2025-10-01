@@ -469,11 +469,11 @@ async function preloadURLs() {
     console.log('✅ URLプリロード完了:', results.filter(url => url !== null).length, '個のURLを取得');
 }
 
-// ページ読み込み時にURLをプリロード
-document.addEventListener('DOMContentLoaded', () => {
-    // 少し遅延してからプリロード（ページ読み込みを優先）
-    setTimeout(preloadURLs, 2000);
-});
+// ページ読み込み時にURLをプリロード（一時的に無効化）
+// document.addEventListener('DOMContentLoaded', () => {
+//     // 少し遅延してからプリロード（ページ読み込みを優先）
+//     setTimeout(preloadURLs, 2000);
+// });
 
 // 戦闘開始（ユーザークリック時）
 function startBattle() {
@@ -593,15 +593,15 @@ const commandEventIds = {
 const urlCache = new Map();
 const CACHE_DURATION = 30000; // 30秒
 
-// 使い切りURL取得関数（最適化版）
+// 使い切りURL取得関数（修正版）
 async function getSingleUseURL(eventId, showLoading = true) {
-    // キャッシュチェック
-    const cacheKey = `url_${eventId}`;
-    const cached = urlCache.get(cacheKey);
-    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-        console.log(`🚀 キャッシュヒット: イベント${eventId}`);
-        return cached.url;
-    }
+    // キャッシュチェック（一時的に無効化）
+    // const cacheKey = `url_${eventId}`;
+    // const cached = urlCache.get(cacheKey);
+    // if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    //     console.log(`🚀 キャッシュヒット: イベント${eventId}`);
+    //     return cached.url;
+    // }
     
     // ローディング表示
     if (showLoading) {
@@ -627,11 +627,11 @@ async function getSingleUseURL(eventId, showLoading = true) {
             const url = data.result.nextURL.url;
             console.log(`✅ URL取得成功:`, url);
             
-            // キャッシュに保存
-            urlCache.set(cacheKey, {
-                url: url,
-                timestamp: Date.now()
-            });
+            // キャッシュに保存（一時的に無効化）
+            // urlCache.set(cacheKey, {
+            //     url: url,
+            //     timestamp: Date.now()
+            // });
             
             if (showLoading) {
                 hideLoadingIndicator();
