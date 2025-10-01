@@ -234,7 +234,7 @@ class KVURLManager {
 
             if (!availableURL) {
                 console.log(`❌ 利用可能なURLがありません (イベント: ${eventId || '全イベント'})`);
-                console.log(`🔍 デバッグ: urlKeys数 = ${urlKeys.length}`);
+                console.log(`🔍 デバッグ: urlKeys数 = ${urlKeys.length}, 処理したキー数 = ${debugCount}`);
                 
                 // エラー履歴を保存
                 const errorData = {
