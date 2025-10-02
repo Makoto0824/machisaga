@@ -180,8 +180,8 @@ class KVURLManager {
         console.log(`🔍 getNextAvailableURL called - userId: ${userId}, eventId: ${eventId}`);
         
         if (!this.isKVAvailable) {
-            console.warn('⚠️ KVが利用できません');
-            return null;
+            console.warn('⚠️ KVが利用できません - フォールバック機能を試行');
+            return await this.getFallbackURL(eventId);
         }
 
         try {
@@ -352,6 +352,58 @@ class KVURLManager {
         } catch (error) {
             console.error('❌ 全URL状態リセットエラー:', error);
             return { error: error.message };
+        }
+    }
+
+    /**
+     * フォールバック機能: KV接続失敗時の代替URL取得
+     */
+    async getFallbackURL(eventId) {
+        try {
+            console.log(`🔄 フォールバック機能: CSVから直接URLを取得 (eventId: ${eventId})`);
+            
+            if (!fs.existsSync(this.csvFile)) {
+                console.warn('⚠️ CSVファイルが見つかりません:', this.csvFile);
+                return null;
+            }
+
+            const csvContent = fs.readFileSync(this.csvFile, 'utf-8');
+            const lines = csvContent.split('\n').filter(line => line.trim());
+            const urlLines = lines.slice(1); // ヘッダーをスキップ
+
+            // イベント別にURLをフィルタリング
+            const eventUrls = urlLines
+                .map(line => {
+                    const [id, event, url, description] = line.split(',').map(item => item.trim().replace(/"/g, ''));
+                    return { id, event, url, description };
+                })
+                .filter(item => item.url && item.url.startsWith('http'))
+                .filter(item => !eventId || item.event === eventId);
+
+            if (eventUrls.length === 0) {
+                console.warn(`⚠️ フォールバック: イベント${eventId}のURLが見つかりません`);
+                return null;
+            }
+
+            // ランダムに1つ選択
+            const randomIndex = Math.floor(Math.random() * eventUrls.length);
+            const selectedUrl = eventUrls[randomIndex];
+
+            console.log(`✅ フォールバック: ${selectedUrl.id} (${selectedUrl.event}) を選択`);
+            
+            return {
+                id: selectedUrl.id,
+                event: selectedUrl.event,
+                url: selectedUrl.url,
+                description: selectedUrl.description || `まちサーガイベント ${selectedUrl.event}`,
+                used: false,
+                usedAt: null,
+                usedBy: null
+            };
+
+        } catch (error) {
+            console.error('❌ フォールバック機能エラー:', error);
+            return null;
         }
     }
 
