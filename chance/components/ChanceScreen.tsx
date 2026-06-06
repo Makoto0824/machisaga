@@ -7,10 +7,12 @@ import {
 } from "@/components/ConfettiLottie";
 import { CouponTicket } from "@/components/CouponTicket";
 import {
+  getPlayBlockReason,
   getRemainingPlays,
   playChance,
   resetUserCoupons,
   type ChanceResult,
+  type PlayBlockReason,
 } from "@/lib/chance";
 import {
   isTestToolsEnabled,
@@ -83,35 +85,39 @@ export function ChanceScreen({ onViewCoupons, onViewStores }: Props) {
   const [phase, setPhase] = useState<Phase>("idle");
   const [lottiePlaying, setLottiePlaying] = useState(false);
   const [result, setResult] = useState<ChanceResult | null>(null);
-  const [limitMessage, setLimitMessage] = useState(false);
+  const [blockReason, setBlockReason] = useState<PlayBlockReason | null>(null);
   const [loading, setLoading] = useState(false);
   const [resultAnimKey, setResultAnimKey] = useState(0);
   const [testUnlimited, setTestUnlimited] = useState(false);
   const [resetMessage, setResetMessage] = useState<string | null>(null);
   const showTestTools = isTestToolsEnabled();
 
-  const refreshRemaining = useCallback(async () => {
-    const count = await getRemainingPlays();
+  const refreshPlayStatus = useCallback(async () => {
+    const [count, reason] = await Promise.all([
+      getRemainingPlays(),
+      getPlayBlockReason(),
+    ]);
     setRemaining(count);
+    setBlockReason(reason);
   }, []);
 
   useEffect(() => {
-    refreshRemaining();
+    refreshPlayStatus();
     setTestUnlimited(isTestUnlimitedEnabled());
-  }, [refreshRemaining]);
+  }, [refreshPlayStatus]);
 
   const handleToggleTestUnlimited = () => {
     const enabled = toggleTestUnlimited();
     setTestUnlimited(enabled);
-    if (enabled) setLimitMessage(false);
-    refreshRemaining();
+    if (enabled) setBlockReason(null);
+    refreshPlayStatus();
   };
 
   const handleResetCoupons = async () => {
     const ok = await resetUserCoupons();
     if (ok) {
-      setLimitMessage(false);
-      await refreshRemaining();
+      setBlockReason(null);
+      await refreshPlayStatus();
     }
     setResetMessage(
       ok ? "チケットと回数をリセットしました" : "リセットに失敗しました"
@@ -133,9 +139,13 @@ export function ChanceScreen({ onViewCoupons, onViewStores }: Props) {
     }
   }, [phase, resetVideoToStart]);
 
+  const isPlayBlocked =
+    !testUnlimited &&
+    (blockReason !== null || remaining <= 0);
+
   const handlePlay = async () => {
-    if (loading || phase === "spinning") return;
-    setLimitMessage(false);
+    if (loading || phase === "spinning" || isPlayBlocked) return;
+    setBlockReason(null);
     setLoading(true);
     setPhase("spinning");
     setLottiePlaying(false);
@@ -148,14 +158,14 @@ export function ChanceScreen({ onViewCoupons, onViewStores }: Props) {
 
     if (!outcome.ok) {
       setPhase("idle");
-      setLimitMessage(true);
-      setRemaining(0);
+      setBlockReason(outcome.reason);
+      if (outcome.reason === "daily_limit") setRemaining(0);
       return;
     }
 
     setResult(outcome.result);
-    setRemaining(outcome.result.remaining);
     setResultAnimKey((k) => k + 1);
+    await refreshPlayStatus();
     setPhase("result");
 
     if (outcome.result.resultType === "win") {
@@ -170,10 +180,9 @@ export function ChanceScreen({ onViewCoupons, onViewStores }: Props) {
   const handleReset = () => {
     setPhase("idle");
     setResult(null);
-    setLimitMessage(false);
     setLottiePlaying(false);
     resetVideoToStart();
-    refreshRemaining();
+    refreshPlayStatus();
   };
 
   const showVideo = phase === "idle" || (phase === "spinning" && !lottiePlaying);
@@ -208,12 +217,6 @@ export function ChanceScreen({ onViewCoupons, onViewStores }: Props) {
           aria-label="チャンス演出"
         />
 
-        {phase === "idle" && limitMessage && (
-          <p className="text-sm text-zinc-600 text-center px-4 py-3 border-t-2 border-[#e0dbd0] bg-white">
-            本日のチャンスを使い切りました。また明日お試しください。
-          </p>
-        )}
-
         {phase === "result" && result?.resultType === "lose" && (
           <div
             className="absolute inset-0 z-[5] bg-black/20 pointer-events-none"
@@ -245,15 +248,15 @@ export function ChanceScreen({ onViewCoupons, onViewStores }: Props) {
         </div>
       </div>
 
+      {blockReason && phase !== "result" && (
+        <PlayBlockNotice reason={blockReason} onViewCoupons={onViewCoupons} />
+      )}
+
       {phase !== "result" && (
         <button
           type="button"
           onClick={handlePlay}
-          disabled={
-            loading ||
-            phase === "spinning" ||
-            (!testUnlimited && remaining <= 0)
-          }
+          disabled={loading || phase === "spinning" || isPlayBlocked}
           className={`${dpBtnPrimary} mt-4`}
         >
           {phase === "spinning" ? "ドキドキ中..." : "挑戦！"}
@@ -271,11 +274,14 @@ export function ChanceScreen({ onViewCoupons, onViewStores }: Props) {
           <button
             type="button"
             onClick={handleReset}
-            disabled={!testUnlimited && remaining <= 0}
+            disabled={isPlayBlocked}
             className={`${dpBtnSecondary} disabled:opacity-40`}
           >
             もう一度挑戦
           </button>
+          {blockReason && (
+            <PlayBlockNotice reason={blockReason} onViewCoupons={onViewCoupons} />
+          )}
         </div>
       )}
 
@@ -312,6 +318,51 @@ export function ChanceScreen({ onViewCoupons, onViewStores }: Props) {
           )}
         </section>
       )}
+    </div>
+  );
+}
+
+function PlayBlockNotice({
+  reason,
+  onViewCoupons,
+}: {
+  reason: PlayBlockReason;
+  onViewCoupons: () => void;
+}) {
+  if (reason === "ticket_limit") {
+    return (
+      <div
+        role="alert"
+        className="mt-4 rounded-xl border-2 border-[#e8384f] bg-[#fff5f5] px-4 py-3 text-center"
+      >
+        <p className="text-sm font-bold text-[#c41e3a]">
+          獲得できるチケットの上限に達しました
+        </p>
+        <p className="text-xs text-zinc-700 mt-2 leading-relaxed">
+          お手持ちのクーポンを店舗でご利用いただくか、有効期限が過ぎてから再度お試しください。
+        </p>
+        <button
+          type="button"
+          onClick={onViewCoupons}
+          className="mt-3 text-xs font-bold text-[#c41e3a] underline"
+        >
+          獲得クーポンを確認する
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      role="alert"
+      className="mt-4 rounded-xl border-2 border-amber-400 bg-amber-50 px-4 py-3 text-center"
+    >
+      <p className="text-sm font-bold text-amber-900">
+        本日の挑戦回数を使い切りました
+      </p>
+      <p className="text-xs text-zinc-700 mt-2 leading-relaxed">
+        1日3回まで挑戦できます。また明日お試しください。
+      </p>
     </div>
   );
 }

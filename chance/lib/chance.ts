@@ -1,5 +1,8 @@
 import type { CouponPrize } from "@/data/types";
-import { drawPrizeForUser } from "@/lib/couponLimits";
+import {
+  drawPrizeForUser,
+  isTicketAcquisitionLimitReached,
+} from "@/lib/couponLimits";
 import { DAILY_LIMIT, getTodayRange } from "@/lib/date";
 import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
 import {
@@ -24,9 +27,11 @@ export type ChanceResult = {
   remaining: number;
 };
 
+export type PlayBlockReason = "daily_limit" | "ticket_limit";
+
 export type PlayChanceOutcome =
   | { ok: true; result: ChanceResult }
-  | { ok: false; reason: "limit" };
+  | { ok: false; reason: PlayBlockReason };
 
 async function countTodayPlaysSupabase(userId: string): Promise<number> {
   const supabase = getSupabase();
@@ -62,15 +67,33 @@ export async function getRemainingPlays(): Promise<number> {
   return Math.max(0, DAILY_LIMIT - count);
 }
 
+export async function getPlayBlockReason(): Promise<PlayBlockReason | null> {
+  if (isTestUnlimitedEnabled()) return null;
+
+  const heldCoupons = await fetchUserCoupons();
+  if (isTicketAcquisitionLimitReached(heldCoupons)) {
+    return "ticket_limit";
+  }
+
+  const remaining = await getRemainingPlays();
+  if (remaining <= 0) return "daily_limit";
+
+  return null;
+}
+
 export async function playChance(): Promise<PlayChanceOutcome> {
   const userId = getCurrentUserId();
   const unlimited = isTestUnlimitedEnabled();
-  const remaining = await getRemainingPlays();
-  if (!unlimited && remaining <= 0) {
-    return { ok: false, reason: "limit" };
-  }
 
   const heldCoupons = await fetchUserCoupons();
+  if (!unlimited && isTicketAcquisitionLimitReached(heldCoupons)) {
+    return { ok: false, reason: "ticket_limit" };
+  }
+
+  const remaining = await getRemainingPlays();
+  if (!unlimited && remaining <= 0) {
+    return { ok: false, reason: "daily_limit" };
+  }
   const prize = drawPrizeForUser(heldCoupons);
   const resultType: "win" | "lose" = prize.is_miss ? "lose" : "win";
   const playedAt = new Date();

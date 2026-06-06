@@ -29,6 +29,22 @@ function getActivePrizes(): CouponPrize[] {
   return getActiveRegion().couponPrizes.filter((c) => c.is_active);
 }
 
+/** まだ獲得可能な当たり景品 */
+export function getDrawableWinPrizes(coupons: UserCoupon[]): CouponPrize[] {
+  return getActivePrizes().filter(
+    (p) => !p.is_miss && canReceiveCoupon(coupons, p.id)
+  );
+}
+
+/** 当たりチケットをすべて所持上限まで獲得済みか */
+export function isTicketAcquisitionLimitReached(
+  coupons: UserCoupon[]
+): boolean {
+  const winPrizes = getActivePrizes().filter((p) => !p.is_miss);
+  if (winPrizes.length === 0) return false;
+  return getDrawableWinPrizes(coupons).length === 0;
+}
+
 function drawFromPool(prizes: CouponPrize[]): CouponPrize {
   const total = prizes.reduce((sum, p) => sum + p.probability, 0);
   if (total <= 0) {
