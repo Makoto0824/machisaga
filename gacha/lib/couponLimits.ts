@@ -1,5 +1,6 @@
-import { COUPON_PRIZES, type CouponPrize } from "@/data/mockData";
+import type { CouponPrize } from "@/data/types";
 import { isExpired } from "@/lib/date";
+import { getActiveRegion } from "@/lib/region";
 import type { UserCoupon } from "@/lib/storage";
 
 /** 同一クーポン（未使用・有効期限内）の最大所持枚数 */
@@ -25,7 +26,7 @@ export function canReceiveCoupon(
 }
 
 function getActivePrizes(): CouponPrize[] {
-  return COUPON_PRIZES.filter((c) => c.is_active);
+  return getActiveRegion().couponPrizes.filter((c) => c.is_active);
 }
 
 function drawFromPool(prizes: CouponPrize[]): CouponPrize {

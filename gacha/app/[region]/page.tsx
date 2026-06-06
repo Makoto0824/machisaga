@@ -14,7 +14,7 @@ type View =
   | { screen: "stores" }
   | { screen: "couponDetail"; couponId: string };
 
-export default function Home() {
+export default function RegionHome() {
   const [view, setView] = useState<View>({ screen: "gacha" });
 
   const bottomScreen: Screen =

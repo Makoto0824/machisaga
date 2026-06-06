@@ -1,4 +1,4 @@
-import type { CouponPrize } from "@/data/mockData";
+import type { CouponPrize } from "@/data/types";
 import { drawPrizeForUser } from "@/lib/couponLimits";
 import { DAILY_LIMIT, getTodayRange } from "@/lib/date";
 import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";

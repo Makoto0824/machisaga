@@ -19,6 +19,7 @@ import {
 import { playCongratulationsSound, playTooBadSound } from "@/lib/sounds";
 import { publicPath } from "@/lib/paths";
 import { getTicketImageByCouponId } from "@/lib/tickets";
+import { useRegion } from "@/components/RegionProvider";
 import {
   dpBtnPrimary,
   dpBtnSecondary,
@@ -74,6 +75,7 @@ async function playGachaVideo(video: HTMLVideoElement | null): Promise<void> {
 }
 
 export function GachaScreen({ onViewCoupons, onViewStores }: Props) {
+  const region = useRegion();
   const videoRef = useRef<HTMLVideoElement>(null);
   const confettiRef = useRef<ConfettiLottieHandle>(null);
   const [remaining, setRemaining] = useState(3);
@@ -173,10 +175,8 @@ export function GachaScreen({ onViewCoupons, onViewStores }: Props) {
     <div className="flex-1 flex flex-col px-4 pb-4">
       <header className="dp-screen-header">
         <p className={dpLabel}>まちサーガ</p>
-        <h1 className={`${dpTitle} mt-1`}>茂原ガチャ</h1>
-        <p className={`${dpSubtitle} mt-2`}>
-          1日3回までチャレンジできます。参加店舗で使えるクーポンや特典が当たります。
-        </p>
+        <h1 className={`${dpTitle} mt-1`}>{region.name}ガチャ</h1>
+        <p className={`${dpSubtitle} mt-2`}>{region.tagline}</p>
       </header>
 
       <div

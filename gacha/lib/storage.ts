@@ -1,5 +1,6 @@
-import type { CouponPrize } from "@/data/mockData";
+import type { CouponPrize } from "@/data/types";
 import { createId } from "@/lib/id";
+import { getActiveRegion } from "@/lib/region";
 
 export type GachaLog = {
   id: string;
@@ -22,8 +23,13 @@ export type UserCoupon = {
   used_at: string | null;
 };
 
-const GACHA_LOGS_KEY = "machisaga_gacha_logs";
-const USER_COUPONS_KEY = "machisaga_user_coupons_v2";
+function gachaLogsKey(): string {
+  return `machisaga_gacha_logs_${getActiveRegion().slug}`;
+}
+
+function userCouponsKey(): string {
+  return `machisaga_user_coupons_${getActiveRegion().slug}`;
+}
 
 function readJson<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;
@@ -41,31 +47,31 @@ function writeJson<T>(key: string, value: T): void {
 }
 
 export function getLocalGachaLogs(userId: string): GachaLog[] {
-  const all = readJson<GachaLog[]>(GACHA_LOGS_KEY, []);
+  const all = readJson<GachaLog[]>(gachaLogsKey(), []);
   return all.filter((l) => l.user_id === userId);
 }
 
 export function addLocalGachaLog(log: GachaLog): void {
-  const all = readJson<GachaLog[]>(GACHA_LOGS_KEY, []);
+  const all = readJson<GachaLog[]>(gachaLogsKey(), []);
   all.push(log);
-  writeJson(GACHA_LOGS_KEY, all);
+  writeJson(gachaLogsKey(), all);
 }
 
 export function getLocalUserCoupons(userId: string): UserCoupon[] {
-  const all = readJson<UserCoupon[]>(USER_COUPONS_KEY, []);
+  const all = readJson<UserCoupon[]>(userCouponsKey(), []);
   return all.filter((c) => c.user_id === userId);
 }
 
 export function addLocalUserCoupon(coupon: UserCoupon): void {
-  const all = readJson<UserCoupon[]>(USER_COUPONS_KEY, []);
+  const all = readJson<UserCoupon[]>(userCouponsKey(), []);
   all.push(coupon);
-  writeJson(USER_COUPONS_KEY, all);
+  writeJson(userCouponsKey(), all);
 }
 
 export function clearLocalUserCoupons(userId: string): void {
-  const all = readJson<UserCoupon[]>(USER_COUPONS_KEY, []);
+  const all = readJson<UserCoupon[]>(userCouponsKey(), []);
   writeJson(
-    USER_COUPONS_KEY,
+    userCouponsKey(),
     all.filter((c) => c.user_id !== userId)
   );
 }
@@ -74,11 +80,11 @@ export function updateLocalUserCoupon(
   id: string,
   updates: Partial<UserCoupon>
 ): UserCoupon | null {
-  const all = readJson<UserCoupon[]>(USER_COUPONS_KEY, []);
+  const all = readJson<UserCoupon[]>(userCouponsKey(), []);
   const index = all.findIndex((c) => c.id === id);
   if (index === -1) return null;
   all[index] = { ...all[index], ...updates };
-  writeJson(USER_COUPONS_KEY, all);
+  writeJson(userCouponsKey(), all);
   return all[index];
 }
 

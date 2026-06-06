@@ -1,6 +1,7 @@
 "use client";
 
-import { STORES, getStoreCoupons } from "@/data/mockData";
+import { getStoreCoupons } from "@/data/types";
+import { useRegion } from "@/components/RegionProvider";
 import {
   dpCardLight,
   dpLabel,
@@ -10,6 +11,8 @@ import {
 } from "@/components/ui/theme";
 
 export function StoreListScreen() {
+  const region = useRegion();
+
   return (
     <div className="flex-1 flex flex-col px-4 pb-4 overflow-y-auto">
       <header className="dp-screen-header">
@@ -21,8 +24,8 @@ export function StoreListScreen() {
       </header>
 
       <ul className="flex flex-col gap-3 mt-4">
-        {STORES.map((store) => {
-          const related = getStoreCoupons(store.id);
+        {region.stores.map((store) => {
+          const related = getStoreCoupons(region, store.id);
           return (
             <li key={store.id} className={`${dpCardLight} p-4`}>
               <div className="flex items-baseline gap-2 flex-wrap">

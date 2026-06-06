@@ -15,8 +15,8 @@ const mplusRounded = M_PLUS_Rounded_1c({
 });
 
 export const metadata: Metadata = {
-  title: "まちサーガ茂原ガチャ",
-  description: "1日3回までチャレンジ！参加店舗で使えるクーポンが当たるガチャ",
+  title: "まちサーガガチャ",
+  description: "地域ごとのガチャで参加店舗クーポンが当たるまちサーガガチャ",
 };
 
 export default function RootLayout({
