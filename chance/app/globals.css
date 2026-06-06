@@ -372,6 +372,24 @@ body {
   }
 }
 
+/* 当たりクーポン: 最初から見えた状態でズームアップ */
+@keyframes win-zoom-up-visible {
+  0% {
+    opacity: 1;
+    transform: scale(0.55);
+  }
+  55% {
+    transform: scale(1.12);
+  }
+  75% {
+    transform: scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 @keyframes lose-sink {
   0% {
     opacity: 0;

@@ -17,7 +17,11 @@ import {
 import { isTestToolsEnabled } from "@/lib/testMode";
 import { playCongratulationsSound, playTooBadSound } from "@/lib/sounds";
 import { publicPath } from "@/lib/paths";
-import { getTicketImageByCouponId } from "@/lib/tickets";
+import {
+  getTicketImageByCouponId,
+  preloadRegionTickets,
+  preloadTicketImage,
+} from "@/lib/tickets";
 import { useRegion } from "@/components/RegionProvider";
 import {
   dpBtnPrimary,
@@ -119,6 +123,10 @@ export function ChanceScreen({ onViewCoupons }: Props) {
     refreshPlayStatus();
   }, [refreshPlayStatus]);
 
+  useEffect(() => {
+    void preloadRegionTickets(region);
+  }, [region]);
+
   const handleResetCoupons = async () => {
     const ok = await resetUserCoupons();
     if (ok) {
@@ -166,6 +174,11 @@ export function ChanceScreen({ onViewCoupons }: Props) {
       setBlockReason(outcome.reason);
       if (outcome.reason === "daily_limit") setRemaining(0);
       return;
+    }
+
+    if (outcome.result.resultType === "win") {
+      const ticketSrc = getTicketImageByCouponId(outcome.result.prize.id);
+      if (ticketSrc) await preloadTicketImage(ticketSrc);
     }
 
     setResult(outcome.result);
@@ -401,21 +414,25 @@ function ResultDisplay({ result }: { result: ChanceResult }) {
 
   if (ticketSrc) {
     return (
-      <div
-        className="w-full"
-        style={{
-          animation: "win-zoom-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both",
-          transformOrigin: "center center",
-          willChange: "transform, opacity",
-        }}
-      >
+      <div className="w-full">
         <p className="fun-win-text text-center mb-2 tracking-wide">
           おめでとう！あたり！
         </p>
-        <CouponTicket
-          src={ticketSrc}
-          alt={`${prize.store_name} ${prize.title}`}
-        />
+        <div
+          className="w-full"
+          style={{
+            animation:
+              "win-zoom-up-visible 0.7s cubic-bezier(0.22, 1, 0.36, 1) both",
+            transformOrigin: "center center",
+            willChange: "transform",
+          }}
+        >
+          <CouponTicket
+            src={ticketSrc}
+            alt={`${prize.store_name} ${prize.title}`}
+            priority
+          />
+        </div>
       </div>
     );
   }
