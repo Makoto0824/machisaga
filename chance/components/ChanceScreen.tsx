@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/theme";
 
 const CHANCE_VIDEO_SRC = publicPath("/assets/videos/chance.mp4");
+const CHANCE_POSTER_SRC = publicPath("/assets/images/chance-poster.png");
 
 type Props = {
   onViewCoupons: () => void;
@@ -60,7 +61,10 @@ function waitForVideoEnd(video: HTMLVideoElement): Promise<void> {
   });
 }
 
-async function playChanceVideo(video: HTMLVideoElement | null): Promise<void> {
+async function playChanceVideo(
+  video: HTMLVideoElement | null,
+  onPlayStart?: () => void
+): Promise<void> {
   if (!video) {
     await new Promise((r) => setTimeout(r, 1200));
     return;
@@ -71,18 +75,35 @@ async function playChanceVideo(video: HTMLVideoElement | null): Promise<void> {
     video.muted = false;
     video.volume = 1;
     await video.play();
+    onPlayStart?.();
     await waitForVideoEnd(video);
   } catch {
     await new Promise((r) => setTimeout(r, 1200));
   }
 }
 
+function useIsMobileViewport(): boolean {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 768px)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  return isMobile;
+}
+
 export function ChanceScreen({ onViewCoupons, onViewStores }: Props) {
   const region = useRegion();
+  const isMobile = useIsMobileViewport();
   const videoRef = useRef<HTMLVideoElement>(null);
   const confettiRef = useRef<ConfettiLottieHandle>(null);
   const [remaining, setRemaining] = useState(3);
   const [phase, setPhase] = useState<Phase>("idle");
+  const [mobileVideoActive, setMobileVideoActive] = useState(false);
   const [lottiePlaying, setLottiePlaying] = useState(false);
   const [result, setResult] = useState<ChanceResult | null>(null);
   const [blockReason, setBlockReason] = useState<PlayBlockReason | null>(null);
@@ -136,6 +157,7 @@ export function ChanceScreen({ onViewCoupons, onViewStores }: Props) {
     if (phase === "idle") {
       resetVideoToStart();
       setLottiePlaying(false);
+      setMobileVideoActive(false);
     }
   }, [phase, resetVideoToStart]);
 
@@ -151,7 +173,7 @@ export function ChanceScreen({ onViewCoupons, onViewStores }: Props) {
     setLottiePlaying(false);
     setResult(null);
 
-    await playChanceVideo(videoRef.current);
+    await playChanceVideo(videoRef.current, () => setMobileVideoActive(true));
 
     const outcome = await playChance();
     setLoading(false);
@@ -181,11 +203,21 @@ export function ChanceScreen({ onViewCoupons, onViewStores }: Props) {
     setPhase("idle");
     setResult(null);
     setLottiePlaying(false);
+    setMobileVideoActive(false);
     resetVideoToStart();
     refreshPlayStatus();
   };
 
-  const showVideo = phase === "idle" || (phase === "spinning" && !lottiePlaying);
+  const showVideoDesktop =
+    phase === "idle" || (phase === "spinning" && !lottiePlaying);
+  const showPoster =
+    isMobile &&
+    phase !== "result" &&
+    (phase === "idle" || (phase === "spinning" && !mobileVideoActive));
+  const showVideo =
+    !isMobile && showVideoDesktop
+      ? true
+      : isMobile && phase === "spinning" && mobileVideoActive && !lottiePlaying;
 
   return (
     <div className="flex-1 flex flex-col px-4 pb-4">
@@ -205,6 +237,15 @@ export function ChanceScreen({ onViewCoupons, onViewStores }: Props) {
             : "overflow-hidden"
         }`}
       >
+        {showPoster && (
+          <img
+            src={CHANCE_POSTER_SRC}
+            alt=""
+            className="w-full min-h-[200px] object-contain bg-zinc-100"
+            aria-hidden
+          />
+        )}
+
         <video
           ref={videoRef}
           src={CHANCE_VIDEO_SRC}
@@ -212,7 +253,7 @@ export function ChanceScreen({ onViewCoupons, onViewStores }: Props) {
             showVideo ? "block" : "hidden"
           }`}
           playsInline
-          preload="auto"
+          preload={isMobile ? "none" : "auto"}
           muted={false}
           aria-label="チャンス演出"
         />
