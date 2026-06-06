@@ -13,6 +13,16 @@
 
 `/` にアクセスすると `/mobara` へリダイレクトします。
 
+### タブ指定（LINE リッチメニュー用）
+
+`?tab=` で起動時の画面を指定できます。タブ切り替え時も URL に反映されます。
+
+| 画面 | URL（茂原市の例） |
+|------|-------------------|
+| チャンス | `https://machisaga-chance.vercel.app/mobara` |
+| クーポン | `https://machisaga-chance.vercel.app/mobara?tab=coupons` |
+| 店舗 | `https://machisaga-chance.vercel.app/mobara?tab=stores` |
+
 ## 使用技術
 
 - Next.js（App Router）
