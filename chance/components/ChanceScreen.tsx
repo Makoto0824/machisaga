@@ -170,7 +170,6 @@ export function ChanceScreen({ onViewCoupons }: Props) {
 
     setResult(outcome.result);
     setResultAnimKey((k) => k + 1);
-    await refreshPlayStatus();
     setPhase("result");
 
     if (outcome.result.resultType === "win") {
@@ -180,6 +179,8 @@ export function ChanceScreen({ onViewCoupons }: Props) {
     } else {
       playTooBadSound();
     }
+
+    await refreshPlayStatus();
   };
 
   const handleReset = () => {
