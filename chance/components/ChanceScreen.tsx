@@ -211,7 +211,7 @@ export function ChanceScreen({ onViewCoupons }: Props) {
       </header>
 
       <div
-        className={`relative mt-4 ${dpMediaFrame} min-h-[200px] ${
+        className={`relative mt-4 ${dpMediaFrame} aspect-square w-full shrink-0 ${
           phase === "idle" ? "fun-media-idle" : ""
         } ${
           lottiePlaying ||
@@ -224,7 +224,7 @@ export function ChanceScreen({ onViewCoupons }: Props) {
           <img
             src={CHANCE_POSTER_SRC}
             alt=""
-            className="w-full min-h-[200px] object-contain bg-zinc-100"
+            className="w-full h-full object-contain bg-zinc-100"
             aria-hidden
           />
         )}
@@ -232,7 +232,7 @@ export function ChanceScreen({ onViewCoupons }: Props) {
         <video
           ref={videoRef}
           src={CHANCE_VIDEO_SRC}
-          className={`w-full min-h-[200px] object-contain bg-zinc-100 ${
+          className={`w-full h-full object-contain bg-zinc-100 ${
             showVideo ? "block" : "hidden"
           }`}
           playsInline
@@ -250,7 +250,7 @@ export function ChanceScreen({ onViewCoupons }: Props) {
         )}
 
         {phase === "result" && result && (
-          <div className="relative z-10 p-4 w-full min-h-[180px] flex items-center justify-center overflow-visible">
+          <div className="absolute inset-0 z-10 p-4 flex items-center justify-center overflow-visible">
             <ResultDisplay key={resultAnimKey} result={result} />
           </div>
         )}
