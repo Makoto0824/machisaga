@@ -14,18 +14,13 @@ import {
   type ChanceResult,
   type PlayBlockReason,
 } from "@/lib/chance";
-import {
-  isTestToolsEnabled,
-  isTestUnlimitedEnabled,
-  toggleTestUnlimited,
-} from "@/lib/testMode";
+import { isTestToolsEnabled } from "@/lib/testMode";
 import { playCongratulationsSound, playTooBadSound } from "@/lib/sounds";
 import { publicPath } from "@/lib/paths";
 import { getTicketImageByCouponId } from "@/lib/tickets";
 import { useRegion } from "@/components/RegionProvider";
 import {
   dpBtnPrimary,
-  dpBtnSecondary,
   dpLabel,
   dpMediaFrame,
   dpSubtitle,
@@ -37,7 +32,6 @@ const CHANCE_POSTER_SRC = publicPath("/assets/images/chance-poster.png");
 
 type Props = {
   onViewCoupons: () => void;
-  onViewStores: () => void;
 };
 
 type Phase = "idle" | "spinning" | "result";
@@ -96,7 +90,7 @@ function useIsMobileViewport(): boolean {
   return isMobile;
 }
 
-export function ChanceScreen({ onViewCoupons, onViewStores }: Props) {
+export function ChanceScreen({ onViewCoupons }: Props) {
   const region = useRegion();
   const isMobile = useIsMobileViewport();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -109,7 +103,6 @@ export function ChanceScreen({ onViewCoupons, onViewStores }: Props) {
   const [blockReason, setBlockReason] = useState<PlayBlockReason | null>(null);
   const [loading, setLoading] = useState(false);
   const [resultAnimKey, setResultAnimKey] = useState(0);
-  const [testUnlimited, setTestUnlimited] = useState(false);
   const [resetMessage, setResetMessage] = useState<string | null>(null);
   const showTestTools = isTestToolsEnabled();
 
@@ -124,15 +117,7 @@ export function ChanceScreen({ onViewCoupons, onViewStores }: Props) {
 
   useEffect(() => {
     refreshPlayStatus();
-    setTestUnlimited(isTestUnlimitedEnabled());
   }, [refreshPlayStatus]);
-
-  const handleToggleTestUnlimited = () => {
-    const enabled = toggleTestUnlimited();
-    setTestUnlimited(enabled);
-    if (enabled) setBlockReason(null);
-    refreshPlayStatus();
-  };
 
   const handleResetCoupons = async () => {
     const ok = await resetUserCoupons();
@@ -141,7 +126,7 @@ export function ChanceScreen({ onViewCoupons, onViewStores }: Props) {
       await refreshPlayStatus();
     }
     setResetMessage(
-      ok ? "チケットと回数をリセットしました" : "リセットに失敗しました"
+      ok ? "クーポンと回数をリセットしました" : "リセットに失敗しました"
     );
     setTimeout(() => setResetMessage(null), 2500);
   };
@@ -161,9 +146,7 @@ export function ChanceScreen({ onViewCoupons, onViewStores }: Props) {
     }
   }, [phase, resetVideoToStart]);
 
-  const isPlayBlocked =
-    !testUnlimited &&
-    (blockReason !== null || remaining <= 0);
+  const isPlayBlocked = blockReason !== null || remaining <= 0;
 
   const handlePlay = async () => {
     if (loading || phase === "spinning" || isPlayBlocked) return;
@@ -281,11 +264,7 @@ export function ChanceScreen({ onViewCoupons, onViewStores }: Props) {
       <div className="flex justify-center">
         <div className="fun-count-box">
           <span>本日の残り回数</span>
-          {testUnlimited ? (
-            <span className="fun-count-num text-xs px-2">∞</span>
-          ) : (
-            <span className="fun-count-num">{remaining}</span>
-          )}
+          <span className="fun-count-num">{remaining}</span>
         </div>
       </div>
 
@@ -306,17 +285,11 @@ export function ChanceScreen({ onViewCoupons, onViewStores }: Props) {
 
       {phase === "result" && (
         <div className="flex flex-col gap-2 mt-4">
-          <button type="button" onClick={onViewCoupons} className={dpBtnPrimary}>
-            獲得クーポンを見る
-          </button>
-          <button type="button" onClick={onViewStores} className={dpBtnSecondary}>
-            参加店舗を見る
-          </button>
           <button
             type="button"
             onClick={handleReset}
             disabled={isPlayBlocked}
-            className={`${dpBtnSecondary} disabled:opacity-40`}
+            className={`${dpBtnPrimary} disabled:opacity-40`}
           >
             もう一度挑戦
           </button>
@@ -336,23 +309,10 @@ export function ChanceScreen({ onViewCoupons, onViewStores }: Props) {
           </p>
           <button
             type="button"
-            onClick={handleToggleTestUnlimited}
-            className={`w-full py-2.5 rounded-xl border text-xs font-bold ${
-              testUnlimited
-                ? "border-emerald-500 bg-emerald-100 text-emerald-800"
-                : "border-zinc-300 bg-white text-zinc-600"
-            }`}
-          >
-            {testUnlimited
-              ? "回数無制限 ON（タップで OFF）"
-              : "回数無制限 OFF（タップで ON）"}
-          </button>
-          <button
-            type="button"
             onClick={handleResetCoupons}
             className="w-full py-2.5 rounded-xl border border-amber-500 bg-white text-xs font-bold text-amber-800"
           >
-            チケット・回数をリセット
+            クーポン・回数をリセット
           </button>
           {resetMessage && (
             <p className="text-center text-xs text-zinc-600">{resetMessage}</p>

@@ -34,7 +34,6 @@ export default function RegionHome() {
         {view.screen === "chance" && (
           <ChanceScreen
             onViewCoupons={() => setView({ screen: "coupons" })}
-            onViewStores={() => setView({ screen: "stores" })}
           />
         )}
         {view.screen === "coupons" && (
