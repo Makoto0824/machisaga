@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { M_PLUS_Rounded_1c, Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 
@@ -19,6 +19,12 @@ export const metadata: Metadata = {
   description: "地域ごとのチャンスで参加店舗クーポンが当たるまちサーガチャンス",
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -29,7 +35,7 @@ export default function RootLayout({
       lang="ja"
       className={`h-full ${notoSansJP.variable} ${mplusRounded.variable}`}
     >
-      <body className="min-h-full antialiased">{children}</body>
+      <body className="h-full antialiased">{children}</body>
     </html>
   );
 }

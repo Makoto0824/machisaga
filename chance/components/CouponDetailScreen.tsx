@@ -98,7 +98,7 @@ export function CouponDetailScreen({ couponId, onBack }: Props) {
   }
 
   return (
-    <div className="flex-1 flex flex-col px-4 pb-4 overflow-y-auto">
+    <div className="app-scroll flex-1 flex flex-col px-4 pb-4">
       <button
         type="button"
         onClick={onBack}

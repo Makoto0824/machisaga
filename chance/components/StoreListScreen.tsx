@@ -14,7 +14,7 @@ export function StoreListScreen() {
   const region = useRegion();
 
   return (
-    <div className="flex-1 flex flex-col px-4 pb-4 overflow-y-auto">
+    <div className="app-scroll flex-1 flex flex-col px-4 pb-4">
       <header className="dp-screen-header">
         <p className={dpLabel}>お店</p>
         <h1 className={`${dpTitle} mt-1`}>参加店舗</h1>

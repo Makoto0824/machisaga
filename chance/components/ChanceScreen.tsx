@@ -203,7 +203,7 @@ export function ChanceScreen({ onViewCoupons }: Props) {
       : isMobile && phase === "spinning" && mobileVideoActive && !lottiePlaying;
 
   return (
-    <div className="flex-1 flex flex-col px-4 pb-4">
+    <div className="app-scroll flex-1 flex flex-col px-4 pb-4">
       <header className="dp-screen-header">
         <p className={dpLabel}>まちサーガ</p>
         <h1 className={`${dpTitle} mt-1`}>{region.name}チャンス</h1>
