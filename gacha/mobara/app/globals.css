@@ -1,0 +1,392 @@
+@import "tailwindcss";
+@source "../components";
+
+:root {
+  --fun-bg: #fff8e8;
+  --fun-surface: #ffffff;
+  --fun-lime: #b8e06a;
+  --fun-pink: #ff6b9d;
+  --fun-sky: #5ec8f2;
+  --fun-red: #e8384f;
+  --fun-yellow: #ffc800;
+  --fun-orange: #ff8c3a;
+  --fun-purple: #9b6dff;
+  --background: var(--fun-bg);
+  --foreground: #1a1a1a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-noto-sans-jp), "Hiragino Sans",
+    "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.tab-bar-fixed {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 28rem;
+  z-index: 50;
+}
+
+.with-tab-bar {
+  padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* ポップな太枠 */
+.dp-chunky-border {
+  border: 2.5px solid #222;
+  box-shadow: 0 0 0 3px var(--fun-red), 3px 5px 0 #222;
+}
+
+.dp-chunky-border-sm {
+  border: 2px solid #222;
+  box-shadow: 0 0 0 2px var(--fun-red), 2px 3px 0 #222;
+}
+
+.dp-screen-header {
+  padding-top: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: none;
+}
+
+/* カラフル背景 */
+.fun-page-bg {
+  background-color: var(--fun-bg);
+  background-image: radial-gradient(
+      circle at 12% 18%,
+      rgba(255, 200, 0, 0.28) 0%,
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at 88% 12%,
+      rgba(94, 200, 242, 0.22) 0%,
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 75% 85%,
+      rgba(255, 107, 157, 0.18) 0%,
+      transparent 30%
+    ),
+    radial-gradient(circle, #ffc800 1.2px, transparent 1.2px);
+  background-size: auto, auto, auto, 22px 22px;
+}
+
+.fun-bg-layer {
+  z-index: 0;
+}
+
+.fun-blob {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.45;
+  animation: fun-float 5s ease-in-out infinite;
+}
+
+.fun-blob-1 {
+  width: 72px;
+  height: 72px;
+  background: var(--fun-yellow);
+  top: 8%;
+  right: -12px;
+  animation-delay: 0s;
+}
+
+.fun-blob-2 {
+  width: 48px;
+  height: 48px;
+  background: var(--fun-sky);
+  top: 32%;
+  left: -10px;
+  animation-delay: 1.2s;
+}
+
+.fun-blob-3 {
+  width: 36px;
+  height: 36px;
+  background: var(--fun-pink);
+  bottom: 28%;
+  right: 8%;
+  animation-delay: 2.4s;
+}
+
+.fun-blob-4 {
+  width: 56px;
+  height: 56px;
+  background: var(--fun-lime);
+  bottom: 12%;
+  left: 6%;
+  animation-delay: 0.8s;
+}
+
+.fun-blob-5 {
+  width: 24px;
+  height: 24px;
+  background: var(--fun-purple);
+  top: 55%;
+  right: 4%;
+  animation-delay: 3s;
+}
+
+/* タイトル — ステッカー風 */
+.fun-title {
+  font-family: var(--font-rounded), var(--font-noto-sans-jp), sans-serif;
+  font-size: 1.85rem;
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--fun-yellow);
+  text-shadow: 2px 2px 0 #222, 4px 4px 0 var(--fun-pink);
+  letter-spacing: 0.02em;
+}
+
+.fun-label {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: white;
+  background: var(--fun-red);
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 2px solid #222;
+  box-shadow: 2px 2px 0 #222;
+}
+
+.fun-catch {
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: #444;
+  background: rgba(255, 255, 255, 0.75);
+  border: 2px solid #222;
+  border-radius: 12px;
+  padding: 10px 12px;
+  box-shadow: 2px 3px 0 rgba(0, 0, 0, 0.12);
+}
+
+/* 残り回数バッジ */
+.fun-count-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 1rem;
+  padding: 8px 16px;
+  background: white;
+  border: 2.5px solid #222;
+  border-radius: 999px;
+  box-shadow: 0 0 0 2px var(--fun-sky), 3px 4px 0 #222;
+  font-size: 0.875rem;
+  color: #444;
+}
+
+.fun-count-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  height: 1.75rem;
+  padding: 0 6px;
+  background: var(--fun-yellow);
+  border: 2px solid #222;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 1rem;
+  color: #222;
+  animation: fun-pulse 2s ease-in-out infinite;
+}
+
+/* ポップボタン */
+.fun-btn-pop {
+  animation: fun-btn-idle 2.5s ease-in-out infinite;
+  background: linear-gradient(180deg, #ff4d63 0%, var(--fun-red) 55%, #c42a3d 100%);
+  transition: transform 0.15s ease;
+}
+
+.fun-btn-pop:not(:disabled):active {
+  transform: scale(0.96) translateY(2px);
+  animation: none;
+}
+
+.fun-btn-pop:not(:disabled):hover {
+  animation: fun-btn-wiggle 0.5s ease-in-out;
+}
+
+/* メディア枠のゆらぎ */
+.fun-media-idle {
+  animation: fun-media-glow 3s ease-in-out infinite;
+}
+
+/* ナビドット */
+.fun-nav-dot {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin: 0 auto 4px;
+  border: 1.5px solid #222;
+}
+
+.fun-nav-dot-gacha {
+  background: var(--fun-red);
+}
+.fun-nav-dot-coupons {
+  background: var(--fun-yellow);
+}
+.fun-nav-dot-stores {
+  background: var(--fun-sky);
+}
+
+/* 当選テキスト */
+.fun-win-text {
+  font-family: var(--font-rounded), sans-serif;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--fun-red);
+  text-shadow: 1px 1px 0 var(--fun-yellow);
+  animation: fun-pop-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.fun-lose-text {
+  font-family: var(--font-rounded), sans-serif;
+  font-weight: 800;
+  font-size: 1.35rem;
+  color: var(--fun-sky);
+}
+
+@keyframes fun-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(6deg);
+  }
+}
+
+@keyframes fun-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes fun-btn-idle {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes fun-btn-wiggle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-2deg);
+  }
+  75% {
+    transform: rotate(2deg);
+  }
+}
+
+@keyframes fun-media-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px var(--fun-red), 3px 5px 0 #222;
+  }
+  50% {
+    box-shadow: 0 0 0 3px var(--fun-orange), 3px 5px 0 #222,
+      0 0 16px rgba(255, 140, 58, 0.35);
+  }
+}
+
+@keyframes fun-pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  70% {
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes win-zoom-up {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+  75% {
+    transform: scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes lose-sink {
+  0% {
+    opacity: 0;
+    transform: scale(1.06) translateY(-12px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes lose-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-5px);
+  }
+  40% {
+    transform: translateX(5px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(2px);
+  }
+}
+
+@keyframes lose-dim {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}

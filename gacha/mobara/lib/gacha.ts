@@ -1,0 +1,207 @@
+import type { CouponPrize } from "@/data/mockData";
+import { drawPrizeForUser } from "@/lib/couponLimits";
+import { DAILY_LIMIT, getTodayRange } from "@/lib/date";
+import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
+import {
+  addLocalGachaLog,
+  addLocalUserCoupon,
+  clearLocalUserCoupons,
+  createUserCouponFromPrize,
+  getLocalGachaLogs,
+  getLocalUserCoupons,
+  updateLocalUserCoupon,
+  type GachaLog,
+  type UserCoupon,
+} from "@/lib/storage";
+import { createId } from "@/lib/id";
+import { isTestUnlimitedEnabled } from "@/lib/testMode";
+import { getCurrentUserId } from "@/lib/user";
+
+export type GachaResult = {
+  prize: CouponPrize;
+  resultType: "win" | "lose";
+  remaining: number;
+};
+
+export type PlayGachaOutcome =
+  | { ok: true; result: GachaResult }
+  | { ok: false; reason: "limit" };
+
+async function countTodayPlaysSupabase(userId: string): Promise<number> {
+  const supabase = getSupabase();
+  if (!supabase) return 0;
+  const { start, end } = getTodayRange();
+  const { count, error } = await supabase
+    .from("gacha_logs")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .gte("played_at", start.toISOString())
+    .lte("played_at", end.toISOString());
+  if (error) {
+    console.error("countTodayPlaysSupabase", error);
+    return 0;
+  }
+  return count ?? 0;
+}
+
+function countTodayPlaysLocal(userId: string): number {
+  const { start, end } = getTodayRange();
+  return getLocalGachaLogs(userId).filter((log) => {
+    const played = new Date(log.played_at);
+    return played >= start && played <= end;
+  }).length;
+}
+
+export async function getRemainingPlays(): Promise<number> {
+  if (isTestUnlimitedEnabled()) return DAILY_LIMIT;
+  const userId = getCurrentUserId();
+  const count = isSupabaseConfigured()
+    ? await countTodayPlaysSupabase(userId)
+    : countTodayPlaysLocal(userId);
+  return Math.max(0, DAILY_LIMIT - count);
+}
+
+export async function playGacha(): Promise<PlayGachaOutcome> {
+  const userId = getCurrentUserId();
+  const unlimited = isTestUnlimitedEnabled();
+  const remaining = await getRemainingPlays();
+  if (!unlimited && remaining <= 0) {
+    return { ok: false, reason: "limit" };
+  }
+
+  const heldCoupons = await fetchUserCoupons();
+  const prize = drawPrizeForUser(heldCoupons);
+  const resultType: "win" | "lose" = prize.is_miss ? "lose" : "win";
+  const playedAt = new Date();
+
+  if (isSupabaseConfigured()) {
+    const supabase = getSupabase()!;
+    const { error: logError } = await supabase.from("gacha_logs").insert({
+      user_id: userId,
+      coupon_id: prize.is_miss ? null : prize.id,
+      result_type: resultType,
+      played_at: playedAt.toISOString(),
+    });
+    if (logError) console.error("gacha_logs insert", logError);
+
+    if (resultType === "win") {
+      const expiresAt = new Date(playedAt);
+      expiresAt.setDate(expiresAt.getDate() + prize.expires_days);
+      const { error: couponError } = await supabase.from("user_coupons").insert({
+        user_id: userId,
+        coupon_id: prize.id,
+        store_name: prize.store_name,
+        title: prize.title,
+        description: prize.description,
+        usage_condition: prize.usage_condition,
+        issued_at: playedAt.toISOString(),
+        expires_at: expiresAt.toISOString(),
+        used_at: null,
+      });
+      if (couponError) console.error("user_coupons insert", couponError);
+    }
+  } else {
+    const log: GachaLog = {
+      id: createId(),
+      user_id: userId,
+      coupon_id: prize.is_miss ? null : prize.id,
+      result_type: resultType,
+      played_at: playedAt.toISOString(),
+    };
+    addLocalGachaLog(log);
+    if (resultType === "win") {
+      addLocalUserCoupon(createUserCouponFromPrize(userId, prize, playedAt));
+    }
+  }
+
+  return {
+    ok: true,
+    result: {
+      prize,
+      resultType,
+      remaining: unlimited ? DAILY_LIMIT : remaining - 1,
+    },
+  };
+}
+
+export async function fetchUserCoupons(): Promise<UserCoupon[]> {
+  const userId = getCurrentUserId();
+  if (isSupabaseConfigured()) {
+    const supabase = getSupabase()!;
+    const { data, error } = await supabase
+      .from("user_coupons")
+      .select("*")
+      .eq("user_id", userId)
+      .order("issued_at", { ascending: false });
+    if (error) {
+      console.error("fetchUserCoupons", error);
+      return [];
+    }
+    return (data ?? []) as UserCoupon[];
+  }
+  return getLocalUserCoupons(userId).sort(
+    (a, b) => new Date(b.issued_at).getTime() - new Date(a.issued_at).getTime()
+  );
+}
+
+export async function fetchUserCouponById(id: string): Promise<UserCoupon | null> {
+  const coupons = await fetchUserCoupons();
+  return coupons.find((c) => c.id === id) ?? null;
+}
+
+export type UseCouponOutcome =
+  | { ok: true; coupon: UserCoupon }
+  | { ok: false; reason: "not_found" | "used" | "expired" };
+
+export async function useCoupon(id: string): Promise<UseCouponOutcome> {
+  const coupon = await fetchUserCouponById(id);
+  if (!coupon) return { ok: false, reason: "not_found" };
+  if (coupon.used_at) return { ok: false, reason: "used" };
+  if (new Date(coupon.expires_at) < new Date()) {
+    return { ok: false, reason: "expired" };
+  }
+
+  const usedAt = new Date().toISOString();
+
+  if (isSupabaseConfigured()) {
+    const supabase = getSupabase()!;
+    const { error } = await supabase
+      .from("user_coupons")
+      .update({ used_at: usedAt })
+      .eq("id", id);
+    if (error) {
+      console.error("useCoupon", error);
+      return { ok: false, reason: "not_found" };
+    }
+    return { ok: true, coupon: { ...coupon, used_at: usedAt } };
+  }
+
+  const updated = updateLocalUserCoupon(id, { used_at: usedAt });
+  if (!updated) return { ok: false, reason: "not_found" };
+  return { ok: true, coupon: updated };
+}
+
+/** 開発時のみ：所持クーポンをすべて削除 */
+export async function resetUserCoupons(): Promise<boolean> {
+  if (process.env.NODE_ENV !== "development") return false;
+
+  const userId = getCurrentUserId();
+
+  if (isSupabaseConfigured()) {
+    const supabase = getSupabase()!;
+    const { error } = await supabase
+      .from("user_coupons")
+      .delete()
+      .eq("user_id", userId);
+    if (error) {
+      console.error("resetUserCoupons", error);
+      return false;
+    }
+    return true;
+  }
+
+  clearLocalUserCoupons(userId);
+  return true;
+}
+
+export type { UserCoupon };
