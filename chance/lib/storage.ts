@@ -2,7 +2,7 @@ import type { CouponPrize } from "@/data/types";
 import { createId } from "@/lib/id";
 import { getActiveRegion } from "@/lib/region";
 
-export type GachaLog = {
+export type ChanceLog = {
   id: string;
   user_id: string;
   coupon_id: string | null;
@@ -23,8 +23,8 @@ export type UserCoupon = {
   used_at: string | null;
 };
 
-function gachaLogsKey(): string {
-  return `machisaga_gacha_logs_${getActiveRegion().slug}`;
+function chanceLogsKey(): string {
+  return `machisaga_chance_logs_${getActiveRegion().slug}`;
 }
 
 function userCouponsKey(): string {
@@ -46,15 +46,23 @@ function writeJson<T>(key: string, value: T): void {
   localStorage.setItem(key, JSON.stringify(value));
 }
 
-export function getLocalGachaLogs(userId: string): GachaLog[] {
-  const all = readJson<GachaLog[]>(gachaLogsKey(), []);
+export function getLocalChanceLogs(userId: string): ChanceLog[] {
+  const all = readJson<ChanceLog[]>(chanceLogsKey(), []);
   return all.filter((l) => l.user_id === userId);
 }
 
-export function addLocalGachaLog(log: GachaLog): void {
-  const all = readJson<GachaLog[]>(gachaLogsKey(), []);
+export function addLocalChanceLog(log: ChanceLog): void {
+  const all = readJson<ChanceLog[]>(chanceLogsKey(), []);
   all.push(log);
-  writeJson(gachaLogsKey(), all);
+  writeJson(chanceLogsKey(), all);
+}
+
+export function clearLocalChanceLogs(userId: string): void {
+  const all = readJson<ChanceLog[]>(chanceLogsKey(), []);
+  writeJson(
+    chanceLogsKey(),
+    all.filter((l) => l.user_id !== userId)
+  );
 }
 
 export function getLocalUserCoupons(userId: string): UserCoupon[] {

@@ -15,7 +15,7 @@ import {
   fetchUserCouponById,
   useCoupon,
   type UserCoupon,
-} from "@/lib/gacha";
+} from "@/lib/chance";
 import { getTicketImageByCouponId } from "@/lib/tickets";
 
 type Props = {

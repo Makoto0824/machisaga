@@ -4,18 +4,18 @@ import { useState } from "react";
 import { BottomNav, type Screen } from "@/components/BottomNav";
 import { CouponDetailScreen } from "@/components/CouponDetailScreen";
 import { CouponListScreen } from "@/components/CouponListScreen";
-import { GachaScreen } from "@/components/GachaScreen";
+import { ChanceScreen } from "@/components/ChanceScreen";
 import { MobileFrame } from "@/components/MobileFrame";
 import { StoreListScreen } from "@/components/StoreListScreen";
 
 type View =
-  | { screen: "gacha" }
+  | { screen: "chance" }
   | { screen: "coupons" }
   | { screen: "stores" }
   | { screen: "couponDetail"; couponId: string };
 
 export default function RegionHome() {
-  const [view, setView] = useState<View>({ screen: "gacha" });
+  const [view, setView] = useState<View>({ screen: "chance" });
 
   const bottomScreen: Screen =
     view.screen === "couponDetail" ? "coupons" : view.screen;
@@ -31,8 +31,8 @@ export default function RegionHome() {
           view.screen !== "couponDetail" ? "with-tab-bar" : ""
         }`}
       >
-        {view.screen === "gacha" && (
-          <GachaScreen
+        {view.screen === "chance" && (
+          <ChanceScreen
             onViewCoupons={() => setView({ screen: "coupons" })}
             onViewStores={() => setView({ screen: "stores" })}
           />

@@ -3,28 +3,29 @@ import { drawPrizeForUser } from "@/lib/couponLimits";
 import { DAILY_LIMIT, getTodayRange } from "@/lib/date";
 import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
 import {
-  addLocalGachaLog,
+  addLocalChanceLog,
   addLocalUserCoupon,
+  clearLocalChanceLogs,
   clearLocalUserCoupons,
   createUserCouponFromPrize,
-  getLocalGachaLogs,
+  getLocalChanceLogs,
   getLocalUserCoupons,
   updateLocalUserCoupon,
-  type GachaLog,
+  type ChanceLog,
   type UserCoupon,
 } from "@/lib/storage";
 import { createId } from "@/lib/id";
-import { isTestUnlimitedEnabled } from "@/lib/testMode";
+import { isTestToolsEnabled, isTestUnlimitedEnabled } from "@/lib/testMode";
 import { getCurrentUserId } from "@/lib/user";
 
-export type GachaResult = {
+export type ChanceResult = {
   prize: CouponPrize;
   resultType: "win" | "lose";
   remaining: number;
 };
 
-export type PlayGachaOutcome =
-  | { ok: true; result: GachaResult }
+export type PlayChanceOutcome =
+  | { ok: true; result: ChanceResult }
   | { ok: false; reason: "limit" };
 
 async function countTodayPlaysSupabase(userId: string): Promise<number> {
@@ -32,7 +33,7 @@ async function countTodayPlaysSupabase(userId: string): Promise<number> {
   if (!supabase) return 0;
   const { start, end } = getTodayRange();
   const { count, error } = await supabase
-    .from("gacha_logs")
+    .from("chance_logs")
     .select("*", { count: "exact", head: true })
     .eq("user_id", userId)
     .gte("played_at", start.toISOString())
@@ -46,7 +47,7 @@ async function countTodayPlaysSupabase(userId: string): Promise<number> {
 
 function countTodayPlaysLocal(userId: string): number {
   const { start, end } = getTodayRange();
-  return getLocalGachaLogs(userId).filter((log) => {
+  return getLocalChanceLogs(userId).filter((log) => {
     const played = new Date(log.played_at);
     return played >= start && played <= end;
   }).length;
@@ -61,7 +62,7 @@ export async function getRemainingPlays(): Promise<number> {
   return Math.max(0, DAILY_LIMIT - count);
 }
 
-export async function playGacha(): Promise<PlayGachaOutcome> {
+export async function playChance(): Promise<PlayChanceOutcome> {
   const userId = getCurrentUserId();
   const unlimited = isTestUnlimitedEnabled();
   const remaining = await getRemainingPlays();
@@ -76,13 +77,13 @@ export async function playGacha(): Promise<PlayGachaOutcome> {
 
   if (isSupabaseConfigured()) {
     const supabase = getSupabase()!;
-    const { error: logError } = await supabase.from("gacha_logs").insert({
+    const { error: logError } = await supabase.from("chance_logs").insert({
       user_id: userId,
       coupon_id: prize.is_miss ? null : prize.id,
       result_type: resultType,
       played_at: playedAt.toISOString(),
     });
-    if (logError) console.error("gacha_logs insert", logError);
+    if (logError) console.error("chance_logs insert", logError);
 
     if (resultType === "win") {
       const expiresAt = new Date(playedAt);
@@ -101,14 +102,14 @@ export async function playGacha(): Promise<PlayGachaOutcome> {
       if (couponError) console.error("user_coupons insert", couponError);
     }
   } else {
-    const log: GachaLog = {
+    const log: ChanceLog = {
       id: createId(),
       user_id: userId,
       coupon_id: prize.is_miss ? null : prize.id,
       result_type: resultType,
       played_at: playedAt.toISOString(),
     };
-    addLocalGachaLog(log);
+    addLocalChanceLog(log);
     if (resultType === "win") {
       addLocalUserCoupon(createUserCouponFromPrize(userId, prize, playedAt));
     }
@@ -181,26 +182,35 @@ export async function useCoupon(id: string): Promise<UseCouponOutcome> {
   return { ok: true, coupon: updated };
 }
 
-/** 開発時のみ：所持クーポンをすべて削除 */
+/** テスト用：所持クーポンと本日の挑戦履歴をリセット */
 export async function resetUserCoupons(): Promise<boolean> {
-  if (process.env.NODE_ENV !== "development") return false;
+  if (!isTestToolsEnabled()) return false;
 
   const userId = getCurrentUserId();
 
   if (isSupabaseConfigured()) {
     const supabase = getSupabase()!;
-    const { error } = await supabase
+    const { error: couponError } = await supabase
       .from("user_coupons")
       .delete()
       .eq("user_id", userId);
-    if (error) {
-      console.error("resetUserCoupons", error);
+    if (couponError) {
+      console.error("resetUserCoupons", couponError);
+      return false;
+    }
+    const { error: logError } = await supabase
+      .from("chance_logs")
+      .delete()
+      .eq("user_id", userId);
+    if (logError) {
+      console.error("resetChanceLogs", logError);
       return false;
     }
     return true;
   }
 
   clearLocalUserCoupons(userId);
+  clearLocalChanceLogs(userId);
   return true;
 }
 

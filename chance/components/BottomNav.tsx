@@ -1,6 +1,6 @@
 "use client";
 
-export type Screen = "gacha" | "coupons" | "stores";
+export type Screen = "chance" | "coupons" | "stores";
 
 type Props = {
   current: Screen;
@@ -12,7 +12,7 @@ const items: {
   label: string;
   dotClass: string;
 }[] = [
-  { id: "gacha", label: "ガチャ", dotClass: "fun-nav-dot-gacha" },
+  { id: "chance", label: "チャンス", dotClass: "fun-nav-dot-chance" },
   { id: "coupons", label: "クーポン", dotClass: "fun-nav-dot-coupons" },
   { id: "stores", label: "店舗", dotClass: "fun-nav-dot-stores" },
 ];

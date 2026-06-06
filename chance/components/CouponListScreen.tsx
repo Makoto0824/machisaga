@@ -12,7 +12,7 @@ import {
   dpTitle,
 } from "@/components/ui/theme";
 import { formatDate, isExpired } from "@/lib/date";
-import { fetchUserCoupons, type UserCoupon } from "@/lib/gacha";
+import { fetchUserCoupons, type UserCoupon } from "@/lib/chance";
 import { getTicketImageByCouponId } from "@/lib/tickets";
 
 type Props = {
@@ -67,7 +67,7 @@ export function CouponListScreen({ onSelectCoupon }: Props) {
         <div className="text-center py-12 px-4">
           <p className="text-sm text-zinc-800">まだクーポンがありません</p>
           <p className="text-sm text-zinc-500 mt-2">
-            ガチャでクーポンを獲得できます
+            チャンスでクーポンを獲得できます
           </p>
         </div>
       )}

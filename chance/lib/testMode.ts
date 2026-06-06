@@ -1,17 +1,25 @@
 import { getActiveRegion } from "@/lib/region";
 
 function storageKey(): string {
-  return `machisaga_gacha_test_unlimited_${getActiveRegion().slug}`;
+  return `machisaga_chance_test_unlimited_${getActiveRegion().slug}`;
+}
+
+/** 開発時、または NEXT_PUBLIC_ENABLE_TEST_TOOLS=true のとき表示 */
+export function isTestToolsEnabled(): boolean {
+  return (
+    process.env.NODE_ENV === "development" ||
+    process.env.NEXT_PUBLIC_ENABLE_TEST_TOOLS === "true"
+  );
 }
 
 export function isTestUnlimitedEnabled(): boolean {
-  if (process.env.NODE_ENV !== "development") return false;
+  if (!isTestToolsEnabled()) return false;
   if (typeof window === "undefined") return false;
   return localStorage.getItem(storageKey()) === "true";
 }
 
 export function setTestUnlimitedEnabled(enabled: boolean): void {
-  if (process.env.NODE_ENV !== "development") return;
+  if (!isTestToolsEnabled()) return;
   if (typeof window === "undefined") return;
   localStorage.setItem(storageKey(), enabled ? "true" : "false");
 }

@@ -15,8 +15,8 @@ const mplusRounded = M_PLUS_Rounded_1c({
 });
 
 export const metadata: Metadata = {
-  title: "まちサーガガチャ",
-  description: "地域ごとのガチャで参加店舗クーポンが当たるまちサーガガチャ",
+  title: "まちサーガチャンス",
+  description: "地域ごとのチャンスで参加店舗クーポンが当たるまちサーガチャンス",
 };
 
 export default function RootLayout({

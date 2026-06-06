@@ -8,11 +8,12 @@ import {
 import { CouponTicket } from "@/components/CouponTicket";
 import {
   getRemainingPlays,
-  playGacha,
+  playChance,
   resetUserCoupons,
-  type GachaResult,
-} from "@/lib/gacha";
+  type ChanceResult,
+} from "@/lib/chance";
 import {
+  isTestToolsEnabled,
   isTestUnlimitedEnabled,
   toggleTestUnlimited,
 } from "@/lib/testMode";
@@ -29,7 +30,7 @@ import {
   dpTitle,
 } from "@/components/ui/theme";
 
-const GACHA_VIDEO_SRC = publicPath("/assets/videos/gacha.mp4");
+const CHANCE_VIDEO_SRC = publicPath("/assets/videos/chance.mp4");
 
 type Props = {
   onViewCoupons: () => void;
@@ -57,7 +58,7 @@ function waitForVideoEnd(video: HTMLVideoElement): Promise<void> {
   });
 }
 
-async function playGachaVideo(video: HTMLVideoElement | null): Promise<void> {
+async function playChanceVideo(video: HTMLVideoElement | null): Promise<void> {
   if (!video) {
     await new Promise((r) => setTimeout(r, 1200));
     return;
@@ -74,20 +75,20 @@ async function playGachaVideo(video: HTMLVideoElement | null): Promise<void> {
   }
 }
 
-export function GachaScreen({ onViewCoupons, onViewStores }: Props) {
+export function ChanceScreen({ onViewCoupons, onViewStores }: Props) {
   const region = useRegion();
   const videoRef = useRef<HTMLVideoElement>(null);
   const confettiRef = useRef<ConfettiLottieHandle>(null);
   const [remaining, setRemaining] = useState(3);
   const [phase, setPhase] = useState<Phase>("idle");
   const [lottiePlaying, setLottiePlaying] = useState(false);
-  const [result, setResult] = useState<GachaResult | null>(null);
+  const [result, setResult] = useState<ChanceResult | null>(null);
   const [limitMessage, setLimitMessage] = useState(false);
   const [loading, setLoading] = useState(false);
   const [resultAnimKey, setResultAnimKey] = useState(0);
   const [testUnlimited, setTestUnlimited] = useState(false);
   const [resetMessage, setResetMessage] = useState<string | null>(null);
-  const isDev = process.env.NODE_ENV === "development";
+  const showTestTools = isTestToolsEnabled();
 
   const refreshRemaining = useCallback(async () => {
     const count = await getRemainingPlays();
@@ -108,7 +109,13 @@ export function GachaScreen({ onViewCoupons, onViewStores }: Props) {
 
   const handleResetCoupons = async () => {
     const ok = await resetUserCoupons();
-    setResetMessage(ok ? "クーポンをリセットしました" : "リセットに失敗しました");
+    if (ok) {
+      setLimitMessage(false);
+      await refreshRemaining();
+    }
+    setResetMessage(
+      ok ? "チケットと回数をリセットしました" : "リセットに失敗しました"
+    );
     setTimeout(() => setResetMessage(null), 2500);
   };
 
@@ -134,9 +141,9 @@ export function GachaScreen({ onViewCoupons, onViewStores }: Props) {
     setLottiePlaying(false);
     setResult(null);
 
-    await playGachaVideo(videoRef.current);
+    await playChanceVideo(videoRef.current);
 
-    const outcome = await playGacha();
+    const outcome = await playChance();
     setLoading(false);
 
     if (!outcome.ok) {
@@ -175,7 +182,7 @@ export function GachaScreen({ onViewCoupons, onViewStores }: Props) {
     <div className="flex-1 flex flex-col px-4 pb-4">
       <header className="dp-screen-header">
         <p className={dpLabel}>まちサーガ</p>
-        <h1 className={`${dpTitle} mt-1`}>{region.name}ガチャ</h1>
+        <h1 className={`${dpTitle} mt-1`}>{region.name}チャンス</h1>
         <p className={`${dpSubtitle} mt-2`}>{region.tagline}</p>
       </header>
 
@@ -191,19 +198,19 @@ export function GachaScreen({ onViewCoupons, onViewStores }: Props) {
       >
         <video
           ref={videoRef}
-          src={GACHA_VIDEO_SRC}
+          src={CHANCE_VIDEO_SRC}
           className={`w-full min-h-[200px] object-contain bg-zinc-100 ${
             showVideo ? "block" : "hidden"
           }`}
           playsInline
           preload="auto"
           muted={false}
-          aria-label="ガチャ演出"
+          aria-label="チャンス演出"
         />
 
         {phase === "idle" && limitMessage && (
           <p className="text-sm text-zinc-600 text-center px-4 py-3 border-t-2 border-[#e0dbd0] bg-white">
-            本日のガチャ回数を使い切りました。また明日お試しください。
+            本日のチャンスを使い切りました。また明日お試しください。
           </p>
         )}
 
@@ -249,7 +256,7 @@ export function GachaScreen({ onViewCoupons, onViewStores }: Props) {
           }
           className={`${dpBtnPrimary} mt-4`}
         >
-          {phase === "spinning" ? "ドキドキ中..." : "ガチャを回す！"}
+          {phase === "spinning" ? "ドキドキ中..." : "挑戦！"}
         </button>
       )}
 
@@ -267,39 +274,49 @@ export function GachaScreen({ onViewCoupons, onViewStores }: Props) {
             disabled={!testUnlimited && remaining <= 0}
             className={`${dpBtnSecondary} disabled:opacity-40`}
           >
-            もう一度回す
+            もう一度挑戦
           </button>
         </div>
       )}
 
-      {isDev && (
-        <div className="mt-6 flex flex-col gap-2">
+      {showTestTools && (
+        <section
+          className="mt-6 rounded-xl border-2 border-dashed border-amber-300 bg-amber-50/80 p-3 flex flex-col gap-2"
+          aria-label="テスト用ツール"
+        >
+          <p className="text-center text-[10px] font-bold tracking-wider text-amber-800">
+            テスト用
+          </p>
           <button
             type="button"
             onClick={handleToggleTestUnlimited}
-            className="w-full py-2 rounded-xl border border-dashed border-zinc-300 text-xs text-zinc-500"
+            className={`w-full py-2.5 rounded-xl border text-xs font-bold ${
+              testUnlimited
+                ? "border-emerald-500 bg-emerald-100 text-emerald-800"
+                : "border-zinc-300 bg-white text-zinc-600"
+            }`}
           >
             {testUnlimited
-              ? "テスト：回数無制限 ON（タップで OFF）"
-              : "テスト：回数無制限 OFF（タップで ON）"}
+              ? "回数無制限 ON（タップで OFF）"
+              : "回数無制限 OFF（タップで ON）"}
           </button>
           <button
             type="button"
             onClick={handleResetCoupons}
-            className="w-full py-2 rounded-xl border border-dashed border-amber-400 text-xs text-amber-700"
+            className="w-full py-2.5 rounded-xl border border-amber-500 bg-white text-xs font-bold text-amber-800"
           >
-            テスト：クーポンをリセット
+            チケット・回数をリセット
           </button>
           {resetMessage && (
             <p className="text-center text-xs text-zinc-600">{resetMessage}</p>
           )}
-        </div>
+        </section>
       )}
     </div>
   );
 }
 
-function ResultDisplay({ result }: { result: GachaResult }) {
+function ResultDisplay({ result }: { result: ChanceResult }) {
   const { prize, resultType } = result;
 
   if (resultType === "lose") {

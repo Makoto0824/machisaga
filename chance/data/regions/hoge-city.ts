@@ -1,12 +1,12 @@
 import type { RegionConfig } from "@/data/types";
 import { publicPath } from "@/lib/paths";
 
-/** 将来の渋谷版など追加地域用の仮置きデータ */
+/** 将来の追加地域用の仮置きデータ */
 export const hogeCity: RegionConfig = {
   slug: "hoge-city",
   name: "ほげ市",
-  title: "まちサーガほげ市ガチャ（準備中）",
-  description: "ほげ市エリアのガチャ（デモ・仮置き）",
+  title: "まちサーガほげ市チャンス（準備中）",
+  description: "ほげ市エリアのチャンス（デモ・仮置き）",
   tagline: "デモ用の仮置き地域です。店舗・景品データは後から差し替えます。",
   stores: [
     {

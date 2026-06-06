@@ -19,7 +19,7 @@ export function StoreListScreen() {
         <p className={dpLabel}>お店</p>
         <h1 className={`${dpTitle} mt-1`}>参加店舗</h1>
         <p className={`${dpSubtitle} mt-1`}>
-          ガチャで当たるクーポンが使えるお店です
+          チャンスで当たるクーポンが使えるお店です
         </p>
       </header>
 

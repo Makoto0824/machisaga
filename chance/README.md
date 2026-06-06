@@ -1,14 +1,14 @@
-# まちサーガガチャ
+# まちサーガチャンス
 
-まちサーガの地域別ガチャ Web 版です。  
-1日3回までガチャを回し、参加店舗で使える独自クーポンが当たります。
+まちサーガの地域別チャンス Web 版です。  
+1日3回まで挑戦し、参加店舗で使える独自クーポンが当たります。
 
 ## URL 構成
 
 | 環境 | URL |
 |------|-----|
-| 本番（例） | `https://machisaga-gacha.vercel.app/mobara` |
-| 仮置き地域 | `https://machisaga-gacha.vercel.app/hoge-city` |
+| 本番 | `https://machisaga-chance.vercel.app/mobara` |
+| 仮置き地域 | `https://machisaga-chance.vercel.app/hoge-city` |
 | ローカル | `http://localhost:3002/mobara` |
 
 `/` にアクセスすると `/mobara` へリダイレクトします。
@@ -26,7 +26,7 @@
 ```text
 ~/projects/machisaga-repo/
 ├── index.html  …ゲーム本体
-└── gacha/      # ガチャアプリ（Vercel Root Directory: gacha）
+└── chance/     # チャンスアプリ（Vercel Root Directory: chance）
     ├── app/[region]/   # 地域別ルート（/mobara, /hoge-city）
     └── data/regions/   # 地域ごとの店舗・景品データ
 ```
@@ -34,15 +34,15 @@
 ## 起動方法
 
 ```bash
-cd ~/projects/machisaga-repo/gacha
+cd ~/projects/machisaga-repo/chance
 npm install
 npm run dev
 ```
 
-- 茂原: [http://localhost:3002/mobara](http://localhost:3002/mobara)
+- 茂原市: [http://localhost:3002/mobara](http://localhost:3002/mobara)
 - 仮置き: [http://localhost:3002/hoge-city](http://localhost:3002/hoge-city)
 
-> 同じマシンでゲーム本体が `3000` を使っているため、ガチャは **`3002`** で起動します。
+> 同じマシンでゲーム本体が `3000` を使っているため、チャンスは **`3002`** で起動します。
 
 ## 地域の追加方法
 
@@ -52,17 +52,17 @@ npm run dev
 
 ## Vercel へのデプロイ
 
-ゲーム本体とは **別の Vercel プロジェクト** を作成し、GitHub リポジトリ `Makoto0824/machisaga` を接続します。
+ゲーム本体とは **別の Vercel プロジェクト** `machisaga-chance` を使用します。
 
-1. [Vercel](https://vercel.com/) → **Add New Project** → `machisaga` を選択
-2. **Root Directory** を `gacha` に設定
+1. GitHub リポジトリ `Makoto0824/machisaga` を接続
+2. **Root Directory** を `chance` に設定
 3. Framework Preset: **Next.js**
 4. 環境変数（Supabase を使う場合）:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 5. デプロイ後:
-   - `https://（プロジェクト名）.vercel.app/mobara`
-   - `https://（プロジェクト名）.vercel.app/hoge-city`
+   - `https://machisaga-chance.vercel.app/mobara`
+   - `https://machisaga-chance.vercel.app/hoge-city`
 
 ## 環境変数
 
@@ -76,7 +76,7 @@ npm run dev
 app/
   page.tsx              # / → /mobara へリダイレクト
   [region]/
-    page.tsx            # ガチャ画面
+    page.tsx            # チャンス画面
     layout.tsx          # 地域メタデータ・RegionProvider
 data/
   types.ts
@@ -85,5 +85,7 @@ data/
     hoge-city.ts
     index.ts
 components/
+  ChanceScreen.tsx
 lib/
+  chance.ts
 ```

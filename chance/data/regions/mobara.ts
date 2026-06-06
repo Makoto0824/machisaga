@@ -3,18 +3,19 @@ import { publicPath } from "@/lib/paths";
 
 export const mobara: RegionConfig = {
   slug: "mobara",
-  name: "茂原",
-  title: "まちサーガ茂原ガチャ",
+  name: "茂原市",
+  title: "まちサーガ茂原市チャンス",
   description:
-    "1日3回までチャレンジ！参加店舗で使えるクーポンが当たるガチャ",
-  tagline: "1日3回までチャレンジできます。参加店舗で使えるクーポンや特典が当たります。",
+    "1日3回までチャレンジ！参加店舗で使えるクーポンが当たるチャンス",
+  tagline:
+    "1日3回までチャレンジできます。参加店舗で使えるクーポンや特典が当たります。",
   stores: [
     {
       id: "store-kurofune",
       name: "茂原黒船",
       category: "創作スイーツ",
       description:
-        "茂原で50年創作スイーツ店。初代ジャムロールが有名で、地元に愛されるスイーツ作りに取り組んでいます。",
+        "茂原市で50年創作スイーツ店。初代ジャムロールが有名で、地元に愛されるスイーツ作りに取り組んでいます。",
       url: "https://maps.app.goo.gl/jnwC2n9CkTXoMEzW9",
     },
     {
@@ -41,7 +42,7 @@ export const mobara: RegionConfig = {
       store_name: "茂原黒船",
       title: "ジャムロール50円引き",
       description:
-        "人気の初代ジャムロールを50円引き。茂原の創作スイーツをお得にお楽しみください。",
+        "人気の初代ジャムロールを50円引き。茂原市の創作スイーツをお得にお楽しみください。",
       usage_condition: "ジャムロール1本購入時・他クーポン併用不可",
       probability: 22,
       expires_days: 30,
