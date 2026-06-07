@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "イベント情報",
   description:
-    "茂原市・茂原アスモ、参加店舗のイベント・セール情報をお知らせします。",
+    "茂原市・アスモの公式イベント情報への案内と、参加店舗のセール・イベント情報。",
 };
 
 export default function EventsLayout({

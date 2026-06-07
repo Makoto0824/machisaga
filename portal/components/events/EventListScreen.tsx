@@ -1,58 +1,53 @@
 "use client";
 
 import { useMemo } from "react";
-import { getRegionEvents } from "@/data/events";
-import type { EventCategory } from "@/data/events/types";
+import { getRegionEventsData } from "@/data/events";
+import type { EventLinkCategory } from "@/data/events/types";
 import { useRegion } from "@/components/RegionProvider";
-import { EventCard } from "@/components/events/EventCard";
+import { EventLinkCard } from "@/components/events/EventLinkCard";
+import { StoreEventCard } from "@/components/events/StoreEventCard";
 import {
-  EVENT_SECTION_TITLES,
-  partitionRegionEvents,
+  ENDED_SECTION_TITLE,
+  LINK_SECTION_TITLES,
+  STORE_SECTION_TITLE,
+  partitionRegionEventsData,
 } from "@/lib/events";
-import {
-  dpLabel,
-  dpSubtitle,
-  dpTitle,
-} from "@/components/ui/theme";
+import { dpLabel, dpSubtitle, dpTitle } from "@/components/ui/theme";
 
-const ACTIVE_SECTIONS: EventCategory[] = ["mobara-city", "asmo", "store"];
+const LINK_SECTIONS: EventLinkCategory[] = ["mobara-city", "asmo"];
 
-function EventSection({
+function LinkSection({
   title,
-  events,
-  emptyMessage,
+  links,
 }: {
   title: string;
-  events: ReturnType<typeof partitionRegionEvents>["activeByCategory"][EventCategory];
-  emptyMessage: string;
+  links: ReturnType<typeof partitionRegionEventsData>["linksByCategory"][EventLinkCategory];
 }) {
+  if (links.length === 0) return null;
+
   return (
     <section className="mt-6">
       <h2 className="text-sm font-bold text-zinc-800 border-b-2 border-zinc-200 pb-2">
         {title}
       </h2>
-      {events.length === 0 ? (
-        <p className="text-sm text-zinc-500 mt-3">{emptyMessage}</p>
-      ) : (
-        <ul className="flex flex-col gap-3 mt-3">
-          {events.map((event) => (
-            <li key={event.id}>
-              <EventCard event={event} />
-            </li>
-          ))}
-        </ul>
-      )}
+      <ul className="flex flex-col gap-3 mt-3">
+        {links.map((link) => (
+          <li key={link.id}>
+            <EventLinkCard link={link} />
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
 
 export function EventListScreen() {
   const region = useRegion();
-  const events = getRegionEvents(region.slug);
+  const data = getRegionEventsData(region.slug);
 
-  const { activeByCategory, ended } = useMemo(
-    () => partitionRegionEvents(events, region),
-    [events, region]
+  const { linksByCategory, activeStores, endedStores } = useMemo(
+    () => partitionRegionEventsData(data, region),
+    [data, region]
   );
 
   return (
@@ -61,28 +56,46 @@ export function EventListScreen() {
         <p className={dpLabel}>イベント</p>
         <h1 className={`${dpTitle} mt-1`}>イベント情報</h1>
         <p className={`${dpSubtitle} mt-1`}>
-          茂原市・アスモ、参加店舗のイベント・セール情報です。詳細は各リンク先でご確認ください。
+          茂原市・アスモのイベントは各公式サイトへ。参加店舗のセール情報はこちらでお知らせします。
         </p>
       </header>
 
-      {ACTIVE_SECTIONS.map((category) => (
-        <EventSection
+      {LINK_SECTIONS.map((category) => (
+        <LinkSection
           key={category}
-          title={EVENT_SECTION_TITLES[category]}
-          events={activeByCategory[category]}
-          emptyMessage="現在掲載中のイベントはありません。"
+          title={LINK_SECTION_TITLES[category]}
+          links={linksByCategory[category]}
         />
       ))}
 
-      {ended.length > 0 && (
+      <section className="mt-6">
+        <h2 className="text-sm font-bold text-zinc-800 border-b-2 border-zinc-200 pb-2">
+          {STORE_SECTION_TITLE}
+        </h2>
+        {activeStores.length === 0 ? (
+          <p className="text-sm text-zinc-500 mt-3">
+            現在掲載中の店舗イベントはありません。
+          </p>
+        ) : (
+          <ul className="flex flex-col gap-3 mt-3">
+            {activeStores.map((event) => (
+              <li key={event.id}>
+                <StoreEventCard event={event} />
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      {endedStores.length > 0 && (
         <section className="mt-8">
           <h2 className="text-sm font-bold text-zinc-600 border-b-2 border-zinc-200 pb-2">
-            終了したイベント
+            {ENDED_SECTION_TITLE}
           </h2>
           <ul className="flex flex-col gap-3 mt-3">
-            {ended.map((event) => (
+            {endedStores.map((event) => (
               <li key={event.id}>
-                <EventCard event={event} ended />
+                <StoreEventCard event={event} ended />
               </li>
             ))}
           </ul>

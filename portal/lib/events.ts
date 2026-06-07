@@ -1,25 +1,20 @@
 import type { RegionConfig } from "@/data/types";
-import type { EventCategory, RegionEvent } from "@/data/events/types";
+import type {
+  EventLinkCategory,
+  EventLinkRef,
+  RegionEventsData,
+  StoreEvent,
+} from "@/data/events/types";
 
-export const EVENT_SECTION_TITLES: Record<EventCategory, string> = {
-  "mobara-city": "茂原市のイベント",
-  asmo: "茂原アスモのイベント",
-  store: "参加店舗のイベント",
+export const LINK_SECTION_TITLES: Record<EventLinkCategory, string> = {
+  "mobara-city": "茂原市のイベント情報",
+  asmo: "茂原アスモのイベント情報",
 };
 
-export const EVENT_CATEGORY_LABELS: Record<EventCategory, string> = {
-  "mobara-city": "茂原市",
-  asmo: "茂原アスモ",
-  store: "参加店舗",
-};
+export const STORE_SECTION_TITLE = "参加店舗のイベント";
+export const ENDED_SECTION_TITLE = "終了したイベント";
 
-const ACTIVE_CATEGORIES: EventCategory[] = [
-  "mobara-city",
-  "asmo",
-  "store",
-];
-
-export type EventWithStoreName = RegionEvent & {
+export type StoreEventWithName = StoreEvent & {
   storeName?: string;
 };
 
@@ -32,7 +27,7 @@ function parseDate(dateStr: string): Date {
   return new Date(y, m - 1, d);
 }
 
-export function isEventEnded(event: RegionEvent, today = new Date()): boolean {
+export function isStoreEventEnded(event: StoreEvent, today = new Date()): boolean {
   return startOfDay(parseDate(event.endDate)) < startOfDay(today);
 }
 
@@ -42,7 +37,7 @@ export function formatEventDate(dateStr: string): string {
   return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}（${weekdays[d.getDay()]}）`;
 }
 
-export function formatEventDateRange(event: RegionEvent): string {
+export function formatStoreEventDateRange(event: StoreEvent): string {
   if (event.startDate === event.endDate) {
     return formatEventDate(event.startDate);
   }
@@ -51,61 +46,62 @@ export function formatEventDateRange(event: RegionEvent): string {
 
 function resolveStoreName(
   region: RegionConfig,
-  event: RegionEvent
+  event: StoreEvent
 ): string | undefined {
-  if (!event.storeId) return undefined;
   return region.stores.find((s) => s.id === event.storeId)?.name;
 }
 
 function attachStoreName(
   region: RegionConfig,
-  event: RegionEvent
-): EventWithStoreName {
+  event: StoreEvent
+): StoreEventWithName {
   const storeName = resolveStoreName(region, event);
   return storeName ? { ...event, storeName } : event;
 }
 
-function sortByStartAsc(a: RegionEvent, b: RegionEvent): number {
+function sortByStartAsc(a: StoreEvent, b: StoreEvent): number {
   return parseDate(a.startDate).getTime() - parseDate(b.startDate).getTime();
 }
 
-function sortByEndDesc(a: RegionEvent, b: RegionEvent): number {
+function sortByEndDesc(a: StoreEvent, b: StoreEvent): number {
   return parseDate(b.endDate).getTime() - parseDate(a.endDate).getTime();
 }
 
-export function partitionRegionEvents(
-  events: RegionEvent[],
+export function partitionRegionEventsData(
+  data: RegionEventsData,
   region: RegionConfig,
   today = new Date()
 ): {
-  activeByCategory: Record<EventCategory, EventWithStoreName[]>;
-  ended: EventWithStoreName[];
+  linksByCategory: Record<EventLinkCategory, EventLinkRef[]>;
+  activeStores: StoreEventWithName[];
+  endedStores: StoreEventWithName[];
 } {
-  const visible = events.filter((e) => e.isActive);
-  const active: RegionEvent[] = [];
-  const ended: RegionEvent[] = [];
+  const linksByCategory: Record<EventLinkCategory, EventLinkRef[]> = {
+    "mobara-city": data.links.filter(
+      (l) => l.isActive && l.category === "mobara-city"
+    ),
+    asmo: data.links.filter((l) => l.isActive && l.category === "asmo"),
+  };
 
-  for (const event of visible) {
-    if (isEventEnded(event, today)) {
-      ended.push(event);
+  const visibleStores = data.storeEvents.filter((e) => e.isActive);
+  const activeStores: StoreEvent[] = [];
+  const endedStores: StoreEvent[] = [];
+
+  for (const event of visibleStores) {
+    if (isStoreEventEnded(event, today)) {
+      endedStores.push(event);
     } else {
-      active.push(event);
+      activeStores.push(event);
     }
   }
 
-  const activeByCategory = ACTIVE_CATEGORIES.reduce(
-    (acc, category) => {
-      acc[category] = active
-        .filter((e) => e.category === category)
-        .sort(sortByStartAsc)
-        .map((e) => attachStoreName(region, e));
-      return acc;
-    },
-    {} as Record<EventCategory, EventWithStoreName[]>
-  );
-
   return {
-    activeByCategory,
-    ended: ended.sort(sortByEndDesc).map((e) => attachStoreName(region, e)),
+    linksByCategory,
+    activeStores: activeStores
+      .sort(sortByStartAsc)
+      .map((e) => attachStoreName(region, e)),
+    endedStores: endedStores
+      .sort(sortByEndDesc)
+      .map((e) => attachStoreName(region, e)),
   };
 }
