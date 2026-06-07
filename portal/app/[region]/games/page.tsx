@@ -1,10 +1,10 @@
-import { PlaceholderScreen } from "@/components/PlaceholderScreen";
+import { MobileFrame } from "@/components/MobileFrame";
+import { GameListScreen } from "@/components/games/GameListScreen";
 
 export default function GamesPage() {
   return (
-    <PlaceholderScreen
-      title="ゲーム"
-      description="まちサーガのミニゲームは準備中です。"
-    />
+    <MobileFrame>
+      <GameListScreen />
+    </MobileFrame>
   );
 }
