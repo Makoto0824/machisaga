@@ -1,16 +1,14 @@
-import { PlaceholderScreen } from "@/components/PlaceholderScreen";
+import { MobileFrame } from "@/components/MobileFrame";
+import { EventListScreen } from "@/components/events/EventListScreen";
 
 type Props = {
   params: Promise<{ region: string }>;
 };
 
-export default async function EventsPage({ params }: Props) {
-  const { region } = await params;
+export default async function EventsPage(_props: Props) {
   return (
-    <PlaceholderScreen
-      regionSlug={region}
-      title="イベント"
-      description="スタンプラリーなどのイベント情報は準備中です。"
-    />
+    <MobileFrame>
+      <EventListScreen />
+    </MobileFrame>
   );
 }
