@@ -45,4 +45,5 @@ export const hogeCity: RegionConfig = {
   ticketImages: {
     "store-hoge-demo": publicPath("/assets/images/tickets/kurofune1.png"),
   },
+  storeCardImages: {},
 };

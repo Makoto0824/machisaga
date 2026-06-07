@@ -87,7 +87,12 @@ export const mobara: RegionConfig = {
   ],
   ticketImages: {
     "store-kurofune": publicPath("/assets/images/tickets/kurofune1.png"),
-    "store-laughin": publicPath("/assets/images/tickets/laughin.png"),
-    "store-reve": publicPath("/assets/images/tickets/reve.png"),
+    "store-laughin": publicPath("/assets/images/tickets/laughin1.png"),
+    "store-reve": publicPath("/assets/images/tickets/reve1.png"),
+  },
+  storeCardImages: {
+    "store-kurofune": publicPath("/assets/images/trading-card/card1.png"),
+    "store-laughin": publicPath("/assets/images/trading-card/card3.png"),
+    "store-reve": publicPath("/assets/images/trading-card/card2.png"),
   },
 };

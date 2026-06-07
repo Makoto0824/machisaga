@@ -1,4 +1,8 @@
-import { PlaceholderScreen } from "@/components/PlaceholderScreen";
+import { notFound } from "next/navigation";
+import { MobileFrame } from "@/components/MobileFrame";
+import { OtherScreen } from "@/components/other/OtherScreen";
+import { getRegionOtherContent, getRegionRoadmapContent } from "@/data/other";
+import { isValidRegion } from "@/data/regions";
 
 type Props = {
   params: Promise<{ region: string }>;
@@ -6,11 +10,14 @@ type Props = {
 
 export default async function OtherPage({ params }: Props) {
   const { region } = await params;
+  if (!isValidRegion(region)) notFound();
+  const content = getRegionOtherContent(region);
+  if (!content) notFound();
+  const roadmap = getRegionRoadmapContent(region);
+
   return (
-    <PlaceholderScreen
-      regionSlug={region}
-      title="その他"
-      description="案内・リンク集は準備中です。"
-    />
+    <MobileFrame>
+      <OtherScreen content={content} roadmap={roadmap} />
+    </MobileFrame>
   );
 }

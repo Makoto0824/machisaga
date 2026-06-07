@@ -56,19 +56,11 @@ export function EventListScreen() {
         <p className={dpLabel}>イベント</p>
         <h1 className={`${dpTitle} mt-1`}>イベント情報</h1>
         <p className={`${dpSubtitle} mt-1`}>
-          茂原市・アスモのイベントは各公式サイトへ。参加店舗のセール情報はこちらでお知らせします。
+          参加店舗のセール情報と、茂原市・アスモの公式イベント情報への案内です。
         </p>
       </header>
 
-      {LINK_SECTIONS.map((category) => (
-        <LinkSection
-          key={category}
-          title={LINK_SECTION_TITLES[category]}
-          links={linksByCategory[category]}
-        />
-      ))}
-
-      <section className="mt-6">
+      <section className="mt-4">
         <h2 className="text-sm font-bold text-zinc-800 border-b-2 border-zinc-200 pb-2">
           {STORE_SECTION_TITLE}
         </h2>
@@ -86,6 +78,14 @@ export function EventListScreen() {
           </ul>
         )}
       </section>
+
+      {LINK_SECTIONS.map((category) => (
+        <LinkSection
+          key={category}
+          title={LINK_SECTION_TITLES[category]}
+          links={linksByCategory[category]}
+        />
+      ))}
 
       {endedStores.length > 0 && (
         <section className="mt-8">

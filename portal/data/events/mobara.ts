@@ -7,6 +7,25 @@ import type { RegionEventsData } from "@/data/events/types";
 export const mobaraEventsData: RegionEventsData = {
   links: [
     {
+      id: "mobara-city-official-events",
+      category: "mobara-city",
+      title: "茂原市公式サイト（まつり・イベント）",
+      summary:
+        "茂原市が案内するまつり・イベント情報です。市主催の催しや関連情報を確認できます。",
+      detailUrl:
+        "https://www.city.mobara.chiba.jp/promotion/category/13-2-2-0-0-0-0-0-0-0.html",
+      isActive: true,
+    },
+    {
+      id: "mobara-kankou-festival",
+      category: "mobara-city",
+      title: "もばら旅日和（お祭り・イベント特集）",
+      summary:
+        "茂原市観光協会が運営するサイト。例年の祭り・イベントの年間スケジュールを掲載しています。",
+      detailUrl: "https://www.mobara-kankou.com/special/festival/",
+      isActive: true,
+    },
+    {
       id: "maruchiba-mobara",
       category: "mobara-city",
       title: "ちば観光ナビ（茂原市のイベント）",

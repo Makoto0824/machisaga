@@ -29,6 +29,7 @@ export type RegionConfig = {
   stores: Store[];
   couponPrizes: CouponPrize[];
   ticketImages: Record<string, string>;
+  storeCardImages: Record<string, string>;
 };
 
 export function getStoreCoupons(
