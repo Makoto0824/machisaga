@@ -11,8 +11,8 @@ export default function RegionNotFound() {
       <ul className="flex flex-col gap-2 text-sm">
         {REGION_SLUGS.map((slug) => (
           <li key={slug}>
-            <Link href={`/${slug}`} className="text-blue-600 underline">
-              /{slug}
+            <Link href={`/${slug}/chance`} className="text-blue-600 underline">
+              /{slug}/chance
             </Link>
           </li>
         ))}

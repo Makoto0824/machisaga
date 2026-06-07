@@ -21,8 +21,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const region = getRegion(slug);
   if (!region) return {};
   return {
-    title: region.title,
-    description: region.description,
+    title: `まちサーガ ${region.name}`,
+    description: region.tagline,
   };
 }
 

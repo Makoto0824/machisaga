@@ -15,8 +15,8 @@ const mplusRounded = M_PLUS_Rounded_1c({
 });
 
 export const metadata: Metadata = {
-  title: "まちサーガチャンス",
-  description: "地域ごとのチャンスで参加店舗クーポンが当たるまちサーガチャンス",
+  title: "まちサーガ",
+  description: "地域のチャンス・ゲーム・イベントを楽しむまちサーガポータル",
 };
 
 export const viewport: Viewport = {
