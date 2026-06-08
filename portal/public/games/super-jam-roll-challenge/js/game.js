@@ -24,14 +24,17 @@ const ROLL_FRAMES = [
 
 const BG_GAME = 'assets/images/bg_game.png';
 const KARASHI_SLOW_DURATION = 3;
+const KARASHI_KEYBOARD_SLOW_RATIO = 0.28;
+const KARASHI_LERP_FOLLOW = 0.12;
 const COMPLETION_TIME_BONUS = 2;
 const TAKUMI_TIME_SECONDS = 5;
 const TAKUMI_SPEED_BONUS = 0.5;
 const TAKUMI_INTERVAL_REDUCTION = 350;
 const MIN_DROP_INTERVAL = 350;
-const JAM_SPAWN_WEIGHT = 40;
-const TAKUMI_SPAWN_WEIGHT = 1;
-const TAKUMI_MIN_SCORE = 2;
+const JAM_SPAWN_WEIGHT = 16;
+const TAKUMI_SPAWN_SLOTS = 2;
+const TAKUMI_MIN_SCORE = 1;
+const TAKUMI_COOLDOWN_SECONDS = 7;
 
 class Game {
     constructor() {
@@ -70,8 +73,9 @@ class Game {
         this.jamCount = 0;
         this.isTakumiTime = false;
         this.takumiTimeLeft = 0;
-        this.karashiSlowLeft = 0;
+        this.karashiSlowMs = 0;
         this.karashiFallPending = false;
+        this.takumiCooldownLeft = 0;
         this.rollTargetX = null;
         this.touchDragStartClientX = null;
         this.touchDragStartRollX = null;
@@ -289,7 +293,7 @@ class Game {
         );
 
         const applyRollTarget = (targetX) => {
-            if (this.karashiSlowLeft > 0) {
+            if (this.isKarashiSlow()) {
                 this.rollTargetX = targetX;
             } else {
                 this.roll.x = targetX;
@@ -367,22 +371,26 @@ class Game {
         });
     }
 
+    isKarashiSlow() {
+        return this.karashiSlowMs > 0;
+    }
+
     getRollMoveSpeed() {
         const base = Math.max(6, Math.round(8 * this.scaleFactor));
-        if (this.karashiSlowLeft > 0) {
-            return Math.max(3, Math.round(base * 0.45));
+        if (this.isKarashiSlow()) {
+            return Math.max(2, Math.round(base * KARASHI_KEYBOARD_SLOW_RATIO));
         }
         return base;
     }
 
     updateRollMovement(deltaTime) {
-        if (!this.roll || this.rollFalling || this.rollRespawnAnimation || this.karashiSlowLeft <= 0) return;
+        if (!this.roll || this.rollFalling || this.rollRespawnAnimation || !this.isKarashiSlow()) return;
 
         if (this.rollTargetX == null) {
             this.rollTargetX = this.roll.x;
         }
 
-        const follow = 0.3 * (deltaTime / 16);
+        const follow = KARASHI_LERP_FOLLOW * (deltaTime / 16);
         const half = this.roll.width / 2;
         this.roll.x += (this.rollTargetX - this.roll.x) * follow;
         this.roll.x = Math.min(Math.max(this.roll.x, half), this.gameWidth - half);
@@ -399,8 +407,9 @@ class Game {
         this.items = [];
         this.isTakumiTime = false;
         this.takumiTimeLeft = 0;
-        this.karashiSlowLeft = 0;
+        this.karashiSlowMs = 0;
         this.karashiFallPending = false;
+        this.takumiCooldownLeft = 0;
         this.rollTargetX = null;
         this.touchDragStartClientX = null;
         this.touchDragStartRollX = null;
@@ -521,12 +530,8 @@ class Game {
                 if (this.takumiTimeLeft <= 0) this.endTakumiTime();
             }
 
-            if (this.karashiSlowLeft > 0) {
-                this.karashiSlowLeft--;
-                if (this.karashiSlowLeft <= 0 && this.karashiFallPending) {
-                    this.karashiFallPending = false;
-                    this.startRollFall();
-                }
+            if (this.takumiCooldownLeft > 0) {
+                this.takumiCooldownLeft--;
             }
 
             this.updateUI();
@@ -565,6 +570,14 @@ class Game {
         }
 
         this.updateRollMovement(deltaTime);
+
+        if (this.karashiSlowMs > 0) {
+            this.karashiSlowMs = Math.max(0, this.karashiSlowMs - deltaTime);
+            if (this.karashiSlowMs <= 0 && this.karashiFallPending) {
+                this.karashiFallPending = false;
+                this.startRollFall();
+            }
+        }
 
         if (this.rollFalling) {
             this.rollFallSpeed += 0.3 * this.scaleFactor;
@@ -686,8 +699,8 @@ class Game {
         const types = Array(JAM_SPAWN_WEIGHT).fill('jam');
         if (this.score >= 2) types.push('karashi');
         if (this.score >= 4) types.push('mogumogun');
-        if (this.score >= TAKUMI_MIN_SCORE) {
-            for (let i = 0; i < TAKUMI_SPAWN_WEIGHT; i++) {
+        if (this.score >= TAKUMI_MIN_SCORE && this.takumiCooldownLeft <= 0) {
+            for (let i = 0; i < TAKUMI_SPAWN_SLOTS; i++) {
                 types.push('takumi');
             }
         }
@@ -926,6 +939,7 @@ class Game {
         this.isTakumiTime = false;
         this.gameScreen.classList.remove('takumi-time');
         this.gameStage.classList.remove('takumi-time');
+        this.takumiCooldownLeft = TAKUMI_COOLDOWN_SECONDS;
         this.adjustDifficulty();
         this.hideTakumiEffect();
     }
@@ -934,8 +948,10 @@ class Game {
         this.jamCount = 0;
         this.updateJamGauge();
         this.karashiFallPending = true;
-        this.karashiSlowLeft = KARASHI_SLOW_DURATION;
-        if (this.roll) this.rollTargetX = this.roll.x;
+        this.karashiSlowMs = KARASHI_SLOW_DURATION * 1000;
+        if (this.roll) {
+            this.rollTargetX = this.roll.x;
+        }
         this.showKarashiEffect();
     }
 
