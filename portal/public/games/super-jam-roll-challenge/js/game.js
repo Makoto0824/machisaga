@@ -71,6 +71,8 @@ class Game {
         this.takumiTimeLeft = 0;
         this.karashiSlowLeft = 0;
         this.rollTargetX = null;
+        this.touchDragStartClientX = null;
+        this.touchDragStartRollX = null;
 
         this.roll = null;
         this.items = [];
@@ -284,12 +286,7 @@ class Game {
             this.gameWidth - this.roll.width / 2
         );
 
-        const moveRollTo = (clientX) => {
-            if (!this.isRunning || this.rollFalling || this.rollRespawnAnimation || !this.roll) return;
-            const rect = this.canvas.getBoundingClientRect();
-            const gameX = ((clientX - rect.left) / rect.width) * this.gameWidth;
-            const targetX = clampRollX(gameX);
-
+        const applyRollTarget = (targetX) => {
             if (this.karashiSlowLeft > 0) {
                 this.rollTargetX = targetX;
             } else {
@@ -298,24 +295,56 @@ class Game {
             }
         };
 
+        const moveRollTo = (clientX) => {
+            if (!this.isRunning || this.rollFalling || this.rollRespawnAnimation || !this.roll) return;
+            const rect = this.canvas.getBoundingClientRect();
+            const gameX = ((clientX - rect.left) / rect.width) * this.gameWidth;
+            applyRollTarget(clampRollX(gameX));
+        };
+
+        const moveRollByTouchDrag = (clientX) => {
+            if (!this.isRunning || this.rollFalling || this.rollRespawnAnimation || !this.roll) return;
+            if (this.touchDragStartClientX == null || this.touchDragStartRollX == null) return;
+
+            const rect = this.canvas.getBoundingClientRect();
+            const deltaClient = clientX - this.touchDragStartClientX;
+            const deltaGame = (deltaClient / rect.width) * this.gameWidth;
+            applyRollTarget(clampRollX(this.touchDragStartRollX + deltaGame));
+        };
+
         this.gameScreen.addEventListener('pointerdown', (e) => {
             if (!this.isRunning || this.rollFalling || this.rollRespawnAnimation) return;
             if (e.pointerType === 'mouse' && e.button !== 0) return;
 
             this.activePointerId = e.pointerId;
             this.gameScreen.setPointerCapture(e.pointerId);
+
+            if (e.pointerType === 'touch') {
+                this.touchDragStartClientX = e.clientX;
+                this.touchDragStartRollX = this.roll?.x ?? null;
+                return;
+            }
+
             moveRollTo(e.clientX);
         });
 
         this.gameScreen.addEventListener('pointermove', (e) => {
             if (this.activePointerId !== e.pointerId) return;
             e.preventDefault();
+
+            if (e.pointerType === 'touch') {
+                moveRollByTouchDrag(e.clientX);
+                return;
+            }
+
             moveRollTo(e.clientX);
         }, { passive: false });
 
         const releasePointer = (e) => {
             if (this.activePointerId !== e.pointerId) return;
             this.activePointerId = null;
+            this.touchDragStartClientX = null;
+            this.touchDragStartRollX = null;
             if (this.gameScreen.hasPointerCapture(e.pointerId)) {
                 this.gameScreen.releasePointerCapture(e.pointerId);
             }
@@ -370,6 +399,8 @@ class Game {
         this.takumiTimeLeft = 0;
         this.karashiSlowLeft = 0;
         this.rollTargetX = null;
+        this.touchDragStartClientX = null;
+        this.touchDragStartRollX = null;
         this.dropInterval = this.baseDropInterval;
         this.dropSpeed = this.baseDropSpeed;
         this.lastDropTime = 0;
