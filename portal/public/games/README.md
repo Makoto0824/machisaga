@@ -7,9 +7,9 @@
 | slug | 配置先 | 公開 URL（例） |
 |------|--------|----------------|
 | 勇者を探せ | `find-the-hero/` | `/games/find-the-hero/index.html` |
-| トレカ Web ゲーム | `trading-card/` | `/games/trading-card/` |
-| GameA | `game-a/` | `/games/game-a/` |
-| GameB | `game-b/` | `/games/game-b/` |
+| トレカ Web ゲーム | `trading-card/` | `/games/trading-card/index.html` |
+| スーパージャムロールチャレンジ | `super-jam-roll-challenge/` | `/games/super-jam-roll-challenge/index.html` |
+| GameB | `game-b/` | `/games/game-b/index.html` |
 
 ## アップロード手順
 

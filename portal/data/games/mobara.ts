@@ -21,11 +21,13 @@ export const mobaraGamesData: RegionGamesData = {
       status: "coming_soon",
     },
     {
-      id: "game-a",
-      slug: "game-a",
-      title: "Game A",
-      summary: "新しいゲームを準備中です。",
-      status: "coming_soon",
+      id: "super-jam-roll-challenge",
+      slug: "super-jam-roll-challenge",
+      title: "スーパージャムロールチャレンジ",
+      summary:
+        "ジャムロールを作って食べ尽くせ！タップで遊べるミニゲームです。",
+      status: "ready",
+      staticPath: publicPath("/games/super-jam-roll-challenge/index.html"),
     },
     {
       id: "game-b",

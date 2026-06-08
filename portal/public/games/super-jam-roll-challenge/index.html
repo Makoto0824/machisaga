@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <title>スーパージャムロールチャレンジ</title>
+    <link rel="icon" href="assets/images/jam.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="orientation-notice" class="orientation-notice hidden" aria-live="polite">
+        <p class="orientation-notice-text">スマホは縦向きで<br>プレイしてください</p>
+    </div>
+    <div id="game-container">
+        <!-- タイトル画面 -->
+        <div id="title-screen" class="screen">
+            <div class="stage-frame stage-frame--title">
+                <div class="title-content">
+                <img
+                    src="assets/images/title.png"
+                    alt="スーパージャムロールチャレンジ"
+                    class="title-logo"
+                    width="2172"
+                    height="724"
+                >
+                <button id="start-button" class="title-button" type="button" aria-label="ゲームスタート">
+                    <img
+                        src="assets/images/button_gamestart.png"
+                        alt="ゲームスタート"
+                        class="title-button-image"
+                        width="2238"
+                        height="461"
+                    >
+                </button>
+                <button id="how-to-button" class="title-button title-button--how-to" type="button" aria-label="あそびかた">
+                    <img
+                        src="assets/images/button_asobikata.png"
+                        alt="あそびかた"
+                        class="title-button-image"
+                        width="1254"
+                        height="1254"
+                    >
+                </button>
+            </div>
+            </div>
+        </div>
+
+        <!-- ゲーム画面 -->
+        <div id="game-screen" class="screen hidden">
+            <div class="stage-frame">
+                <div id="game-stage">
+                    <canvas id="game-canvas"></canvas>
+                    <div id="game-ui">
+                        <img
+                            src="assets/images/header_game.png"
+                            alt=""
+                            class="game-header-image"
+                            width="969"
+                            height="200"
+                        >
+                        <div class="game-header-stats">
+                            <div id="timer-display">
+                                <span class="ui-label">タイム</span>
+                                <span id="timer">タイム: 30</span>
+                            </div>
+                            <div id="score-display">
+                                <span class="ui-label">ロール</span>
+                                <span id="score">0 個</span>
+                                <span id="score-delta" class="score-delta" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="jam-gauge">
+                        <img
+                            src="assets/images/tabbar_game.png"
+                            alt=""
+                            class="game-tabbar-image"
+                            width="2838"
+                            height="452"
+                        >
+                        <div class="jam-gauge-dots">
+                            <span class="jam-dot" data-index="0"></span>
+                            <span class="jam-dot" data-index="1"></span>
+                            <span class="jam-dot" data-index="2"></span>
+                            <span class="jam-dot" data-index="3"></span>
+                            <span class="jam-dot" data-index="4"></span>
+                        </div>
+                    </div>
+                    <div id="effect-text"></div>
+                    <img
+                        id="effect-complete"
+                        class="effect-complete"
+                        src="assets/images/complete.png"
+                        alt="完成"
+                        width="800"
+                        height="400"
+                    >
+                    <img
+                        id="effect-takumi"
+                        class="effect-takumi"
+                        src="assets/images/takumi_time.png"
+                        alt="匠タイム"
+                        width="900"
+                        height="450"
+                    >
+                    <img
+                        id="effect-mogumogun"
+                        class="effect-mogumogun"
+                        src="assets/images/mogumogun_eat.png"
+                        alt="モグモグンに食べられた"
+                        width="900"
+                        height="500"
+                    >
+                    <img
+                        id="effect-karashi"
+                        class="effect-karashi"
+                        src="assets/images/karashi_miss.png"
+                        alt="からし"
+                        width="900"
+                        height="400"
+                    >
+                </div>
+            </div>
+        </div>
+
+        <!-- 結果画面 -->
+        <div id="result-screen" class="screen hidden">
+            <div class="stage-frame stage-frame--result">
+            <div class="result-layout">
+                <div class="result-content">
+                    <h2 class="result-title">ゲーム終了！</h2>
+                    <p class="result-text">あなたは</p>
+                    <p class="result-score"><span id="final-score">0</span>個</p>
+                    <p class="result-text">のスーパージャムロールを<br>完成させました！</p>
+                </div>
+                <div class="result-actions">
+                    <button id="retry-button" class="result-button" type="button" aria-label="トップへもどる">
+                        <img
+                            src="assets/images/button_back_to_top.png"
+                            alt="トップへもどる"
+                            class="result-button-image"
+                            width="2421"
+                            height="513"
+                        >
+                    </button>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="how-to-modal" class="how-to-modal hidden" role="dialog" aria-modal="true" aria-labelledby="how-to-title">
+        <button type="button" class="how-to-backdrop" id="how-to-backdrop" aria-label="閉じる"></button>
+        <div class="how-to-panel">
+            <div class="how-to-panel-inner">
+                <h2 id="how-to-title" class="how-to-title">あそびかた</h2>
+                <div class="how-to-body">
+                    <section class="how-to-section">
+                        <h3 class="how-to-heading">目的</h3>
+                        <p>画面下のロール生地を動かして、上から落ちてくるジャムを受け取ろう。</p>
+                        <p>ジャムを5個集めるとスーパージャムロールが1個完成。30秒以内に何個作れるか競うぞ！</p>
+                        <p>1個完成するたびに、残りタイムが2秒ふえる。</p>
+                    </section>
+                    <section class="how-to-section">
+                        <h3 class="how-to-heading">操作</h3>
+                        <ul class="how-to-list">
+                            <li>スマホ：画面をドラッグ</li>
+                            <li>PC：マウス移動</li>
+                            <li>PC：← → または A / D キー</li>
+                        </ul>
+                    </section>
+                    <section class="how-to-section">
+                        <h3 class="how-to-heading">アイテム</h3>
+                        <ul class="how-to-list">
+                            <li><strong>ジャム</strong> … 1個集まる</li>
+                            <li><strong>匠のパティシエ</strong> … 5秒間「匠タイム」。ジャムが大量に降ってくる</li>
+                            <li><strong>からし</strong> … ジャムが0に戻る。しばらく操作がにぶくなる</li>
+                            <li><strong>モグモグン</strong> … 完成数が1個減る（0個のときは減らない）</li>
+                        </ul>
+                    </section>
+                </div>
+                <button id="how-to-close" class="how-to-close" type="button">とじる</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/game.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+Deploy instructions
+===================
+
+Copy everything inside this dist/ folder to your web server document root.
+
+Example:
+  rsync -av dist/ user@server:/var/www/html/super-jam-roll-challenge/
+
+The entry point is index.html at the copied root.
