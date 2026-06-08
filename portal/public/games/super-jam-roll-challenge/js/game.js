@@ -24,10 +24,13 @@ const ROLL_FRAMES = [
 
 const BG_GAME = 'assets/images/bg_game.png';
 const KARASHI_SLOW_DURATION = 3;
+const COMPLETION_TIME_BONUS = 2;
 const TAKUMI_TIME_SECONDS = 5;
 const TAKUMI_SPEED_BONUS = 0.5;
 const TAKUMI_INTERVAL_REDUCTION = 350;
 const MIN_DROP_INTERVAL = 350;
+const JAM_SPAWN_WEIGHT = 18;
+const TAKUMI_SPAWN_WEIGHT = 1;
 
 class Game {
     constructor() {
@@ -642,10 +645,14 @@ class Game {
     getItemTypes() {
         if (this.isTakumiTime) return ['jam'];
 
-        const types = ['jam', 'jam', 'jam', 'jam', 'jam', 'jam', 'jam', 'jam'];
+        const types = Array(JAM_SPAWN_WEIGHT).fill('jam');
         if (this.score >= 2) types.push('karashi');
         if (this.score >= 4) types.push('mogumogun');
-        if (this.score >= 1) types.push('takumi');
+        if (this.score >= 1) {
+            for (let i = 0; i < TAKUMI_SPAWN_WEIGHT; i++) {
+                types.push('takumi');
+            }
+        }
         return types;
     }
 
@@ -683,7 +690,7 @@ class Game {
     completeRoll() {
         this.score++;
         this.jamCount = 0;
-        this.timeLeft += 2;
+        this.timeLeft += COMPLETION_TIME_BONUS;
         this.updateUI();
         this.updateJamGauge();
         this.completionAnimation = true;
