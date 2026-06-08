@@ -29,8 +29,9 @@ const TAKUMI_TIME_SECONDS = 5;
 const TAKUMI_SPEED_BONUS = 0.5;
 const TAKUMI_INTERVAL_REDUCTION = 350;
 const MIN_DROP_INTERVAL = 350;
-const JAM_SPAWN_WEIGHT = 18;
+const JAM_SPAWN_WEIGHT = 40;
 const TAKUMI_SPAWN_WEIGHT = 1;
+const TAKUMI_MIN_SCORE = 2;
 
 class Game {
     constructor() {
@@ -70,6 +71,7 @@ class Game {
         this.isTakumiTime = false;
         this.takumiTimeLeft = 0;
         this.karashiSlowLeft = 0;
+        this.karashiFallPending = false;
         this.rollTargetX = null;
         this.touchDragStartClientX = null;
         this.touchDragStartRollX = null;
@@ -398,6 +400,7 @@ class Game {
         this.isTakumiTime = false;
         this.takumiTimeLeft = 0;
         this.karashiSlowLeft = 0;
+        this.karashiFallPending = false;
         this.rollTargetX = null;
         this.touchDragStartClientX = null;
         this.touchDragStartRollX = null;
@@ -520,6 +523,10 @@ class Game {
 
             if (this.karashiSlowLeft > 0) {
                 this.karashiSlowLeft--;
+                if (this.karashiSlowLeft <= 0 && this.karashiFallPending) {
+                    this.karashiFallPending = false;
+                    this.startRollFall();
+                }
             }
 
             this.updateUI();
@@ -679,7 +686,7 @@ class Game {
         const types = Array(JAM_SPAWN_WEIGHT).fill('jam');
         if (this.score >= 2) types.push('karashi');
         if (this.score >= 4) types.push('mogumogun');
-        if (this.score >= 1) {
+        if (this.score >= TAKUMI_MIN_SCORE) {
             for (let i = 0; i < TAKUMI_SPAWN_WEIGHT; i++) {
                 types.push('takumi');
             }
@@ -926,20 +933,22 @@ class Game {
     hitKarashi() {
         this.jamCount = 0;
         this.updateJamGauge();
-        this.rollFalling = true;
-        this.rollFallY = 0;
-        this.rollFallSpeed = 0;
+        this.karashiFallPending = true;
         this.karashiSlowLeft = KARASHI_SLOW_DURATION;
         if (this.roll) this.rollTargetX = this.roll.x;
         this.showKarashiEffect();
     }
 
-    hitMogumogun() {
-        this.jamCount = 0;
-        this.updateJamGauge();
+    startRollFall() {
         this.rollFalling = true;
         this.rollFallY = 0;
         this.rollFallSpeed = 0;
+    }
+
+    hitMogumogun() {
+        this.jamCount = 0;
+        this.updateJamGauge();
+        this.startRollFall();
         if (this.score > 0) {
             this.score--;
             this.updateUI();
