@@ -23,12 +23,10 @@ export function CouponTicket({
         alt={alt}
         loading={priority ? "eager" : "lazy"}
         fetchPriority={priority ? "high" : "auto"}
-        className={`w-full h-auto rounded-xl dp-chunky-border-sm ${
-          dimmed ? "opacity-45 grayscale" : ""
-        }`}
+        className={`w-full h-auto ${dimmed ? "opacity-45 grayscale" : ""}`}
       />
       {dimmed && (
-        <div className="absolute inset-0 rounded-xl bg-black/30 pointer-events-none" />
+        <div className="absolute inset-0 bg-black/30 pointer-events-none" />
       )}
     </div>
   );
