@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { AuthProvider } from "@/components/AuthProvider";
 import { RegionProvider } from "@/components/RegionProvider";
 import {
   REGION_SLUGS,
@@ -31,5 +32,9 @@ export default async function RegionLayout({ children, params }: Props) {
   if (!isValidRegion(slug)) notFound();
   const region = getRegion(slug)!;
 
-  return <RegionProvider region={region}>{children}</RegionProvider>;
+  return (
+    <RegionProvider region={region}>
+      <AuthProvider>{children}</AuthProvider>
+    </RegionProvider>
+  );
 }

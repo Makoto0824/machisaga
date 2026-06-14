@@ -81,7 +81,18 @@ npm run dev
 
 `.env.example` を `.env.local` にコピーし、Supabase を使う場合は値を設定します。
 
-**Supabase 未設定**でも localStorage で動作します（地域ごとにデータは分離されます）。
+**Supabase 未設定**でも端末ごとの localStorage UUID で動作します（地域ごとにデータは分離されます）。
+
+### Supabase セットアップ
+
+1. Supabase Dashboard → **SQL Editor** で `supabase/schema.sql` を実行
+2. **Authentication → Providers → Anonymous Sign-Ins** を **ON**
+3. **Project Settings → API** から URL と `anon` key を `.env.local` に設定
+4. ローカルでチャンスを1回実行し、`chance_logs` に行が増えることを確認
+5. 本番公開前に `supabase/rls-production.sql` を実行（開発用 RLS を置き換え）
+6. Vercel に同じ環境変数を設定し、必要なら `NEXT_PUBLIC_ENABLE_TEST_TOOLS=false`
+
+ユーザー ID は Anonymous Auth の `session.user.id` を `user_id` として保存します。LIFF 化時は `lib/auth.ts` の `resolveUserId()` を LINE ID 取得に差し替えます。
 
 ## ファイル構成
 
@@ -89,7 +100,7 @@ npm run dev
 app/
   page.tsx                    # / → /mobara/chance
   [region]/
-    layout.tsx                # 地域メタデータ・RegionProvider
+    layout.tsx                # RegionProvider + AuthProvider
     page.tsx                  # /mobara → /mobara/chance
     chance/page.tsx           # チャンス画面
     games/page.tsx
@@ -104,5 +115,10 @@ data/
 components/
   ChanceScreen.tsx
 lib/
+  auth.ts
   chance.ts
+  supabase.ts
+supabase/
+  schema.sql
+  rls-production.sql
 ```

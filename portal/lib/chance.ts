@@ -19,7 +19,7 @@ import {
 } from "@/lib/storage";
 import { createId } from "@/lib/id";
 import { isTestToolsEnabled } from "@/lib/testMode";
-import { getCurrentUserId } from "@/lib/user";
+import { resolveUserId } from "@/lib/user";
 
 export type ChanceResult = {
   prize: CouponPrize;
@@ -59,7 +59,7 @@ function countTodayPlaysLocal(userId: string): number {
 }
 
 export async function getRemainingPlays(): Promise<number> {
-  const userId = getCurrentUserId();
+  const userId = await resolveUserId();
   const count = isSupabaseConfigured()
     ? await countTodayPlaysSupabase(userId)
     : countTodayPlaysLocal(userId);
@@ -79,7 +79,7 @@ export async function getPlayBlockReason(): Promise<PlayBlockReason | null> {
 }
 
 export async function playChance(): Promise<PlayChanceOutcome> {
-  const userId = getCurrentUserId();
+  const userId = await resolveUserId();
 
   const heldCoupons = await fetchUserCoupons();
   if (isTicketAcquisitionLimitReached(heldCoupons)) {
@@ -145,7 +145,7 @@ export async function playChance(): Promise<PlayChanceOutcome> {
 }
 
 export async function fetchUserCoupons(): Promise<UserCoupon[]> {
-  const userId = getCurrentUserId();
+  const userId = await resolveUserId();
   if (isSupabaseConfigured()) {
     const supabase = getSupabase()!;
     const { data, error } = await supabase
@@ -205,7 +205,7 @@ export async function useCoupon(id: string): Promise<UseCouponOutcome> {
 export async function resetUserCoupons(): Promise<boolean> {
   if (!isTestToolsEnabled()) return false;
 
-  const userId = getCurrentUserId();
+  const userId = await resolveUserId();
 
   if (isSupabaseConfigured()) {
     const supabase = getSupabase()!;

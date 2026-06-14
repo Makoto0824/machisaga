@@ -46,7 +46,8 @@ create table if not exists user_coupons (
 create index if not exists user_coupons_user_idx
   on user_coupons (user_id, issued_at desc);
 
--- 開発用: 匿名キーで読み書き可能（本番では削除し RLS を設定）
+-- 開発用: 匿名キーで読み書き可能
+-- 本番公開前に portal/supabase/rls-production.sql を実行してください
 alter table coupons enable row level security;
 alter table chance_logs enable row level security;
 alter table user_coupons enable row level security;
@@ -54,5 +55,10 @@ alter table user_coupons enable row level security;
 create policy "dev_coupons_all" on coupons for all using (true) with check (true);
 create policy "dev_chance_logs_all" on chance_logs for all using (true) with check (true);
 create policy "dev_user_coupons_all" on user_coupons for all using (true) with check (true);
+
+-- API ロールへのテーブル権限（Anonymous Auth / anon key 利用に必要）
+grant select on public.coupons to anon, authenticated;
+grant select, insert, delete on public.chance_logs to anon, authenticated;
+grant select, insert, update, delete on public.user_coupons to anon, authenticated;
 
 -- 初期景品データはアプリ内 data/regions/ を参照して手動投入してください

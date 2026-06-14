@@ -1,8 +1,10 @@
 /**
- * 現在のユーザーIDを返す。
- * 初期Web版では demo-user-001。
- * LINE LIFF対応時はこの関数内だけを差し替える。
+ * ユーザー ID の取得。
+ * Supabase 利用時は Anonymous Auth、未設定時は端末 UUID。
+ * LINE LIFF 対応時は lib/auth.ts の resolveUserId を差し替える。
  */
-export function getCurrentUserId(): string {
-  return "demo-user-001";
-}
+export {
+  getCurrentUserId,
+  isAuthReady,
+  resolveUserId,
+} from "@/lib/auth";
