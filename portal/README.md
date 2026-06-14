@@ -90,9 +90,13 @@ npm run dev
 3. **Project Settings → API** から URL と `anon` key を `.env.local` に設定
 4. ローカルでチャンスを1回実行し、`chance_logs` に行が増えることを確認
 5. 本番公開前に `supabase/rls-production.sql` を実行（開発用 RLS を置き換え）
-6. Vercel に同じ環境変数を設定し、必要なら `NEXT_PUBLIC_ENABLE_TEST_TOOLS=false`
+6. Vercel に同じ環境変数を設定 → Redeploy
+
+**テスト用リセット:** ローカル（`npm run dev`）のみ画面に表示。本番は Supabase Dashboard で `chance_logs` / `user_coupons` を削除（[`docs/supabase.md`](docs/supabase.md) 参照）。
 
 ユーザー ID は Anonymous Auth の `session.user.id` を `user_id` として保存します。LIFF 化時は `lib/auth.ts` の `resolveUserId()` を LINE ID 取得に差し替えます。
+
+詳細は [`docs/supabase.md`](docs/supabase.md)（localStorage との比較表含む）を参照。
 
 ## ファイル構成
 
