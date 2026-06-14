@@ -157,8 +157,12 @@ body {
     opacity: 0.88;
 }
 
+.title-button--start {
+    width: 200px;
+}
+
 .title-button--how-to {
-    width: 145px;
+    width: 115px;
     margin-top: clamp(6px, 2vw, 12px);
 }
 

@@ -23,10 +23,24 @@ const ROLL_FRAMES = [
 ];
 
 const BG_GAME = 'assets/images/bg_game.png';
+const SOUND_PATHS = {
+    bgmMain: 'assets/sounds/bgm_main.mp3',
+    bgmTakumi: 'assets/sounds/bgm_takumi_time.mp3',
+    bgmResults: 'assets/sounds/bgm_results.mp3',
+    success: 'assets/sounds/success_jingle.mp3',
+    buttonPress: 'assets/sounds/button_press.mp3',
+    itemPickup: 'assets/sounds/item_pickup.mp3',
+    wrongItem: 'assets/sounds/wrong_item.mp3',
+    mistake: 'assets/sounds/mistake.mp3',
+};
+const BGM_MAIN_VOLUME = 0.45;
+const BGM_TAKUMI_VOLUME = 0.5;
+const BGM_RESULTS_VOLUME = 0.45;
+const SFX_VOLUME = 0.85;
 const KARASHI_SLOW_DURATION = 3;
 const KARASHI_KEYBOARD_SLOW_RATIO = 0.28;
 const KARASHI_LERP_FOLLOW = 0.12;
-const COMPLETION_TIME_BONUS = 2;
+const COMPLETION_TIME_BONUS = 1;
 const TAKUMI_TIME_SECONDS = 5;
 const TAKUMI_SPEED_BONUS = 0.5;
 const TAKUMI_INTERVAL_REDUCTION = 350;
@@ -66,13 +80,15 @@ class Game {
 
         this.images = {};
         this.imagesLoaded = false;
+        this.sounds = {};
+        this.currentBgm = null;
 
         this.isRunning = false;
         this.timeLeft = 30;
         this.score = 0;
         this.jamCount = 0;
         this.isTakumiTime = false;
-        this.takumiTimeLeft = 0;
+        this.takumiTimeMsLeft = 0;
         this.karashiSlowMs = 0;
         this.karashiFallPending = false;
         this.takumiCooldownLeft = 0;
@@ -144,14 +160,25 @@ class Game {
         this.startButton.disabled = true;
         this.startButton.classList.add('is-loading');
 
-        document.getElementById('retry-button').addEventListener('click', () => this.goToTitle());
-        this.startButton.addEventListener('click', () => this.startGame());
+        document.getElementById('retry-button').addEventListener('click', () => {
+            this.playButtonPress();
+            this.goToTitle();
+        });
+        this.startButton.addEventListener('click', () => {
+            this.playButtonPress();
+            this.startGame();
+        });
         this.setupHowToModal();
 
         this.setupInputHandlers();
 
         try {
             await this.loadImages();
+            try {
+                await this.loadSounds();
+            } catch (soundErr) {
+                console.warn('Sound assets unavailable:', soundErr);
+            }
             this.imagesLoaded = true;
             this.startButton.disabled = false;
             this.startButton.classList.remove('is-loading');
@@ -166,9 +193,18 @@ class Game {
     setupHowToModal() {
         if (!this.howToModal) return;
 
-        this.howToButton?.addEventListener('click', () => this.openHowToModal());
-        this.howToClose?.addEventListener('click', () => this.closeHowToModal());
-        this.howToBackdrop?.addEventListener('click', () => this.closeHowToModal());
+        this.howToButton?.addEventListener('click', () => {
+            this.playButtonPress();
+            this.openHowToModal();
+        });
+        this.howToClose?.addEventListener('click', () => {
+            this.playButtonPress();
+            this.closeHowToModal();
+        });
+        this.howToBackdrop?.addEventListener('click', () => {
+            this.playButtonPress();
+            this.closeHowToModal();
+        });
 
         document.addEventListener('keydown', (event) => {
             if (event.key === 'Escape' && !this.howToModal.classList.contains('hidden')) {
@@ -212,6 +248,90 @@ class Game {
         }
 
         this.images.bgGame = await this.loadImage(BG_GAME);
+    }
+
+    loadSound(src, { loop = false, volume = 1 } = {}) {
+        return new Promise((resolve, reject) => {
+            const audio = new Audio(src);
+            audio.loop = loop;
+            audio.volume = volume;
+            audio.preload = 'auto';
+
+            const finish = () => resolve(audio);
+            const fail = () => reject(new Error(`Failed to load sound: ${src}`));
+
+            audio.addEventListener('canplaythrough', finish, { once: true });
+            audio.addEventListener('error', fail, { once: true });
+            audio.load();
+        });
+    }
+
+    async loadSounds() {
+        this.sounds.bgmMain = await this.loadSound(SOUND_PATHS.bgmMain, {
+            loop: true,
+            volume: BGM_MAIN_VOLUME,
+        });
+        this.sounds.bgmTakumi = await this.loadSound(SOUND_PATHS.bgmTakumi, {
+            loop: true,
+            volume: BGM_TAKUMI_VOLUME,
+        });
+        this.sounds.bgmResults = await this.loadSound(SOUND_PATHS.bgmResults, {
+            loop: true,
+            volume: BGM_RESULTS_VOLUME,
+        });
+
+        const sfxKeys = ['success', 'buttonPress', 'itemPickup', 'wrongItem', 'mistake'];
+        await Promise.all(sfxKeys.map(async (key) => {
+            this.sounds[key] = await this.loadSound(SOUND_PATHS[key], {
+                volume: SFX_VOLUME,
+            });
+        }));
+    }
+
+    playSfx(key) {
+        const template = this.sounds[key];
+        if (!template) return;
+
+        const sfx = template.cloneNode();
+        sfx.volume = template.volume;
+        sfx.play().catch(() => {});
+    }
+
+    playButtonPress() {
+        this.playSfx('buttonPress');
+    }
+
+    playBgm(type) {
+        const bgmMap = {
+            main: this.sounds.bgmMain,
+            takumi: this.sounds.bgmTakumi,
+            results: this.sounds.bgmResults,
+        };
+        const nextBgm = bgmMap[type];
+        if (!nextBgm) return;
+
+        if (this.currentBgm === nextBgm && !nextBgm.paused) return;
+
+        if (this.currentBgm) {
+            this.currentBgm.pause();
+            this.currentBgm.currentTime = 0;
+        }
+
+        this.currentBgm = nextBgm;
+        nextBgm.currentTime = 0;
+        nextBgm.play().catch(() => {});
+    }
+
+    playSuccessJingle() {
+        this.playSfx('success');
+    }
+
+    stopAudio() {
+        if (this.currentBgm) {
+            this.currentBgm.pause();
+            this.currentBgm.currentTime = 0;
+            this.currentBgm = null;
+        }
     }
 
     handleViewportChange() {
@@ -397,6 +517,7 @@ class Game {
     }
 
     resetGameState() {
+        this.stopAudio();
         this.isRunning = false;
         if (this.timerInterval) clearInterval(this.timerInterval);
         this.timerInterval = null;
@@ -406,7 +527,7 @@ class Game {
         this.jamCount = 0;
         this.items = [];
         this.isTakumiTime = false;
-        this.takumiTimeLeft = 0;
+        this.takumiTimeMsLeft = 0;
         this.karashiSlowMs = 0;
         this.karashiFallPending = false;
         this.takumiCooldownLeft = 0;
@@ -512,6 +633,7 @@ class Game {
         this.resultScreen.classList.add('hidden');
         this.gameScreen.classList.remove('hidden');
 
+        this.playBgm('main');
         this.startTimer();
         this.lastTime = performance.now();
         this.gameLoop();
@@ -524,11 +646,6 @@ class Game {
             if (!this.isRunning) return;
 
             this.timeLeft--;
-
-            if (this.isTakumiTime) {
-                this.takumiTimeLeft--;
-                if (this.takumiTimeLeft <= 0) this.endTakumiTime();
-            }
 
             if (this.takumiCooldownLeft > 0) {
                 this.takumiCooldownLeft--;
@@ -576,6 +693,13 @@ class Game {
             if (this.karashiSlowMs <= 0 && this.karashiFallPending) {
                 this.karashiFallPending = false;
                 this.startRollFall();
+            }
+        }
+
+        if (this.isTakumiTime && this.takumiTimeMsLeft > 0) {
+            this.takumiTimeMsLeft = Math.max(0, this.takumiTimeMsLeft - deltaTime);
+            if (this.takumiTimeMsLeft <= 0) {
+                this.endTakumiTime();
             }
         }
 
@@ -735,6 +859,7 @@ class Game {
     collectJam() {
         this.jamCount++;
         this.updateJamGauge();
+        this.playSfx('itemPickup');
         if (this.jamCount >= 5) this.completeRoll();
     }
 
@@ -760,6 +885,7 @@ class Game {
         setTimeout(() => this.gameStage.classList.remove('completion-burst'), 380);
         this.startRollRespawn();
         this.showCompleteEffect();
+        this.playSuccessJingle();
     }
 
     getScoreTargetPosition() {
@@ -928,10 +1054,12 @@ class Game {
 
     startTakumiTime() {
         this.isTakumiTime = true;
-        this.takumiTimeLeft = TAKUMI_TIME_SECONDS;
+        this.takumiTimeMsLeft = TAKUMI_TIME_SECONDS * 1000;
         this.gameScreen.classList.add('takumi-time');
         this.gameStage.classList.add('takumi-time');
         this.adjustDifficulty();
+        this.playSfx('itemPickup');
+        this.playBgm('takumi');
         this.showTakumiEffect();
     }
 
@@ -941,6 +1069,9 @@ class Game {
         this.gameStage.classList.remove('takumi-time');
         this.takumiCooldownLeft = TAKUMI_COOLDOWN_SECONDS;
         this.adjustDifficulty();
+        if (this.isRunning) {
+            this.playBgm('main');
+        }
         this.hideTakumiEffect();
     }
 
@@ -952,6 +1083,7 @@ class Game {
         if (this.roll) {
             this.rollTargetX = this.roll.x;
         }
+        this.playSfx('wrongItem');
         this.showKarashiEffect();
     }
 
@@ -965,6 +1097,7 @@ class Game {
         this.jamCount = 0;
         this.updateJamGauge();
         this.startRollFall();
+        this.playSfx('mistake');
         if (this.score > 0) {
             this.score--;
             this.updateUI();
@@ -1259,6 +1392,7 @@ class Game {
         setTimeout(() => {
             this.gameScreen.classList.add('hidden');
             this.resultScreen.classList.remove('hidden');
+            this.playBgm('results');
         }, 500);
     }
 
