@@ -39,7 +39,7 @@ export const mobaraOtherContent: RegionOtherContent = {
       id: "coupon-hold",
       question: "同じクーポンは何枚まで持てますか？",
       answer:
-        "同じ種類のクーポンは、未使用かつ有効期限内で最大1枚までです。参加店舗3店分、最大3枚まで所持できます。",
+        "同じ種類のクーポンは、未使用かつ有効期限内で最大1枚までです。当たりクーポンは種類ごとに最大1枚まで所持できます。",
     },
     {
       id: "coupon-use",

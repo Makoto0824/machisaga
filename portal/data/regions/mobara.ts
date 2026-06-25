@@ -37,14 +37,26 @@ export const mobara: RegionConfig = {
   ],
   couponPrizes: [
     {
-      id: "coupon-kurofune-jamroll",
+      id: "coupon-kurofune-acai-topping",
       store_id: "store-kurofune",
       store_name: "茂原黒船",
-      title: "ジャムロール50円引き",
+      title: "アサイーボウルトッピング1個サービス",
       description:
-        "人気の初代ジャムロールを50円引き。茂原市の創作スイーツをお得にお楽しみください。",
-      usage_condition: "ジャムロール1本購入時・他クーポン併用不可",
-      probability: 22,
+        "アサイーボウルにトッピング1個をサービス。茂原市の創作スイーツをお得にお楽しみください。",
+      usage_condition: "アサイーボウル1杯購入時・他クーポン併用不可",
+      probability: 11,
+      expires_days: 30,
+      is_active: true,
+    },
+    {
+      id: "coupon-kurofune-all-10off",
+      store_id: "store-kurofune",
+      store_name: "茂原黒船",
+      title: "全品10%OFF",
+      description:
+        "店内商品が10%OFF。茂原市の創作スイーツをお得にお楽しみください。",
+      usage_condition: "全品対象・他クーポン併用不可",
+      probability: 11,
       expires_days: 30,
       is_active: true,
     },
@@ -86,7 +98,12 @@ export const mobara: RegionConfig = {
     },
   ],
   ticketImages: {
-    "store-kurofune": publicPath("/assets/images/tickets/kurofune1.png"),
+    "coupon-kurofune-acai-topping": publicPath(
+      "/assets/images/tickets/kurofune1.png"
+    ),
+    "coupon-kurofune-all-10off": publicPath(
+      "/assets/images/tickets/kurofune2.png"
+    ),
     "store-laughin": publicPath("/assets/images/tickets/laughin1.png"),
     "store-reve": publicPath("/assets/images/tickets/reve1.png"),
   },
