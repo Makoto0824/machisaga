@@ -1,6 +1,6 @@
 "use client";
 
-import { getStoreCoupons } from "@/data/types";
+import { getStoreCoupons, getVisibleStores } from "@/data/types";
 import { useRegion } from "@/components/RegionProvider";
 import { StoreCharacterImage } from "@/components/StoreCharacterImage";
 import { getStoreCardImage } from "@/lib/storeCards";
@@ -26,7 +26,7 @@ export function StoreListScreen() {
       </header>
 
       <ul className="flex flex-col gap-3 mt-4">
-        {region.stores.map((store) => {
+        {getVisibleStores(region).map((store) => {
           const related = getStoreCoupons(region, store.id);
           const cardSrc = getStoreCardImage(region, store.id);
           return (

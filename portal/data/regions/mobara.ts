@@ -25,6 +25,7 @@ export const mobara: RegionConfig = {
       description:
         "茂原市で唯一のハンバーガー専門店。安心・安全食材で19種のバーガーをご用意。ラフィンでHappy & Smile",
       url: "https://maps.app.goo.gl/HmMZdxZqU7AaPze48",
+      showInStoreList: false,
     },
     {
       id: "store-reve",
@@ -33,6 +34,7 @@ export const mobara: RegionConfig = {
       description:
         "店名のレーヴは仏語で『夢』を表しています。『夢を叶える力になる』地産地消スイーツ。低アレルギー対応、予約制フレンチのお店。",
       url: "https://maps.app.goo.gl/qcVYn9hGYGA7jvvE6",
+      showInStoreList: false,
     },
   ],
   couponPrizes: [
@@ -44,7 +46,7 @@ export const mobara: RegionConfig = {
       description:
         "アサイーボウルにトッピング1個をサービス。茂原市の創作スイーツをお得にお楽しみください。",
       usage_condition: "アサイーボウル1杯購入時・他クーポン併用不可",
-      probability: 11,
+      probability: 33,
       expires_days: 30,
       is_active: true,
     },
@@ -56,7 +58,7 @@ export const mobara: RegionConfig = {
       description:
         "店内商品が10%OFF。茂原市の創作スイーツをお得にお楽しみください。",
       usage_condition: "全品対象・他クーポン併用不可",
-      probability: 11,
+      probability: 33,
       expires_days: 30,
       is_active: true,
     },
@@ -68,9 +70,9 @@ export const mobara: RegionConfig = {
       description:
         "バーガーご注文の方にポテトSを1つプレゼント。19種のバーガーからお好みをお選びください。",
       usage_condition: "バーガー1品以上のご注文時",
-      probability: 22,
+      probability: 0,
       expires_days: 30,
-      is_active: true,
+      is_active: false,
     },
     {
       id: "coupon-reve-sweets",
@@ -80,9 +82,9 @@ export const mobara: RegionConfig = {
       description:
         "地産地消の創作スイーツを100円引き。夢を叶えるスイーツをお持ち帰りください。",
       usage_condition: "テイクアウトスイーツ購入時",
-      probability: 22,
+      probability: 0,
       expires_days: 30,
-      is_active: true,
+      is_active: false,
     },
     {
       id: "coupon-miss",
