@@ -55,7 +55,7 @@ export const mobaraEventsData: RegionEventsData = {
       endDate: "2026-08-31",
       venue: "茂原黒船",
       detailUrl: "https://maps.app.goo.gl/jnwC2n9CkTXoMEzW9",
-      isActive: true,
+      isActive: false,
     },
     {
       id: "store-laughin-burger-week",
@@ -67,7 +67,7 @@ export const mobaraEventsData: RegionEventsData = {
       endDate: "2026-06-20",
       venue: "バーガーキッチン ラフィン",
       detailUrl: "https://maps.app.goo.gl/HmMZdxZqU7AaPze48",
-      isActive: true,
+      isActive: false,
     },
     {
       id: "store-reve-takeout-sale",
@@ -79,7 +79,7 @@ export const mobaraEventsData: RegionEventsData = {
       endDate: "2026-06-30",
       venue: "創作スイーツ＆フレンチ レーヴ",
       detailUrl: "https://maps.app.goo.gl/qcVYn9hGYGA7jvvE6",
-      isActive: true,
+      isActive: false,
     },
     {
       id: "store-kurofune-spring-fair",
@@ -90,7 +90,7 @@ export const mobaraEventsData: RegionEventsData = {
       endDate: "2026-03-31",
       venue: "茂原黒船",
       detailUrl: "https://maps.app.goo.gl/jnwC2n9CkTXoMEzW9",
-      isActive: true,
+      isActive: false,
     },
   ],
 };
