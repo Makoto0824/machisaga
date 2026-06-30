@@ -1,6 +1,7 @@
 import type { CouponPrize } from "@/data/types";
 import {
   drawPrizeForUser,
+  filterVisibleUserCoupons,
   isTicketAcquisitionLimitReached,
 } from "@/lib/couponLimits";
 import { DAILY_LIMIT, getTodayRange } from "@/lib/date";
@@ -157,10 +158,12 @@ export async function fetchUserCoupons(): Promise<UserCoupon[]> {
       console.error("fetchUserCoupons", error);
       return [];
     }
-    return (data ?? []) as UserCoupon[];
+    return filterVisibleUserCoupons((data ?? []) as UserCoupon[]);
   }
-  return getLocalUserCoupons(userId).sort(
-    (a, b) => new Date(b.issued_at).getTime() - new Date(a.issued_at).getTime()
+  return filterVisibleUserCoupons(
+    getLocalUserCoupons(userId).sort(
+      (a, b) => new Date(b.issued_at).getTime() - new Date(a.issued_at).getTime()
+    )
   );
 }
 

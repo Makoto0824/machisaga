@@ -6,6 +6,17 @@ import type { UserCoupon } from "@/lib/storage";
 /** 同一クーポン（未使用・有効期限内）の最大所持枚数 */
 export const MAX_HOLD_PER_COUPON = 1;
 
+/** クーポン一覧などに表示する当たり券か（is_active な景品のみ） */
+export function isVisibleCouponId(couponId: string): boolean {
+  const prize = getActiveRegion().couponPrizes.find((c) => c.id === couponId);
+  if (!prize || prize.is_miss) return false;
+  return prize.is_active;
+}
+
+export function filterVisibleUserCoupons(coupons: UserCoupon[]): UserCoupon[] {
+  return coupons.filter((c) => isVisibleCouponId(c.coupon_id));
+}
+
 export function countActiveHoldings(
   coupons: UserCoupon[],
   couponId: string
