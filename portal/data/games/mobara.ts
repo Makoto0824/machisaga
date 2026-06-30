@@ -14,13 +14,6 @@ export const mobaraGamesData: RegionGamesData = {
       staticPath: publicPath("/games/find-the-hero/index.html"),
     },
     {
-      id: "trading-card",
-      slug: "trading-card",
-      title: "まちサーガトレカ",
-      summary: "全18種のトレカを使って遊べる Web ゲームです。",
-      status: "coming_soon",
-    },
-    {
       id: "super-jam-roll-challenge",
       slug: "super-jam-roll-challenge",
       title: "スーパージャムロールチャレンジ",
@@ -30,10 +23,10 @@ export const mobaraGamesData: RegionGamesData = {
       staticPath: publicPath("/games/super-jam-roll-challenge/index.html"),
     },
     {
-      id: "game-b",
-      slug: "game-b",
-      title: "Game B",
-      summary: "新しいゲームを準備中です。",
+      id: "trading-card",
+      slug: "trading-card",
+      title: "まちサーガトレカ",
+      summary: "全18種のトレカを使って遊べる Web ゲームです。",
       status: "coming_soon",
     },
   ],
