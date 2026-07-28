@@ -19,6 +19,14 @@ export const mobara: RegionConfig = {
       url: "https://maps.app.goo.gl/jnwC2n9CkTXoMEzW9",
     },
     {
+      id: "store-morphee",
+      name: "株式会社morphee",
+      category: "美容・健康",
+      description:
+        "地域で唯一の医療美容師在籍の美容室。抗がん剤治療前後の方のウィッグカットご相談ください。学生カットも得意です。",
+      url: "https://maps.app.goo.gl/Z68LDW9ZFAyaVjzg6",
+    },
+    {
       id: "store-laughin",
       name: "バーガーキッチン ラフィン",
       category: "ハンバーガー",
@@ -46,7 +54,7 @@ export const mobara: RegionConfig = {
       description:
         "アサイーボウルにトッピング1個をサービス。茂原市の創作スイーツをお得にお楽しみください。",
       usage_condition: "アサイーボウル1杯購入時・他クーポン併用不可",
-      probability: 33,
+      probability: 16,
       expires_days: 30,
       is_active: true,
     },
@@ -58,8 +66,33 @@ export const mobara: RegionConfig = {
       description:
         "店内商品が10%OFF。茂原市の創作スイーツをお得にお楽しみください。",
       usage_condition: "全品対象・他クーポン併用不可",
-      probability: 33,
+      probability: 17,
       expires_days: 30,
+      is_active: true,
+    },
+    {
+      id: "coupon-morphee-bangs-cut",
+      store_id: "store-morphee",
+      store_name: "株式会社morphee",
+      title: "前髪カット¥1100→¥550",
+      description: "前髪カットを550円でご利用いただけます（通常1,100円）。",
+      usage_condition: "事前予約・他クーポンとの併用不可",
+      probability: 16,
+      expires_days: 30,
+      fixed_end_date: "2026-08-31",
+      is_active: true,
+    },
+    {
+      id: "coupon-morphee-first-10off",
+      store_id: "store-morphee",
+      store_name: "株式会社morphee",
+      title: "初回限定10%OFF",
+      description: "初回限定で10%OFF。カット・カラー・パーマ・トリートメントが対象です。",
+      usage_condition:
+        "事前予約・10%オフはカット、カラー、パーマ、トリートメントで使用可・他クーポンとの併用不可",
+      probability: 17,
+      expires_days: 30,
+      fixed_end_date: "2026-08-31",
       is_active: true,
     },
     {
@@ -106,11 +139,18 @@ export const mobara: RegionConfig = {
     "coupon-kurofune-all-10off": publicPath(
       "/assets/images/tickets/kurofune2.png"
     ),
+    "coupon-morphee-bangs-cut": publicPath(
+      "/assets/images/tickets/morphee1.png"
+    ),
+    "coupon-morphee-first-10off": publicPath(
+      "/assets/images/tickets/morphee2.png"
+    ),
     "store-laughin": publicPath("/assets/images/tickets/laughin1.png"),
     "store-reve": publicPath("/assets/images/tickets/reve1.png"),
   },
   storeCardImages: {
     "store-kurofune": publicPath("/assets/images/trading-card/card1.png"),
+    "store-morphee": publicPath("/assets/images/trading-card/card11.png"),
     "store-laughin": publicPath("/assets/images/trading-card/card3.png"),
     "store-reve": publicPath("/assets/images/trading-card/card2.png"),
   },

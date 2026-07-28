@@ -1,4 +1,5 @@
 import type { CouponPrize } from "@/data/types";
+import { resolveCouponExpiresAt } from "@/lib/couponExpires";
 import {
   drawPrizeForUser,
   filterVisibleUserCoupons,
@@ -106,8 +107,7 @@ export async function playChance(): Promise<PlayChanceOutcome> {
     if (logError) console.error("chance_logs insert", logError);
 
     if (resultType === "win") {
-      const expiresAt = new Date(playedAt);
-      expiresAt.setDate(expiresAt.getDate() + prize.expires_days);
+      const expiresAt = resolveCouponExpiresAt(prize, playedAt);
       const { error: couponError } = await supabase.from("user_coupons").insert({
         user_id: userId,
         coupon_id: prize.id,

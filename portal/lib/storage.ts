@@ -1,4 +1,5 @@
 import type { CouponPrize } from "@/data/types";
+import { resolveCouponExpiresAt } from "@/lib/couponExpires";
 import { createId } from "@/lib/id";
 import { getActiveRegion } from "@/lib/region";
 
@@ -101,8 +102,7 @@ export function createUserCouponFromPrize(
   prize: CouponPrize,
   issuedAt: Date
 ): UserCoupon {
-  const expiresAt = new Date(issuedAt);
-  expiresAt.setDate(expiresAt.getDate() + prize.expires_days);
+  const expiresAt = resolveCouponExpiresAt(prize, issuedAt);
   return {
     id: createId(),
     user_id: userId,

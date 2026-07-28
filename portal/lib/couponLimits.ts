@@ -1,3 +1,4 @@
+import { isPrizeDrawPeriodEnded } from "@/lib/couponExpires";
 import type { CouponPrize } from "@/data/types";
 import { isExpired } from "@/lib/date";
 import { getActiveRegion } from "@/lib/region";
@@ -43,7 +44,10 @@ function getActivePrizes(): CouponPrize[] {
 /** まだ獲得可能な当たり景品 */
 export function getDrawableWinPrizes(coupons: UserCoupon[]): CouponPrize[] {
   return getActivePrizes().filter(
-    (p) => !p.is_miss && canReceiveCoupon(coupons, p.id)
+    (p) =>
+      !p.is_miss &&
+      !isPrizeDrawPeriodEnded(p) &&
+      canReceiveCoupon(coupons, p.id)
   );
 }
 
@@ -73,7 +77,9 @@ function drawFromPool(prizes: CouponPrize[]): CouponPrize {
 export function drawPrizeForUser(coupons: UserCoupon[]): CouponPrize {
   const all = getActivePrizes();
   const drawable = all.filter(
-    (p) => p.is_miss || canReceiveCoupon(coupons, p.id)
+    (p) =>
+      p.is_miss ||
+      (!isPrizeDrawPeriodEnded(p) && canReceiveCoupon(coupons, p.id))
   );
   if (drawable.length === 0) {
     return all.find((p) => p.is_miss)!;

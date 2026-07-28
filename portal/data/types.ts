@@ -18,6 +18,8 @@ export type CouponPrize = {
   usage_condition: string;
   probability: number;
   expires_days: number;
+  /** 指定時は当選券の有効期限（その日 23:59 まで）。抽選もこの日を過ぎたら対象外 */
+  fixed_end_date?: string;
   is_active: boolean;
   is_miss?: boolean;
 };
